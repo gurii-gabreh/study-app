@@ -789,6 +789,18 @@ function saveComment(lid, qi, text) {
   save();
 }
 
+// ── Quiz field normalizer ────────────────────────────────
+function normalizeQuiz(quiz) {
+  if (!Array.isArray(quiz)) return [];
+  return quiz.map(q => ({
+    type: q.type || q.t || '基礎',
+    q: q.q,
+    opts: q.opts || q.o || [],
+    ans: q.ans !== undefined ? q.ans : (q.a !== undefined ? q.a : 0),
+    exp: q.exp || q.e || ''
+  }));
+}
+
 // ── Utils ──────────────────────────────────────────────
 function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -823,7 +835,7 @@ window.addEventListener('message', (event) => {
       id, course: d.course, lesson: d.lesson, title: d.title,
       summary: d.summary || '',
       points: d.points || [],
-      quiz: d.quiz || []
+      quiz: normalizeQuiz(d.quiz)
     };
     state.lessons.push(newLesson);
     state.activeLesson = id;
@@ -851,7 +863,7 @@ window.addEventListener('message', (event) => {
       }
       const id = d.course.replace(/\s/g,'') + '_' + d.lesson.replace(/\./g,'');
       state.lessons.push({ id, course: d.course, lesson: d.lesson, title: d.title,
-        summary: d.summary || '', points: d.points || [], quiz: d.quiz || [] });
+        summary: d.summary || '', points: d.points || [], quiz: normalizeQuiz(d.quiz) });
       count++;
     });
     save();
