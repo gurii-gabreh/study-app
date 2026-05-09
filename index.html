@@ -120,6 +120,13 @@ textarea.tinput{min-height:180px;}
 .opt:disabled{cursor:default;}
 .exp{font-size:12px;line-height:1.7;padding:10px 12px;border-radius:var(--r);margin-top:8px;}
 .exp-ok{background:var(--green-bg);border:1px solid var(--green-border);color:#7ee787;}
+.comment-box{margin:8px 0 4px;padding:10px 12px;background:#161b22;border:1px solid #30363d;border-radius:6px;}
+.comment-label{font-size:11px;color:#8b949e;margin-bottom:6px;}
+.comment-ta{width:100%;min-height:64px;background:#0d1117;color:#c9d1d9;border:1px solid #30363d;border-radius:4px;padding:8px;font-size:12px;font-family:inherit;resize:vertical;line-height:1.5;}
+.comment-ta:focus{outline:none;border-color:#58a6ff;}
+.datasrc-btn{cursor:pointer;padding:6px 14px;background:#21262d;border:1px solid #388bfd;color:#58a6ff;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;transition:all .15s;}
+.datasrc-btn:hover{background:#1f3358;border-color:#58a6ff;}
+.datasrc-indicator{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#3fb950;}
 .exp-ng{background:var(--red-bg);border:1px solid var(--red-border);color:#ff7b72;}
 .exp-label{font-weight:700;margin-right:4px;}
 
@@ -151,6 +158,9 @@ textarea.tinput{min-height:180px;}
     <button class="hdr-tab" onclick="setMode('quiz')">❓ 問題</button>
     <button class="hdr-tab" onclick="setMode('review')">🔴 復習</button>
     <button class="hdr-tab" onclick="setMode('history')">📊 履歴</button>
+    <button class="datasrc-btn" id="datasrc-btn" onclick="openDataSource()" title="all_lessons_data.htmlからデータを読み込みます">
+      <span class="datasrc-indicator"></span>データソース更新
+    </button>
   </div>
 </div>
 
@@ -217,7 +227,9 @@ let state = {
   activeLesson: null,
   quizState: {},     // lessonId -> {scores:[], wrongs:[], done:false, current:0}
   history: [],       // [{lessonId, title, correct, total, date, wrongs:[]}]
-  errors: {}         // lessonId -> Set of question indices that were ever wrong
+  errors: {},        // lessonId -> Set of question indices that were ever wrong
+  comments: {},      // 'lessonId_qi' -> comment text
+  dataSourceUrl: '' // URL of all_lessons_data.html
 };
 
 function save() {
@@ -238,6 +250,13 @@ function load() {
     state.quizState = s.quizState || {};
     state.errors = {};
     for (const k in (s.errors || {})) state.errors[k] = new Set(s.errors[k]);
+    state.comments = s.comments || {};
+    state.dataSourceUrl = s.dataSourceUrl || '';
+    // Restore datasource button indicator
+    if (state.dataSourceUrl) {
+      const ind = document.querySelector('.datasrc-indicator');
+      if (ind) ind.style.background = '#3fb950';
+    }
   } catch(e) { console.warn(e); }
 }
 
@@ -468,10 +487,21 @@ function renderQuiz(el, lesson, isReview) {
     if (done) {
       const expCls = wasOk ? 'exp-ok' : 'exp-ng';
       const label = wasOk ? '✅ 正解！' : '❌ 不正解';
+      const annotatedExp = addJpAnnotations(escHtml(q.exp));
+      const annotatedOptCorrect = addJpAnnotations(escHtml(q.opts[q.ans]));
+      const annotatedOptWrong = (!wasOk && qs.wrongs[qi] != null) ? addJpAnnotations(escHtml(q.opts[qs.wrongs[qi]])) : '';
       const reason = wasOk
-        ? `<span class="exp-label">${label}</span>この選択肢が正解の理由：${escHtml(q.exp)}`
-        : `<span class="exp-label">${label}</span>正解は「${String.fromCharCode(65+q.ans)}」です。<br><br>【なぜ不正解か】あなたは「${String.fromCharCode(65+qs.wrongs[qi])}」を選びましたが、これは誤りです。<br><br>【正解の理由】${escHtml(q.exp)}`;
+        ? `<span class="exp-label">${label}</span>この選択肢が正解の理由：${annotatedExp}`
+        : `<span class="exp-label">${label}</span>正解は「${String.fromCharCode(65+q.ans)}：${annotatedOptCorrect}」です。<br><br>【なぜ不正解か】あなたは「${String.fromCharCode(65+qs.wrongs[qi])}：${annotatedOptWrong}」を選びましたが、これは誤りです。<br><br>【正解の理由】${annotatedExp}`;
       html += `<div class="exp ${expCls}">${reason}</div>`;
+      // コメント欄（回答後のみ表示）
+      const commentKey = lid + '_' + qi;
+      const savedComment = getComment(lid, qi);
+      html += `<div class="comment-box">
+        <div class="comment-label">📝 メモ・コメント（内容は自動保存されます）</div>
+        <textarea class="comment-ta" id="cmt_${qkey}_${qi}" placeholder="ここに気づきや疑問点を記録できます..."
+          oninput="saveComment('${lid}',${qi},this.value)">${escHtml(savedComment)}</textarea>
+      </div>`;
     }
 
     html += `</div>`;
@@ -667,6 +697,71 @@ function deleteLesson(id) {
   renderContent();
 }
 
+// ── 英語キーワードに日本語補足を付与 ──────────────────────
+const JP_MAP = [
+  [/\bCIクラス\b/g,'CIクラス'],
+  [/\bCIs\b/g,'CIs（構成アイテム群）'],
+  [/\bCI(?!（|クラス|名|的|情|的)/g,'CI（構成アイテム）'],
+  [/\bIRE\b/g,'IRE（識別・照合エンジン）'],
+  [/\bCSDM\b/g,'CSDM（共通サービスデータモデル）'],
+  [/\bMID Server\b/gi,'MID Server（仲介サーバー）'],
+  [/\bdiscovery source\b/gi,'discovery source（ディスカバリソース）'],
+  [/\bnon-discoverable data\b/gi,'non-discoverable data（自動検出不可データ）'],
+  [/\bLife Cycle Stage Status\b/gi,'Life Cycle Stage Status（ライフサイクルステージステータス）'],
+  [/\bLife Cycle Stage\b/gi,'Life Cycle Stage（ライフサイクルステージ）'],
+  [/\bAttestation\b/gi,'Attestation（証明）'],
+  [/\bCompleteness\b/g,'Completeness（完全性）'],
+  [/\bCompliance\b/g,'Compliance（コンプライアンス）'],
+  [/\bCorrectness\b/g,'Correctness（正確性）'],
+  [/\bStaleness\b/g,'Staleness（陳腐化）'],
+  [/\bOrphan CI\b/gi,'Orphan CI（孤立CI）'],
+  [/\bDuplicate CI\b/gi,'Duplicate CI（重複CI）'],
+  [/\bStale CI\b/gi,'Stale CI（陳腐化CI）'],
+  [/\bOrphan\b/g,'Orphan（孤立）'],
+  [/\bDuplicate\b/g,'Duplicate（重複）'],
+  [/\bUpgrade\b/g,'Upgrade（アップグレード）'],
+  [/\bDowngrade\b/g,'Downgrade（ダウングレード）'],
+  [/\bManaged By Group\b/gi,'Managed By Group（管理グループ）'],
+  [/\bSupport Group\b/gi,'Support Group（サポートグループ）'],
+  [/\bChange Group\b/gi,'Change Group（変更グループ）'],
+  [/\bInstall Status\b/gi,'Install Status（インストールステータス）'],
+  [/\bOperational Status\b/gi,'Operational Status（運用ステータス）'],
+  [/\bAssignment Group\b/gi,'Assignment Group（担当グループ）'],
+  [/\bRetired\b/g,'Retired（廃止済み）'],
+  [/\bRetire\b/g,'Retire（廃止）'],
+  [/\bDesired State\b/gi,'Desired State（望ましい状態）'],
+  [/\bNLQ\b/g,'NLQ（自然言語クエリ）'],
+  [/\bsys_updated_on\b/g,'sys_updated_on（最終更新日時フィールド）'],
+  [/\bCI Class Manager\b/gi,'CI Class Manager（CIクラスマネージャー）'],
+  [/\bCMDB Workspace\b/gi,'CMDB Workspace（CMDBワークスペース）'],
+  [/\bImport Set\b/gi,'Import Set（インポートセット）'],
+  [/\bTransform Map\b/gi,'Transform Map（変換マップ）'],
+  [/\bService Mapping\b/g,'Service Mapping（サービスマッピング）'],
+  [/\bpolicy-driven framework\b/gi,'policy-driven framework（ポリシー駆動型フレームワーク）'],
+];
+function addJpAnnotations(text) {
+  if (!text) return text;
+  return JP_MAP.reduce((t, [p, r]) => {
+    try { return t.replace(p, (m, ...args) => {
+      const idx = args[args.length-2];
+      const before = t.slice(Math.max(0,idx-1), idx);
+      const after = t.slice(idx+m.length, idx+m.length+1);
+      if (after === '（') return m;
+      return r;
+    }); } catch(e) { return t; }
+  }, text);
+}
+
+// ── コメント状態 ──────────────────────────────────────────
+function getComment(lid, qi) {
+  return ((state.comments||{})[lid+'_'+qi]) || '';
+}
+function saveComment(lid, qi, text) {
+  if (!state.comments) state.comments = {};
+  state.comments[lid+'_'+qi] = text;
+  save();
+}
+
 // ── Utils ──────────────────────────────────────────────
 function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -735,8 +830,105 @@ window.addEventListener('message', (event) => {
     save();
     renderSidebar();
     renderContent();
-    showToast(`✅ ${count}レッスンを一括インポートしました`);
-    event.source.postMessage({ type: 'CMDB_IMPORT_ALL_DONE', count }, event.origin);
+    showToast(`✅ ${count}レッスンをデータソースから更新しました`);
+    // ボタンの色を更新
+    const ind = document.querySelector('.datasrc-indicator');
+    if (ind) { ind.style.background='#3fb950'; ind.title='最終更新: '+new Date().toLocaleTimeString('ja-JP'); }
+    event.source.postMessage({ type: 'CMDB_IMPORT_ALL_DONE', count }, '*');
+  }
+});
+
+// ── データソース機能 ──────────────────────────────────────
+let dataSourceWindow = null;
+
+function openDataSource() {
+  const url = state.dataSourceUrl;
+  const btn = document.getElementById('datasrc-btn');
+
+  if (!url) {
+    // URLが未設定の場合はURLを入力させる
+    const input = prompt(
+      '📂 all_lessons_data.html のURLを入力してください
+
+' +
+      '例（GitHub Pages）:
+https://あなたのユーザー名.github.io/cmdb-study-app/all_lessons_data.html
+
+' +
+      '例（ローカル）:
+file:///C:/Users/xxx/all_lessons_data.html',
+      state.dataSourceUrl || ''
+    );
+    if (!input || !input.trim()) return;
+    state.dataSourceUrl = input.trim();
+    save();
+    showToast('✅ データソースURLを保存しました');
+    btn.querySelector('.datasrc-indicator').style.background = '#3fb950';
+    openDataSource(); // 再度開く
+    return;
+  }
+
+  // データソースウィンドウを開く（既に開いていれば再利用）
+  if (dataSourceWindow && !dataSourceWindow.closed) {
+    dataSourceWindow.focus();
+  } else {
+    dataSourceWindow = window.open(url, 'cmdb_datasource',
+      'width=1000,height=700,scrollbars=yes,resizable=yes');
+  }
+
+  if (!dataSourceWindow) {
+    // ポップアップがブロックされた場合
+    showToast('⚠️ ポップアップがブロックされました。ブラウザの設定を確認してください。');
+    return;
+  }
+
+  // ウィンドウが開くのを待ってから全レッスン送信を要求
+  const checkReady = setInterval(() => {
+    if (dataSourceWindow && !dataSourceWindow.closed) {
+      try {
+        dataSourceWindow.postMessage({ type: 'CMDB_REQUEST_ALL' }, '*');
+        clearInterval(checkReady);
+      } catch(e) {}
+    } else {
+      clearInterval(checkReady);
+    }
+  }, 500);
+
+  // 5秒後にタイムアウト
+  setTimeout(() => clearInterval(checkReady), 5000);
+}
+
+function changeDataSource() {
+  const input = prompt(
+    'データソースURLを変更します
+
+現在のURL:
+' + (state.dataSourceUrl || '（未設定）'),
+    state.dataSourceUrl || ''
+  );
+  if (input === null) return;
+  state.dataSourceUrl = input.trim();
+  save();
+  const btn = document.getElementById('datasrc-btn');
+  if (btn) {
+    const ind = btn.querySelector('.datasrc-indicator');
+    if (ind) ind.style.background = state.dataSourceUrl ? '#3fb950' : '#f85149';
+  }
+  showToast(state.dataSourceUrl ? '✅ URLを更新しました' : '⚠️ URLをクリアしました');
+}
+
+// データソースボタン右クリックでURL変更
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('datasrc-btn');
+  if (btn) {
+    btn.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      changeDataSource();
+    });
+    // URLが設定済みかどうかでインジケーター色を設定
+    if (!state.dataSourceUrl) {
+      btn.querySelector('.datasrc-indicator').style.background = '#f0883e';
+    }
   }
 });
 
