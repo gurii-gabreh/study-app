@@ -126,6 +126,9 @@ textarea.tinput{min-height:180px;}
 .comment-ta:focus{outline:none;border-color:#58a6ff;}
 .datasrc-btn{cursor:pointer;padding:6px 14px;background:#21262d;border:1px solid #388bfd;color:#58a6ff;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;transition:all .15s;}
 .datasrc-btn:hover{background:#1f3358;border-color:#58a6ff;}
+.datasrc-open-btn{cursor:pointer;padding:6px 14px;background:#21262d;border:1px solid #3fb950;color:#3fb950;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;transition:all .15s;margin-left:4px;}
+.datasrc-open-btn:hover{background:#0d2e19;border-color:#56d364;}
+.datasrc-open-btn:disabled{opacity:.4;cursor:default;}
 .datasrc-indicator{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#3fb950;}
 .exp-ng{background:var(--red-bg);border:1px solid var(--red-border);color:#ff7b72;}
 .exp-label{font-weight:700;margin-right:4px;}
@@ -161,6 +164,7 @@ textarea.tinput{min-height:180px;}
     <button class="datasrc-btn" id="datasrc-btn" onclick="openDataSource()" title="all_lessons_data.htmlからデータを読み込みます">
       <span class="datasrc-indicator"></span>データソース更新
     </button>
+    <button class="datasrc-open-btn" id="datasrc-open-btn" onclick="openDataSourceNewTab()" title="all_lessons_data.htmlを新しいタブで開く">📂 データを開く</button>
   </div>
 </div>
 
@@ -840,6 +844,26 @@ window.addEventListener('message', (event) => {
 
 // ── データソース機能 ──────────────────────────────────────
 let dataSourceWindow = null;
+
+function openDataSourceNewTab() {
+  const url = state.dataSourceUrl;
+  if (!url) {
+    const input = prompt(
+      '📂 all_lessons_data.html のURLを入力してください\n\n' +
+      '例（GitHub Pages）:\nhttps://あなたのユーザー名.github.io/cmdb-study-app/all_lessons_data.html',
+      ''
+    );
+    if (!input || !input.trim()) return;
+    state.dataSourceUrl = input.trim();
+    save();
+    const ind = document.querySelector('.datasrc-indicator');
+    if (ind) ind.style.background = '#3fb950';
+    showToast('✅ URLを保存しました');
+    window.open(state.dataSourceUrl, '_blank');
+  } else {
+    window.open(url, '_blank');
+  }
+}
 
 function openDataSource() {
   const url = state.dataSourceUrl;
