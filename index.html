@@ -269,6 +269,16 @@ function load() {
     state.dataSourceUrl = s.dataSourceUrl || '';
     state.gistToken = s.gistToken || '';
     state.gistId = s.gistId || '';
+    // コメントキーのマイグレーション（タイムスタンプ付き→固定キー）
+    if (s.comments) {
+      const migratedComments = {};
+      Object.keys(s.comments).forEach(k => {
+        // Course1_1-1_1778297231376_0_2 → Course1_1-1_0_2
+        const fixed = k.replace(/^([^_]+_[^_]+)_\d{13}_(\d+_\d+)$/, '$1_$2');
+        migratedComments[fixed] = s.comments[k];
+      });
+      state.comments = migratedComments;
+    }
     // Restore datasource button indicator
     if (state.dataSourceUrl) {
       const ind = document.querySelector('.datasrc-indicator');
@@ -653,7 +663,7 @@ function importLesson() {
   const pointsRaw = document.getElementById('imp-points').value.trim();
   const quizRaw = document.getElementById('imp-quiz').value.trim();
 
-  const id = course.replace(/\s/g,'') + '_' + lesson.replace(/\./g,'') + '_' + Date.now();
+  const id = course.replace(/\s/g,'') + '_' + lesson.replace(/\./g,'');
 
   // Parse points
   const points = [];
@@ -808,7 +818,7 @@ window.addEventListener('message', (event) => {
       delete state.errors[exists.id];
     }
 
-    const id = d.course.replace(/\s/g,'') + '_' + d.lesson.replace(/\./g,'') + '_' + Date.now();
+    const id = d.course.replace(/\s/g,'') + '_' + d.lesson.replace(/\./g,'');
     const newLesson = {
       id, course: d.course, lesson: d.lesson, title: d.title,
       summary: d.summary || '',
@@ -839,7 +849,7 @@ window.addEventListener('message', (event) => {
         delete state.quizState[exists.id];
         delete state.errors[exists.id];
       }
-      const id = d.course.replace(/\s/g,'') + '_' + d.lesson.replace(/\./g,'') + '_' + Date.now() + '_' + count;
+      const id = d.course.replace(/\s/g,'') + '_' + d.lesson.replace(/\./g,'');
       state.lessons.push({ id, course: d.course, lesson: d.lesson, title: d.title,
         summary: d.summary || '', points: d.points || [], quiz: d.quiz || [] });
       count++;
