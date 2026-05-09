@@ -590,10 +590,27 @@ function showToast(msg, color='#58a6ff'){
   setTimeout(()=>t.remove(),3000);
 }
 
-// postMessage 完了受信
+// postMessage 完了受信 & CMDB_REQUEST_ALL への応答
 window.addEventListener('message', e => {
   if(e.data?.type==='CMDB_IMPORT_DONE') showToast(`✅ 「${e.data.title}」をアプリに追加しました`);
   if(e.data?.type==='CMDB_IMPORT_ALL_DONE') showToast(`✅ ${e.data.count}レッスンをアプリに追加しました`);
+
+  // アプリ側からデータ送信要求を受けたら全レッスンを送信する
+  if(e.data?.type==='CMDB_REQUEST_ALL') {
+    const payload = {
+      type: 'CMDB_IMPORT_ALL',
+      lessons: L.map(l => ({
+        course: l.c, lesson: l.l, title: l.t,
+        summary: l.s || '', points: l.p || [], quiz: l.q || []
+      }))
+    };
+    // 送信元（アプリ）ウィンドウに返信
+    const target = e.source || window.opener;
+    if (target) {
+      target.postMessage(payload, '*');
+      showToast(`📤 ${L.length}レッスンをアプリへ送信しました`);
+    }
+  }
 });
 
 // ── DOM 構築 ──────────────────────────────────
@@ -635,6 +652,1170 @@ Object.entries(courses).forEach(([course,lessons])=>{
     cnt.appendChild(block);
   });
 });
+
+</script>
+</body>
+</html>
+
+// ─── Course 2 Lesson 4 ───────────────────────────────
+L.push({c:"Course 2",l:"2-4",t:"Reconciliation Rules（照合ルール）",
+s:`Reconciliation Rules（照合ルール）はIREによって使用され、複数のソースからCMDBにデータが取り込まれる際にCIのクラスと属性をどのようにマージ・更新するかを決定する。最も accurate かつ authoritative なデータがCMDBに保持されることを確保する。
+
+ServiceNowはベースラインインスタンスにreconciliation rulesを提供しない。各データソースに対して設定することを推奨する。適切に設定された場合、reconciliation rulesは信頼できるデータソースとauthoritative source of truthを決定するプロセスの90%を管理できる。
+
+Why Configure：Data Accuracy（信頼性の高い最新データの確保）・Conflict Resolution（異なるソースのデータ競合を解決）・Data Prioritization（複数ソースが同じCI情報を提供する場合の優先順位決定）
+
+Reconciliation Process：identification processの後・CIがCMDBで更新される前に実行される。CIのcreation（作成）プロセスの一部ではない。プロセスフロー：Data Ingestion → Identification → Reconciliation
+
+order value（オーダー値）が低いほどpriority（優先度）が高い。例：ServiceNowが最低order value＝最高優先度。ServiceNowが更新後はAltiris・SCCMは同じレコードを更新できない。
+
+Inserts のブロックには IRE Data Source Rules を設定（Configuration > Identification/Reconciliation > IRE Data Source Rules）。Reconciliation rulesは主にupdates（更新）に焦点。
+
+Data Source Histories [cmdb_datasource_last_update]テーブル：各データソースの最終更新時刻を追跡。reconciliation rulesが設定されデータが取り込まれた後に初めてpopulatedされる。
+
+Data Refresh Rules：上位優先度データソースがCIクラスを更新しなければならないtime intervalを定義。例：ServiceNow（高優先度）が14日間更新しない場合、Altiris（低優先度）がWindows Serverレコードを更新可能になる。CI Class Managerの特定クラスのReconciliation RulesタブでオプションとしてData Refresh Rulesを設定できる。`,
+p:[
+["定義","Reconciliation Rules（照合ルール）はIREが複数ソースからのデータをCMDBにマージ・更新する方法を決定するルール","最も accurate かつ authoritative なデータがCMDBに保持されることを確保"],
+["ベースライン設定","ServiceNowはベースラインインスタンスにreconciliation rulesを提供しない","各データソースに対して設定することを推奨。適切に設定された場合90%のプロセスを管理できる"],
+["Why Configure①","Data Accuracy（データ精度）：CMDBに最もreliableかつup-to-dateなデータが含まれることを確保","Conflict Resolution：異なるソースのデータ間のconflicts（競合）を解決"],
+["Why Configure②","Data Prioritization（データ優先順位付け）：複数ソースが同じCI情報を提供する場合にどのデータソースを優先するかを決定","優先順位のないデータソースは互いの更新を上書きする可能性がある"],
+["Reconciliation Processの位置","identification processの後・CIがCMDBで更新される前に実行される","CIのcreation（作成）プロセスの一部ではない"],
+["優先度の仕組み","order value（オーダー値）が低いほどpriority（優先度）が高い","例：ServiceNowがorder value最低＝最高優先度。更新後はAltiris・SCCMは同じレコードを更新できない"],
+["Insertsの防止","Reconciliation rulesは主にupdates（更新）に焦点。insertsのブロックにはIRE Data Source Rulesを設定","ナビゲーション：Configuration > Identification/Reconciliation > IRE Data Source Rules"],
+["Data Source Historiesテーブル","cmdb_datasource_last_update：各データソースの最終更新時刻を追跡","reconciliation rulesが設定されデータが取り込まれた後に初めてpopulatedされる"],
+["Data Refresh Rulesの定義","上位優先度データソースがCIクラスを更新しなければならないtime intervalを定義","高優先度ソースがinterval内に更新しない場合、低優先度ソースが更新できるようになる"],
+["Data Refresh Rulesの設定場所","CI Class Managerの特定クラスのReconciliation RulesタブでオプションとしてData Refresh Rulesを設定","例：ServiceNow（高優先度）が14日間更新しない場合、Altiris（低優先度）がWindows Serverレコードを更新可能"],
+],
+q:[
+{t:"基礎",q:"Reconciliation Rules の定義として正しいものはどれか？",o:["CIを一意に識別するためのルール","IREが複数ソースからのデータをCMDBにマージ・更新する方法を決定するルール。最も accurate かつ authoritative なデータがCMDBに保持されることを確保する","CIの財務価値を管理するルール","データソースを自動検出するルール"],a:1,e:"Reconciliation Rules はIREによって使用され、複数のソースからCMDBにデータが取り込まれる際にCIのクラスと属性をどのようにマージ・更新するかを決定するルールである。"},
+{t:"基礎",q:"Reconciliation Process の実行タイミングとして正しいものはどれか？",o:["Data Ingestionの前に実行される","identification processの後・CIがCMDBで更新される前に実行される。CIのcreation（作成）プロセスの一部ではない","CIが作成された後に実行される","毎日スケジュール実行される"],a:1,e:"Reconciliation Processはidentification processの後・CIがCMDBで更新される前に実行される。CIのcreation（作成）プロセスの一部ではない点が重要。"},
+{t:"基礎",q:"order valueとpriorityの関係として正しいものはどれか？",o:["order valueが高いほどpriorityが高い","order valueが低いほどpriorityが高い","order valueとpriorityは無関係","すべてのデータソースが同じpriorityを持つ"],a:1,e:"order value（オーダー値）が低いほどpriority（優先度）が高い。例：ServiceNowがorder value最低＝最高優先度を持つ。"},
+{t:"基礎",q:"Data Refresh Rulesの説明として正しいものはどれか？",o:["CIを定期的に自動削除するルール","上位優先度データソースがCIクラスを更新しなければならないtime intervalを定義する。高優先度ソースがinterval内に更新しない場合、低優先度ソースが更新できるようになる","データを暗号化するルール","CIを自動分類するルール"],a:1,e:"Data Refresh Rulesは上位優先度データソースがCIクラスを更新しなければならないtime interval（時間間隔）を定義する。高優先度ソースが指定されたinterval内に更新を実行しない場合、低優先度ソースが更新を実行できるようになる。"},
+{t:"引っ掛け",q:"Reconciliation Rulesが主に焦点を当てているものはどれか？",o:["inserts（挿入）の制御","updates（更新）の制御。insertsのブロックには別途IRE Data Source Rulesの設定が必要","CIの削除の制御","CIの分類変更の制御"],a:1,e:"Reconciliation rulesは主にupdates（更新）に焦点を当てている。特定のデータソースからのinserts（挿入）をブロックするには別途IRE Data Source Rulesを設定する必要がある。"},
+{t:"意地悪",q:"Data Source Histories テーブルはいつpopulatedされるか？",o:["ServiceNowインスタンス作成時に自動的にpopulatedされる","reconciliation rulesが特定のクラスに設定され、データがそのクラスに取り込まれた後に初めてpopulatedされる","CMDB導入時に自動的にpopulatedされる","毎日スケジュール実行でpopulatedされる"],a:1,e:"Data Source Histories [cmdb_datasource_last_update]テーブルはreconciliation rulesが特定のクラスに設定され、データがそのクラスに取り込まれた後に初めてpopulated（データが入力）される。"},
+{t:"試験対策",q:"Reconciliation Rules・Data Refresh Rules・IRE Data Source Rulesの違いとして正しいものはどれか？",o:["3つはすべて同じ目的","Reconciliation Rules：データソースの優先順位とupdatesの制御 / Data Refresh Rules：高優先度ソースがinterval内に更新しない場合の低優先度ソースへの許可 / IRE Data Source Rules：特定ソースからのinsertsのブロック","Reconciliation Rulesはデータを削除しData Refresh Rulesはデータを作成する","IRE Data Source RulesはReconciliation Rulesの別名"],a:1,e:"Reconciliation Rulesはデータソースの優先順位とupdatesの制御。Data Refresh Rulesは高優先度ソースがinterval内に更新しない場合に低優先度ソースの更新を許可。IRE Data Source Rulesは特定データソースからのinsertsをブロックするために使用する。"},
+]});
+
+// ─── Course 2 Lesson 5 ───────────────────────────────
+L.push({c:"Course 2",l:"2-5",t:"CMDB 360 / Multisource CMDB",
+s:`CMDB 360 / Multisource CMDB は CIの属性を更新する際に関与したディスカバリーソースと提案された値の完全な履歴を保持する機能である。Multisource CMDB機能はCMDB WorkspaceのCMDB 360機能の一部。CMDB 360はMultisource CMDBのすべての機能＋analytics dashboard＋新しいquery functionalityを提供する。
+
+CMDB 360がない場合：低優先度のディスカバリーソースの値の詳細は破棄・消失し、低優先度のデータソースから取り込まれたCI属性値を特定することがほぼ不可能になる。
+
+CMDB 360がある場合：選択・非選択すべてのディスカバリーソースのraw details（生データの詳細）が保持される。CMDB MultiSource Data [cmdb_multisource_data]テーブルに格納される。
+
+利点：Track（様々なディスカバリーソースがCIの属性レベルでCMDBをどのようにpopulateしているかを追跡）・Revert（特定のディスカバリーソースからのCI更新を元に戻す）・Recompute（更新されたreconciliation rulesを使用して属性値を再計算する）
+
+Multisource CMDB ユースケース解決：① CIデータに貢献する各ディスカバリーソースの attribute-level data を可視化 ② マルチソースデータから operational insights を取得 ③ reconciliation rulesを変更し最新ルールでCMDBデータをrecompute ④ ディスカバリーソースが提供したCMDBデータをrevert
+
+アーキテクチャ：CIデータは通常通りCMDBに格納（golden CIs）。Multisource CMDB有効化後はすべてのディスカバリーソースのCIデータもCMDB Multisource Dataテーブルに格納される。
+
+アクティベーション：① ITOM Discovery License（com.snc.itom.vis.license）プラグインをアクティベート ② glide.identification_engine.multisource_enabled を true に設定
+
+CI Class ManagerのRecompute機能注意事項：一度にrecomputeできるCIレコードは100,000件の制限あり。クラス階層の上位ではなく特定クラスに焦点を当てることを推奨。
+
+CMDB Workspaceの CMDB 360ビュー：ディスカバリーソース数・各ソースのCI数・単一ソースのCI・複数ソースのCIを表示。「Multisource Dashboard Analytics Population」スケジュールジョブ実行後に毎日更新。
+
+CMDB 360 Query：CMDB Workspaceの CMDB 360ビューで最大20件のクエリを表示・編集・実行・新規作成できる。`,
+p:[
+["定義","CMDB 360 / Multisource CMDBはCIの属性を更新する際に関与したディスカバリーソースと提案された値の完全な履歴を保持する機能","CMDB WorkspaceのCMDB 360機能の一部"],
+["CMDB 360とMultisource CMDBの関係","Multisource CMDBはCMDB 360の一部。CMDB 360はMultisource CMDBのすべての機能＋analytics dashboard＋新しいquery functionalityを提供","すべての機能はCMDB Workspace内のCMDB 360ビューからアクセス可能"],
+["利点①：Track","様々なディスカバリーソースがCIの属性レベルでCMDBをどのようにpopulateしているかを追跡する","属性レベルでの詳細な追跡が可能"],
+["利点②：Revert","特定のディスカバリーソースからのCI更新を元に戻す","誤ったデータソースによる更新を取り消せる"],
+["利点③：Recompute","更新されたreconciliation rulesを使用して属性値を再計算する","ルール変更後に既存データへ即座に反映できる"],
+["CMDB 360なしの問題","低優先度のディスカバリーソースの値の詳細は破棄・消失してしまう","低優先度のデータソースから取り込まれたCI属性値を特定することがほぼ不可能になる"],
+["格納テーブル","CMDB MultiSource Data [cmdb_multisource_data]テーブル","各ディスカバリーソースのすべてのCI属性を追跡。一部はカラムフィールド・すべてはJSON blobに格納"],
+["アクティベーション①","ITOM Discovery License（com.snc.itom.vis.license）プラグインをアクティベート","System Applications > All Available Applications > Allから検索・インストール"],
+["アクティベーション②","glide.identification_engine.multisource_enabled を true に設定","System Properties > All Propertiesから設定"],
+["Recomputeの制限","一度にrecomputeできるCIレコードは100,000件の制限あり","クラス階層の上位ではなく特定のクラスに焦点を当てることを推奨"],
+["データアクセス場所","CI Class Manager / CMDB 360 Data Previewリンク / Multisource Data related list / CMDB Workspace","CIレコードのRelated LinksまたはCI Class ManagerのReconciliation RuleタブからアクセスAPossible"],
+["CMDB 360 Query","CMDB Workspaceの CMDB 360ビューで最大20件のクエリを表示・編集・実行・新規作成できる","CIsの理解と管理・operational insightsの取得に活用"],
+],
+q:[
+{t:"基礎",q:"CMDB 360 / Multisource CMDB の利点として正しいものはどれか？",o:["CIの財務価値を自動計算する","Track（追跡）・Revert（元に戻す）・Recompute（再計算）の3つの利点を提供する","ネットワークをリアルタイムでスキャンする","CIを自動削除する"],a:1,e:"CMDB 360 / Multisource CMDBの3つの利点はTrack（様々なディスカバリーソースがCIの属性レベルでCMDBをどのようにpopulateしているかを追跡）・Revert（特定のディスカバリーソースからのCI更新を元に戻す）・Recompute（更新されたreconciliation rulesを使用して属性値を再計算する）である。"},
+{t:"基礎",q:"CMDB 360のアクティベーションに必要な2つの手順として正しいものはどれか？",o:["CMDB CI Class Modelsプラグインをインストールし、glide.cmdb.multisource_enabled=trueに設定する","ITOM Discovery License（com.snc.itom.vis.license）プラグインをアクティベートし、glide.identification_engine.multisource_enabled を true に設定する","Discoveryライセンスを購入するだけでよい","システムプロパティの設定のみで有効化できる"],a:1,e:"CMDB 360のアクティベーションには①ITOM Discovery License（com.snc.itom.vis.license）プラグインをアクティベート②System Propertiesでglide.identification_engine.multisource_enabled を true に設定の2つが必要。"},
+{t:"引っ掛け",q:"CMDB 360がない場合の問題として正しいものはどれか？",o:["問題は発生しない","低優先度のディスカバリーソースの値の詳細は破棄・消失し、低優先度のデータソースから取り込まれたCI属性値を特定することがほぼ不可能になる","CMDBが自動的にクリーンアップされる","高優先度のデータのみが保存される"],a:1,e:"CMDB 360がない場合、複数のディスカバリーソースが同じCI属性を更新しようとすると、IREはreconciliation rulesを使用して1つのディスカバリーソースを選択する。低優先度のソースの値の詳細は破棄・消失し、低優先度のデータソースから取り込まれたCI属性値を特定することがほぼ不可能になる。"},
+{t:"試験対策",q:"CMDB 360 Recompute機能の制限として正しいものはどれか？",o:["制限なしですべてのCIを一度にrecomputeできる","一度にrecomputeできるCIレコードは100,000件の制限あり。スコープを限定するために特定のクラスに焦点を当てることを推奨","recompute機能は有償ライセンスが必要","recompute機能はCMDB Workspaceからのみ実行できる"],a:1,e:"Recompute機能の制限：一度にrecomputeできるCIレコードは100,000件の上限がある。スコープを限定するためにクラス階層の上位ではなく特定のクラスに焦点を当てることを推奨する。"},
+]});
+
+// ─── Course 2 Lesson 6 ───────────────────────────────
+L.push({c:"Course 2",l:"2-6",t:"Dynamic Reconciliation Rules（動的照合ルール）",
+s:`Dynamic Reconciliation Rules（動的リコンシリエーション・ルール）はMultisource CMDBのデータを活用して複雑なデータ照合シナリオを処理するルール。「最大の値」や「最初に報告された値」などの基準に基づいて値を選択する。
+
+Static vs Dynamic：Static Reconciliation Rules（静的ルール）はどのディスカバリソースがクラス属性を更新する権限を持つかを定義し優先順位を確立する。Dynamic Reconciliation Rulesは Multisource CMDBデータを使用して基準に基づいて値を選択する。
+
+同じCI属性に静的ルールと動的ルールの両方がある場合、動的ルールが優先される（Dynamic wins over Static）。
+
+前提条件：「動的リコンシリエーション・ルール」オプションはMultisource CMDBが有効化された後にのみ利用可能。
+
+動的ルールのタイプ（5種類）：
+・First Reported（最初に報告された）：最初にディスカバリされた値を使用
+・Most Reported（最も報告された）：最も多くのソースから報告された値を使用
+・Last Reported（最後に報告された）：最後にディスカバリされた値を使用
+・Largest Value（最大値）：数値フィールドにのみ適用。最も大きい値を使用
+・Smallest Value（最小値）：数値フィールドにのみ適用。最も小さい値を使用
+
+注意：Largest Value・Smallest Valueは数値フィールド型にのみ適用。「属性の選択」タブには数値フィールド型のみが表示される。
+
+IRE処理フロー：まず現在のpayloadを処理し、次にMultisource CMDBデータをレビューして適切な値を決定する。
+
+例1：Windows ServerクラスのRAM属性に「Largest Value」ルール設定。ServiceNow(100)・Tivoli(200)・LANDesk(300)の静的ルールも存在。→ 動的ルールが優先されるため、Multisource CMDBのプレビューデータに基づきLANDesk最大値で更新。
+
+例2：Serverクラス→Largest Value / Windows Serverクラス→Most Reported。→ Windows Serverクラスにより具体的なルールがあるためServerクラスの動的ルールは使用されない。
+
+重要ポイント（優先順位ルール）：
+1. 特定クラス内の動的ルールは親クラスのルールより優先される
+2. クラスにルールがなければ親クラスのルールを継承する
+3. 同一属性に静的と動的の両方がある場合は動的が優先される`,
+p:[
+["定義","Dynamic Reconciliation RulesはMultisource CMDBデータを活用して「最大の値」「最初に報告された値」などの基準で値を選択するルール","Multisource CMDBが有効化された後にのみ利用可能"],
+["Static vs Dynamic","Static Rules：更新権限とソースの優先順位を定義する / Dynamic Rules：Multisource CMDBデータを使用して基準で値を選択する","同一属性に両方がある場合はDynamic Rulesが優先される（Dynamic wins over Static）"],
+["動的ルールのタイプ①","First Reported（最初に報告された）・Most Reported（最も報告された）・Last Reported（最後に報告された）","異なるタイミングで報告された値を基準に選択"],
+["動的ルールのタイプ②","Largest Value（最大値）・Smallest Value（最小値）：数値フィールド型にのみ適用","「属性の選択」タブには数値フィールド型のみが表示される"],
+["例1：Largest Valueの適用","Windows ServerクラスのRAM属性に「Largest Value」動的ルール設定","静的ルールも存在するが動的ルールが優先。Multisource CMDBのプレビューデータに基づきLANDesk最大値で更新"],
+["例2：クラスごとに異なるルール","Serverクラス：Largest Value / Windows Serverクラス：Most Reported","Windows Serverクラスにより具体的なルールがあるためServerクラスの動的ルールは使用されない"],
+["重要ポイント①","特定クラス内の動的ルールは親クラスのルールより優先される","より具体的（下位）のクラスのルールが常に優先される"],
+["重要ポイント②","クラスにルールがなければ親クラスのルールを継承する","ルールが未定義の場合は親クラスから継承"],
+["重要ポイント③","同一CI属性に静的ルールと動的ルールの両方がある場合、動的ルールが優先される","これは最も重要な優先順位ルールである"],
+],
+q:[
+{t:"基礎",q:"Dynamic Reconciliation Rulesを利用するための前提条件として正しいものはどれか？",o:["ServiceNowの任意のインスタンスで即座に使用できる","Multisource CMDBが有効化されていること","Static Reconciliation Rulesを設定した後に自動的に有効化される","ITOM Visibilityライセンスなしでも使用できる"],a:1,e:"「動的リコンシリエーション・ルール」オプションはMultisource CMDBが有効化された後にのみ利用可能である。有効化前はこのオプションは表示されない。"},
+{t:"基礎",q:"Largest ValueとSmallest Valueの動的ルールタイプが適用できるフィールドとして正しいものはどれか？",o:["すべてのフィールドタイプに適用できる","テキストフィールドのみに適用できる","数値フィールド型にのみ適用できる","日付フィールドのみに適用できる"],a:2,e:"Largest Value・Smallest Valueは数値フィールド型にのみ適用される。「属性の選択」タブでは数値フィールド型のみが表示され、その他の属性は非表示になる。"},
+{t:"引っ掛け",q:"同じCI属性に静的ルールと動的ルールの両方が設定されている場合、どちらが優先されるか？",o:["静的ルールが優先される","動的ルールが優先される（Dynamic wins over Static）","どちらも同等に適用される","最後に設定されたルールが優先される"],a:1,e:"同じCI属性に対して静的リコンシリエーション・ルールと動的リコンシリエーション・ルールの両方が適用される場合、動的ルールが優先される（Dynamic wins over Static）。"},
+{t:"試験対策",q:"Dynamic Reconciliation Rulesの優先順位ルールをすべて正しく説明しているものはどれか？",o:["静的ルールが常に優先される","①特定クラスのルールが親クラスのルールより優先される ②クラスにルールがなければ親クラスのルールを継承 ③同一属性に静的と動的の両方がある場合は動的が優先される","①親クラスが常に優先される ②動的と静的は同等 ③新しいルールが優先される","優先順位はなくすべてのルールが同時に適用される"],a:1,e:"Dynamic Reconciliation Rulesの3つの重要な優先順位ルール：①特定のクラス内の動的ルールは親クラスより優先 ②クラスにルールがない場合は親クラスのルールを継承 ③同じCI属性に静的ルールと動的ルールの両方がある場合は動的ルールが優先（Dynamic wins over Static）。"},
+]});
+
+// ─── Course 3 Lesson 3 ───────────────────────────────
+// ─── Course 3 Lesson 2 ───────────────────────────────
+L.push({c:"Course 3",l:"3-2",t:"ServiceNow Discovery 詳細",
+s:`ServiceNow Discovery はスケジュールベースの automated discovery solution（自動ディスカバリソリューション）。別名：Horizontal discovery・Agentless discovery・IP-based discovery。ITOM Visibility の一部として提供され有償ライセンス必要。
+
+対応プラットフォーム：Windows・Linux・macOS・クラウド環境。収集データはすべて IRE に送信され CMDB での重複レコードを回避する。スケジュールベースのため real-time discovery solution（リアルタイムディスカバリ）ではない。真のリアルタイムディスカバリには Agent Client Collector（ACC）を使用する。
+
+Discovery の4フェーズ：
+1. Scan Phase（スキャンフェーズ）：ネットワークをスキャンしてすべての IP 対応デバイスを特定する。IP アドレスまたは範囲をスイープしてネットワーク内のライブホストを検出する。
+2. Classification Phase（分類フェーズ）：検出されたデバイスをタイプ（サーバー・ルーター・スイッチ・プリンターなど）に基づいて分類する。probes と sensors を使用してデバイスタイプを判定する。
+3. Identification Phase（識別フェーズ）：デバイスを一意に識別するためにシリアル番号・MAC アドレス・ホスト名・IP アドレスなどを収集する。identification rules を使用して既存CIとのマッチングを行い、マッチが見つからない場合は新しいCIを作成する。
+4. Exploration Phase（探索フェーズ）：各識別デバイスの詳細データを収集する。Discovery probes と patterns の組み合わせを使用する。
+
+MID Server：ServiceNow インスタンスと組織の内部ネットワークの bridge（橋渡し）として機能。ファイアウォール・セキュリティ・ネットワークセグメンテーションがある環境で特に重要。組織の trusted network environment 内で動作し機密データが組織外に出ないことを確保。encrypted communication を使用。プロトコル：WMI（Windows）・SSH（Unix/Linux）・SNMP（ネットワークスイッチ・プリンター）
+
+Discovery Schedules：Discovery Admin Workspace の Schedules ページが central hub。スコープ・タイミング・MID Servers を定義する。
+
+範囲制限：初期実装では Limited Range から開始を推奨。Broader Range（192.168.0.0/24）はネットワーク・ブロードキャストアドレスを含み過剰データの可能性あり。Limited Range（192.168.0.1〜192.168.0.254）は初期実装に推奨。最大範囲 /16（65,000 IP アドレス）に制限推奨。
+
+Discovery Configuration Console：検出するデバイス・アプリケーション・ソフトウェアのタイプを指定。アクセス：Discovery Definition > Configuration Console。
+
+Discoverable Data：Hardware（CPU・メモリ・ストレージ）・Software（インストール済みアプリ・OS）・Network（IP・MAC・トポロジー）・Cloud（AWS・Azure・GCP）。Discovery がデバイスを識別すると discovery source フィールドが「ServiceNow」に設定される。Asset Management で作成されたレコードは「SNAssetManagement」→Discovery 後「ServiceNow」に更新。
+
+Non-Discoverable Data：Assigned to・Owned by・Support group・Change Group・Managed By Group などは自動検出不可。ServiceNow はディスカバリデータに non-discoverable data を補充することを強く推奨する。`,
+p:[
+["定義","ServiceNow Discovery はスケジュールベースの automated discovery solution","別名：Horizontal discovery・Agentless discovery・IP-based discovery。ITOM Visibility の一部。有償ライセンス必要"],
+["リアルタイム性","スケジュールベースのため real-time discovery solution ではない","真のリアルタイムディスカバリには Agent Client Collector（ACC）を使用する"],
+["フェーズ①：Scan Phase","ネットワークをスキャンしてすべての IP 対応デバイスを特定する","IP アドレスまたは範囲をスイープしてネットワーク内のライブホストを検出"],
+["フェーズ②：Classification Phase","検出されたデバイスをタイプ（サーバー・ルーター・スイッチ・プリンターなど）に基づいて分類する","probes と sensors を使用してデバイスタイプを判定"],
+["フェーズ③：Identification Phase","デバイスを一意に識別するためにシリアル番号・MAC アドレス・ホスト名・IP アドレスなどを収集する","identification rules で既存CIとマッチング。マッチなしの場合は新規CI作成"],
+["フェーズ④：Exploration Phase","各識別デバイスの詳細データを収集する","Discovery probes と patterns の組み合わせを使用"],
+["MID Server の役割","ServiceNow インスタンスと組織の内部ネットワークの bridge（橋渡し）として機能","ファイアウォール・セキュリティ・ネットワークセグメンテーションがある環境で特に重要"],
+["MID Server のプロトコル","WMI：Windows / SSH：Unix・Linux / SNMP：ネットワークスイッチ・プリンター","エージェントレスのため永続的なソフトウェアなしにデバイスをプローブ"],
+["範囲制限の推奨","初期実装では Limited Range から開始することを推奨","最大範囲は /16（65,000 IP アドレス）に制限することを推奨"],
+["Discovery Configuration Console","検出するデバイス・アプリケーション・ソフトウェアのタイプを指定する設定オプションを提供","アクセス：Discovery Definition > Configuration Console"],
+["Discoverable Data","Hardware（CPU・メモリ・ストレージ）・Software（インストール済みアプリ・OS）・Network（IP・MAC・トポロジー）・Cloud（AWS・Azure・GCP）","Discovery がデバイスを識別すると discovery source フィールドが「ServiceNow」に設定される"],
+["discovery source フィールド","Asset Management で作成されたレコードは「SNAssetManagement」→Discovery 後「ServiceNow」に更新","Discovery がデバイスを識別すると自動的に「ServiceNow」に設定"],
+["Non-Discoverable Data","Assigned to・Owned by・Support group・Change Group・Managed By Group などは自動検出不可","ServiceNow はディスカバリデータに non-discoverable data を補充することを強く推奨する"],
+],
+q:[
+{t:"基礎",q:"Discovery の4フェーズの正しい順序はどれか？",o:["Classification → Scan → Identification → Exploration","Scan → Classification → Identification → Exploration","Identification → Scan → Classification → Exploration","Exploration → Identification → Classification → Scan"],a:1,e:"Discovery の4フェーズの正しい順序は Scan Phase（スキャン）→ Classification Phase（分類）→ Identification Phase（識別）→ Exploration Phase（探索）である。"},
+{t:"基礎",q:"MID Server が各プロトコルで接続するデバイスの正しい組み合わせはどれか？",o:["WMI→Linux / SSH→Windows / SNMP→クラウド","WMI→Windows / SSH→Unix・Linux / SNMP→ネットワークスイッチ・プリンター","WMI→プリンター / SSH→クラウド / SNMP→Windows","WMI→Unix / SSH→プリンター / SNMP→Linux"],a:1,e:"MID Server のプロトコル：WMI（Windows マシンのディスカバリ）・SSH（Unix または Linux コンピュータへの接続）・SNMP（ネットワークスイッチまたはプリンターからのデータ収集）。"},
+{t:"基礎",q:"Asset Management で作成されたレコードの discovery source フィールドの初期値として正しいものはどれか？",o:["ServiceNow","SNAssetManagement","MID Server","Not Discovered"],a:1,e:"Asset Management で作成されたレコードの discovery source フィールドの初期値は「SNAssetManagement」である。その後 ServiceNow Discovery で検出されると「ServiceNow」に更新される。"},
+{t:"引っ掛け",q:"ServiceNow Discovery と Agent Client Collector（ACC）の違いとして正しいものはどれか？",o:["Discovery はエージェントが必要で ACC はエージェントレス","Discovery はスケジュールベース（リアルタイムではない）でエージェントレス。ACC は各ホストにエージェントをインストールしてリアルタイムのエンドポイント可視性を提供する","両者はまったく同じ機能を提供する","Discovery は無償で ACC は有償"],a:1,e:"Discovery はスケジュールベース（リアルタイムではない）でエージェントレス。ACC（Agent Client Collector）は各ターゲットホストにエージェントをインストールしてリアルタイムのエンドポイント可視性を提供する。"},
+{t:"試験対策",q:"Non-Discoverable Data の例と ServiceNow の推奨事項として正しいものはどれか？",o:["IPアドレス・MACアドレス・OS名が Non-Discoverable Data","Assigned to・Owned by・Support group・Change Group・Managed By Group などが Non-Discoverable Data。ServiceNow はディスカバリデータにこれらを補充することを強く推奨する","Non-Discoverable Data は不要であるため設定しなくてよい","MID Server が自動収集する"],a:1,e:"Non-Discoverable Data の例は Assigned to・Owned by・Support group・Change Group・Managed By Group などである。ServiceNow はディスカバリデータに non-discoverable data を補充することを強く推奨する。グループ情報はインシデント対応や変更管理において essential（不可欠）。"},
+]});
+
+// ─── Course 3 Lesson 5 ───────────────────────────────
+L.push({c:"Course 3",l:"3-5",t:"IntegrationHub ETL",
+s:`ServiceNow IntegrationHub ETL（IH-ETL）はサードパーティデータをCMDBまたは非CMDBテーブルに統合するためのETL（Extract・Transform・Load）transform mapsを作成・管理するストアアプリケーション。インポートされたデータはIREを通じて自動処理され、データ品質の向上と重複の最小化が図られる。Service Graph ConnectorsはIntegrationHub ETLのtransform mapsを活用してCMDBへのデータ取り込みを準備する。
+
+Why Use：Data Integrity（IRE経由でデータをルーティングしCMDBの整合性を維持）・Consistent and Efficient（ソースデータのtransformとマッピングを簡素化）・Improved Data Quality（少量サンプルデータでテスト・レビューを繰り返して期待する成果を達成）
+
+2つの主要コンポーネント：
+1. RTE（Robust Transform Engine）：ステージングテーブルのraw source dataをETL transform mapsを使用してマッピング・統合されたデータに変換する
+2. IRE（Identification and Reconciliation Engine）：様々なデータソースにわたる識別と照合を管理するcentralized framework。duplicate CIsなどの問題を防止しターゲットテーブルの整合性を確保する
+
+プロセスフロー：①外部データをImport Setsとしてステージングテーブルに保存→②RTEがIRE payloadsを生成→③IREが照合を実行→④CMDBに格納
+
+用語：CMDB Application（サードパーティベンダーの名前。Name・Discovery Sourceの2属性。1つのCMDB Applicationは複数のETL transform mapsを持てる）・ETL Transform Map（IntegrationHub ETLが生成する出力物）・Data Source（生ソースデータのソースフィード。異なるタイプのデータには各REST endpointが独自のData SourceとETL transform mapに関連付けられる）
+
+ETL Transform Map Assistant（ガイド付きセットアップ）4ステップ：①Basic Details（基本情報入力）②Preview and Prepare Source Data（データプレビュー・クレンジング）③Select CMDB Classes and Map Source Data（CMDBクラス選択・フィールドマッピング）④Preview and Schedule（テスト実行・スケジュール設定）
+
+CMDB Integrations Dashboard：Integration Commons for CMDB（sn_cmdb_int_util）に含まれる。全CMDB統合のkey performanceとエラーメトリクスを公開する。
+
+Non-CMDB Table Support：glide.identification_engine.non_cmdb_tablesで指定されたテーブルのみサポート。サポートテーブル：Location・Department・Cost Center・Building・User・Group。identification rulesの作成が必要。`,
+p:[
+["定義","IntegrationHub ETL（IH-ETL）はサードパーティデータをCMDBまたは非CMDBテーブルに統合するためのETL transform mapsを作成・管理するストアアプリケーション","インポートされたデータはIREを通じて自動処理される"],
+["Service Graph Connectorsとの関係","Service Graph ConnectorsはIntegrationHub ETLのtransform mapsを活用してCMDBへのデータ取り込みを準備する","CMDB管理者はIntegrationHub ETLでマッピングをプレビュー・調整できる"],
+["主要コンポーネント①：RTE","Robust Transform Engine：ステージングテーブルのraw source dataをETL transform mapsを使用してマッピング・統合されたデータに変換する","IntegrationHub ETL内で作成されたETL transform mapsを使用してデータ変換を実行"],
+["主要コンポーネント②：IRE","様々なデータソースにわたる識別と照合を管理するcentralized framework","duplicate CIsなどの問題を防止しターゲットテーブルの整合性を確保する"],
+["プロセスフロー","①外部データをImport Setsとしてステージングテーブルに保存→②RTEがIRE payloadsを生成→③IREが照合を実行→④CMDBに格納","各ステップが順番に実行されてデータ整合性が確保される"],
+["用語：CMDB Application","サードパーティベンダーの名前（例：SCCM）。Name・Discovery Sourceの2属性を持つ","1つのCMDB Applicationは複数のETL transform mapsを持てる。各ETL transform mapは単一のData Sourceに関連付けられる"],
+["ETL Transform Map Assistant①","Step1 Basic Details→Step2 Preview and Prepare Source Data","Step3 Select CMDB Classes and Map Source Data→Step4 Preview and Schedule"],
+["CMDB Integrations Dashboard","Integration Commons for CMDB（sn_cmdb_int_util）に含まれる","全CMDB統合のkey performanceとエラーメトリクスを公開する"],
+["Non-CMDB Table Support","glide.identification_engine.non_cmdb_tablesで指定されたテーブルのみサポート","サポートテーブル：Location・Department・Cost Center・Building・User・Group"],
+],
+q:[
+{t:"基礎",q:"IntegrationHub ETLとService Graph Connectorsの関係として正しいものはどれか？",o:["両者はまったく異なる独立したツール","Service Graph ConnectorsはIntegrationHub ETLのtransform mapsを活用してCMDBへのデータ取り込みを準備する","IntegrationHub ETLはService Graph Connectorsの別名","Service Graph ConnectorsはIntegrationHub ETLを使用しない"],a:1,e:"Service Graph ConnectorsはIntegrationHub ETLのtransform mapsを活用してCMDBへのデータ取り込みを準備する。CMDB管理者はIntegrationHub ETLを使用してマッピングをプレビュー・調整できる。"},
+{t:"基礎",q:"RTEとIREの役割の違いとして正しいものはどれか？",o:["RTEとIREはまったく同じ機能を提供する","RTE（Robust Transform Engine）はraw source dataをマッピング・統合されたデータに変換する。IRE（Identification and Reconciliation Engine）は識別と照合を管理してduplicate CIsを防止しデータ整合性を確保する","RTEはデータを削除しIREはデータを暗号化する","RTEはネットワークをスキャンしIREはデータを可視化する"],a:1,e:"RTE（Robust Transform Engine）はステージングテーブルのraw source dataをETL transform mapsを使用してマッピング・統合されたデータに変換する。IRE（Identification and Reconciliation Engine）は識別と照合プロセスを管理するcentralized frameworkとして機能し、duplicate CIsを防止しデータ整合性を確保する。"},
+{t:"引っ掛け",q:"1つのCMDB Applicationと複数のETL Transform Mapsの関係として正しいものはどれか？",o:["1つのCMDB Applicationは1つのETL Transform Mapしか持てない","1つのCMDB Applicationは複数のETL Transform Mapsを持てる。各ETL Transform Mapは単一のData Sourceに関連付けられる","1つのETL Transform Mapは複数のCMDB Applicationsに関連付けられる","両者は独立していて関連がない"],a:1,e:"1つのCMDB Applicationは複数のETL Transform Mapsを持てる。ただし各ETL Transform Mapは単一のData Sourceに関連付けられる。"},
+{t:"試験対策",q:"IntegrationHub ETLとImport Sets and Transform Mapsの最も重要な違いとして正しいものはどれか？",o:["両者はまったく同じ機能を提供する","IntegrationHub ETLはネイティブでIRE（識別ルール）を活用して重複を防止する。Import Sets and Transform MapsはデフォルトでIREを使用せずonBefore scriptの設定が必要","Import Sets and Transform MapsはIntegrationHub ETLより新しい技術","どちらもIREを自動的に使用する"],a:1,e:"IntegrationHub ETLはネイティブでIRE（identification rules）を活用して重複を防止する。Import Sets and Transform MapsはデフォルトでIREを使用せず、IREを使用するにはonBefore scriptを設定してCMDBTransformUtil APIを呼び出す必要がある。"},
+]});
+
+// ─── Course 3 Lesson 7 ───────────────────────────────
+L.push({c:"Course 3",l:"3-7",t:"Service Graph Connectors（サービスグラフコネクター）",
+s:`Service Graph Connectors（サービスグラフコネクター）は外部システムとデータソースをServiceNowと接続することで、CMDBへのデータのインポート・正規化・高品質なデータの維持を支援するspecialized integrations（専門的な統合）である。
+
+CMDBはorganizationのdigital foundationでありServiceNowの基盤。CMDBがhealthyかつtrustworthy状態を維持するために自動化された方法でデータを取り込むことを推奨。ITOM Visibility（Discovery・ACC・Service Graph Connectors）がfastest time to valueを提供。
+
+カテゴリ（7種類）：Partner cloud providers・Endpoint or IT asset management applications・Monitoring and observability applications・Security solutions・Software/server/network applications・Operational Technology（OT）applications・Partner-built connectors
+
+out-of-the-box connectors：AWS・Azure・VMwareなど。extensive customizationなしで統合プロセスを簡素化するよう設計。
+
+特徴：
+・各コネクターはIREを使用してデータが適切に取り込まれることをレビュー済み（重複防止・重要データの上書き回避）
+・各コネクターはCSDM conformance（CSDMへの準拠）についてレビュー済み
+・すべてのコネクターはIntegrationHub ETLを活用（管理者がマッピングを表示・変更可能）
+・ServiceNowはニーズの拡大や問題発生時にコネクターを継続的に改善する
+
+ライセンス要件：IREを活用するService Graph ConnectorsにはITOM Visibilityライセンスが必要。例外：SCCMコネクターは無料。
+
+カスタマイズの注意：Service Graph Connectorsまたはそのマッピングにカスタマイズを行うと、そのコネクターのサポートと責任が全面的に顧客に移行する。`,
+p:[
+["定義","Service Graph Connectorsは外部システムとServiceNowを接続してCMDBへのデータインポート・正規化・高品質データの維持を支援するspecialized integrations","CMDBはorganizationのdigital foundationでありServiceNowの基盤"],
+["カテゴリ（7種類）","Partner cloud providers・Endpoint/IT asset management・Monitoring and observability・Security solutions","Software/server/network applications・OT applications・Partner-built connectors"],
+["out-of-the-box connectors","AWS・Azure・VMwareなどの一般的なプラットフォームに対応","extensive customizationなしで統合プロセスを簡素化するよう設計"],
+["IREとの連携","各コネクターはIREを使用してデータが適切に取り込まれることをレビュー済み","重複を防止し各ソースの重要なデータの上書きを回避する"],
+["CSDMとの連携","各コネクターはCSDM conformance（CSDMへの準拠）についてレビュー済み","データと構造がCSDMのprescriptive guidanceに準拠していることを確保"],
+["IntegrationHub ETLとの連携","すべてのコネクターはIntegrationHub ETLを活用","管理者が必要に応じてマッピングを表示・変更することが容易"],
+["ライセンス要件","IREを活用するService Graph ConnectorsにはITOM Visibilityライセンスが必要","例外：SCCMコネクターは無料で使用できる"],
+["カスタマイズの注意","Service Graph Connectorsまたはそのマッピングにカスタマイズを行うと、そのコネクターのサポートと責任が全面的に顧客に移行する","カスタマイズはServiceNowのサポート対象外となる"],
+],
+q:[
+{t:"基礎",q:"SCCMコネクターのライセンスに関して正しいものはどれか？",o:["SCCMコネクターもITOM Visibilityライセンスが必要","SCCMコネクターはITOM Visibilityライセンスの例外として無料で使用できる","SCCMコネクターは存在しない","SCCMコネクターは有償だがITOM Visibilityは不要"],a:1,e:"IREを活用するService Graph ConnectorsにはITOM Visibilityライセンスが必要だが、SCCMコネクターは例外として無料（無料）で使用できる。"},
+{t:"引っ掛け",q:"Service Graph Connectorsへのカスタマイズに関して正しいものはどれか？",o:["カスタマイズはServiceNowが推奨しており完全にサポートされる","カスタマイズを行うとそのコネクターのサポートと責任が全面的に顧客に移行するため注意が必要","カスタマイズするとコネクターが完全に無効になる","カスタマイズは有償サービスとして提供される"],a:1,e:"Service Graph Connectorsまたはそのマッピングにカスタマイズを行うと、そのコネクターのサポートと責任が全面的に顧客に移行する。カスタマイズはServiceNowのサポート対象外となる。"},
+{t:"試験対策",q:"Service Graph Connectors・IntegrationHub ETL・IREの連携として最も適切な説明はどれか？",o:["3つは独立して機能し連携しない","Service Graph ConnectorsはIntegrationHub ETLのtransform mapsを活用してデータを準備し、IREを通じてCMDBへのデータ取り込みの整合性を確保する。管理者はIntegrationHub ETLでマッピングを調整できる","Service Graph ConnectorsはIREのみと連携しIntegrationHub ETLは使用しない","IntegrationHub ETLはService Graph Connectorsを完全に置き換えた"],a:1,e:"Service Graph ConnectorsはIntegrationHub ETLのtransform mapsを活用してCMDBへのデータ取り込みを準備する。IREを通じて重複を防止しデータ整合性を確保する。管理者はIntegrationHub ETLでマッピングをプレビュー・調整できる。"},
+]});
+
+// ─── Course 3 Lesson 8 ───────────────────────────────
+L.push({c:"Course 3",l:"3-8",t:"Import Sets and Transform Maps",
+s:`Import Sets and Transform Maps はCMDBにデータをインポート・変換するための最も古い方法。最新リリースではIntegrationHub ETLがより現代的で簡素化されたUIを提供しネイティブでIREを活用して重複を防止するため推奨される。
+
+Import Sets（インポートセット）：CSV・Excel・外部データベースなどの外部ソースからraw dataをServiceNowの temporary staging table（一時的なステージングテーブル）にインポートする。
+
+Transform Maps（変換マップ）：Import Set（ステージングテーブル）のデータをIncident・Problem・CMDBテーブルなどの適切なターゲットテーブルにマッピングする。カスタムロジック・データクレンジング・検証もサポート。field mappings・coalesce values・scriptable actionsを定義する。
+
+CMDBデータインポート計画時の考慮事項：①どのCIクラスが関与するか②どの属性がインポートされるか③ユニークレコードの識別方法（coalesce fieldsまたはIRE identification rules）④ターゲットクラスのmandatory fieldsのマッピング⑤特定の処理やカスタムロジックの要否
+
+CMDBインポートプロセスの3ステップ：①ソースデータをレビューしターゲットテーブル要件を理解→②変換マップを構築し実行順序を定義→③インポートデータとrelationshipsが期待通りに作成されていることを確認
+
+IREのデフォルト動作：デフォルトではIREは使用されない。管理者がTransform MapにカスタムのonBefore scriptを設定しない限りIREは使用されない→重複レコードが発生する可能性がある。
+
+IREを使用するには：Transform MapにonBefore scriptを設定してCMDBTransformUtil APIを呼び出す。APIがソースデータを前処理しImport SetのデータをIREに渡す。CMDBTransformUtil APIが呼び出されるとcoalesce valuesは無視される（技術的に不要）。
+
+IREの処理結果：新規→ターゲットテーブルにレコードを挿入 / 既存→CMDBの既存CIをソースレコードのデータで更新。`,
+p:[
+["重要な更新","Import Sets and Transform Mapsは引き続き有効だが、IntegrationHub ETLがより現代的で簡素化されたUIを提供しネイティブでIREを活用して重複を防止するため推奨される","最新リリースではIntegrationHub ETLの使用を推奨"],
+["Import Setsの定義","CSV・Excel・外部データベースなどの外部ソースからraw dataをServiceNowの一時的なstaging tableにインポートする","データを一時的に保持して処理・検証してからターゲットテーブルに挿入"],
+["Transform Mapsの定義","Import Set（ステージングテーブル）のデータを適切なターゲットテーブルにマッピングする。field mappings・coalesce values・scriptable actionsを定義する","カスタムロジック・データクレンジング・検証もサポート"],
+["IREのデフォルト動作","デフォルトではIREは使用されない。管理者がTransform MapにカスタムのonBefore scriptを設定しない限りIREは使用されない","IREが使用されない場合は重複レコードがCMDBに挿入される可能性がある"],
+["IREを使用するための設定","Transform MapにonBefore scriptを設定してCMDBTransformUtil APIを呼び出す必要がある","APIがソースデータを前処理しImport SetのデータをIREに渡す。CMDBTransformUtil APIが呼び出されるとcoalesce valuesは無視される"],
+["IREの処理結果","新規の場合はターゲットテーブルにレコードを挿入 / 既存の場合はCMDBの既存CIをソースレコードのデータで更新","各ソースレコードがCMDBに挿入される前に識別を実行"],
+],
+q:[
+{t:"基礎",q:"デフォルトのインポート時におけるIREの動作として正しいものはどれか？",o:["デフォルトでIREが自動的に使用される","デフォルトではIREは使用されない。管理者がTransform MapにカスタムのonBefore scriptを設定しない限りIREは使用されない","IREは常にオフ","IREはインポート完了後に自動実行される"],a:1,e:"デフォルトでは、管理者がTransform MapにカスタムのonBefore scriptを設定しない限り、インポート時にIREは使用されない。IREが使用されない場合は重複レコードがCMDBに挿入される可能性がある。"},
+{t:"引っ掛け",q:"IRE使用時のcoalesce valuesの扱いについて正しいものはどれか？",o:["CMDBTransformUtil APIを使用してもcoalesce valuesは引き続き有効","CMDBTransformUtil APIが呼び出されるとcoalesce valuesは無視されるため技術的に不要","coalesce valuesを必ず設定してからAPIを呼び出す必要がある","coalesce valuesはAPIとは別のプロセスで処理される"],a:1,e:"CMDBTransformUtil APIが呼び出されると、Transform Mapで定義されたcoalesce valuesは無視される（技術的に不要）。IREがすべての識別・照合処理を担うため、coalesce valuesを設定する必要はない。"},
+{t:"試験対策",q:"Import Sets/Transform MapsとIntegrationHub ETLの最も重要な違いとして正しいものはどれか？",o:["両者はまったく同じ機能を提供する","IntegrationHub ETLはネイティブでIREを活用して重複を防止する。Import Sets and Transform MapsはデフォルトでIREを使用せずonBefore scriptの設定が必要。IntegrationHub ETLがより現代的で推奨される","Import Sets and Transform MapsはIntegrationHub ETLより新しい技術","どちらもIREを自動的に使用する"],a:1,e:"最も重要な違いはIREの活用方法。IntegrationHub ETLはネイティブでIREを活用して重複を防止する。Import Sets and Transform MapsはデフォルトでIREを使用せず、IREを使用するにはonBefore scriptを設定してCMDBTransformUtil APIを呼び出す必要がある。"},
+]});
+
+// ─── Course 3 Lesson 9 ───────────────────────────────
+L.push({c:"Course 3",l:"3-9",t:"Populate Foundation Group Data（基盤グループデータの投入）",
+s:`Discovery等でデータ取り込み後、non-discoverable dataであるグループ情報・ロケーション情報を補充することがCMDB管理者のcrucial（不可欠）な次のステップ。グループ情報はインシデント発生時・変更実施時にessential（不可欠）。
+
+主要なグループフィールド：
+・Managed By Group：Data Managerタスク（attestation・life cycle・certification policies）の割り当てを効率化
+・Support Group：Incident Assignment Groupにマッピングされincident routing（インシデントルーティング）を効率化
+・Change Group：Change Assignment Groupにマッピングされchange routing（変更ルーティング）を効率化
+
+Incident Routing：受信インシデントを事前定義された基準に基づいて適切なチームまたは個人に自動的に振り分けるプロセス。応答時間の改善・解決時間の短縮・IT サービス管理の効率向上を実現。
+
+Change Routing：変更管理プロセス内の事前定義されたルールに基づいて変更リクエストを適切なグループまたは個人に自動的に振り分けるプロセス。
+
+グループデータ追加後は定期的にaudit（監査）して正確性を確保することがcrucial。ServiceNow の Data Manager で certification policies を設定可能。
+
+グループフィールドを自動投入する2つの方法：
+
+Method 1：CI Class Manager
+・特定クラスのManaged By Groupを設定。クラス内すべてのCIに自動同期される
+・Technology Management Offeringに関連付けられていないCIのみに適用
+・extended classesのCIには同期されない
+
+Method 2：Technology Management Offering（旧称：Technical Service Offering）
+・Support group・Change group・Managed By Groupの3つをオファリング内で直接設定
+・オファリングに関連付けられたCIに適用
+・Managed By GroupはまずdynamicCI groupと同期され、次にその動的CIグループの一部のCIと同期→CI Class Managerの設定を上書き
+・設定方法①：Forms（各種フォームを直接入力）②：Service Builder（ServiceNow Storeの無償アプリ。ガイド付きステップバイステップフロー）
+
+優先順位：Priority 1→Technology Management Offering / Priority 2→CI Class Manager（Offeringの設定がCI Class Managerより優先）`,
+p:[
+["背景","Discovery等でデータ取り込み後、non-discoverable dataであるグループ情報・ロケーション情報を補充することがCMDB管理者のcrucial（不可欠）な次のステップ","グループ情報はインシデント発生時・変更実施時にessential（不可欠）"],
+["Managed By Group","Data Managerタスク（attestation・life cycle・certification policies）の割り当てを効率化するために使用される","グループフィールドの中で最も重要な管理フィールド"],
+["Support Group","Incident Assignment Groupにマッピングされincident routing（インシデントルーティング）を効率化する","インシデントの自動振り分けに直結"],
+["Change Group","Change Assignment Groupにマッピングされchange routing（変更ルーティング）を効率化する","変更リクエストの自動振り分けに直結"],
+["Method 1：CI Class Manager","特定クラスのManaged By Groupを設定。クラス内すべてのCIに自動同期される","Technology Management Offeringに関連付けられていないCIのみに適用。extended classesのCIには同期されない"],
+["Method 2：Technology Management Offering","Support group・Change group・Managed By Groupの3つをオファリング内で直接設定","オファリングに関連付けられたCIに適用。dynamic CI groupを通じてCIと同期しCI Class Managerの設定を上書き"],
+["優先順位","Priority 1：Technology Management Offering の Managed By Group","Priority 2：CI Class Manager の Managed By Group（Offeringの設定に上書きされる）"],
+["Method 2の設定方法","Forms（各種フォームを直接入力）またはService Builder（ServiceNow Storeの無償アプリ・ガイド付きステップバイステップフロー）","Service Builderで重要なフィールドと値の説明が提供される"],
+],
+q:[
+{t:"基礎",q:"Support Group・Change Group・Managed By Groupの各フィールドの役割として正しいものはどれか？",o:["3つのフィールドはすべて同じ目的","Support GroupはIncident Assignment Groupにマッピングされincident routingを効率化する。Change GroupはChange Assignment Groupにマッピングされchange routingを効率化する。Managed By GroupはData Managerタスクの割り当てを効率化する","Support GroupはChange Managementに使用される","Change GroupはIncident Managementに使用される"],a:1,e:"Support Group（サポートグループ）はIncident Assignment GroupにマッピングされてIncident Routing（インシデントルーティング）を効率化する。Change Group（変更グループ）はChange Assignment GroupにマッピングされてChange Routing（変更ルーティング）を効率化する。Managed By Group（管理グループ）はData Managerタスク（attestation・life cycle・certification policies）の割り当てを効率化する。"},
+{t:"基礎",q:"CI Class ManagerでManaged By Groupを設定した場合のextended classesへの適用について正しいものはどれか？",o:["設定したクラスとすべてのextended classesのCIに同期される","CI Class ManagerのManaged By Groupの設定はextended classes（拡張クラス）のCIには同期されない","extended classesには手動で設定する必要がある","extended classesへの同期は有償機能"],a:1,e:"CI Class ManagerのManaged By Group設定はクラスの基礎となるCIにのみ同期され、extended classes（拡張クラス）のCIには同期されない。これは重要な制限事項である。"},
+{t:"引っ掛け",q:"CI Class ManagerとTechnology Management Offeringの両方でManaged By Groupが設定されている場合、どちらが適用されるか？",o:["CI Class Managerの設定が優先される（Priority 1）","Technology Management Offeringの設定が優先される（Priority 1）。CI Class Managerは Priority 2であり上書きされる","最後に設定された値が優先される","どちらも同時に適用される"],a:1,e:"特定のCIについてTechnology Management Offering（Priority 1）のManaged By GroupはCI Class Manager（Priority 2）の設定より優先される。OfferingのManaged By GroupがCI Class Managerの設定を上書きする。"},
+{t:"試験対策",q:"グループフィールドの自動投入における2つの方法の特徴と優先順位として最も適切な説明はどれか？",o:["CI Class ManagerとTechnology Management Offeringはまったく同じ機能を提供する","CI Class Manager（Method 1）はManaged By Groupのみ設定可能でextended classesには同期されない。Technology Management Offering（Method 2）はSupport・Change・Managed By Groupの3つを設定でき、Offeringの設定がCI Class Managerより優先される（Priority 1）","CI Class ManagerはSupport GroupとChange Groupを設定でき、Technology Management OfferingはManaged By Groupのみ設定できる","どちらも同じ優先順位でグループを設定する"],a:1,e:"CI Class Manager（Method 1）はManaged By Groupのみ設定可能でextended classesには同期されない。Technology Management Offering（Method 2）はSupport Group・Change Group・Managed By Groupの3つをすべて設定できる。優先順位はTechnology Management Offering（Priority 1）がCI Class Manager（Priority 2）より高く、Offeringの設定がCI Class Managerの設定を上書きする。"},
+]});
+
+L.push({c:"Course 3",l:"3-3",t:"ServiceNow Service Mapping（サービスマッピング）",
+s:`Service Mapping（サービスマッピング）はTop-Downアプローチでサービスを構成するCIs間のrelationshipsとdependenciesを自動的に検出・モデル化してCMDBに投入するServiceNowの製品。別名：Top-down discovery・Tag-based discovery・ML-powered mapping。
+
+forward-thinking（先進的）なIT組織は特定のインフラよりも critical services（重要なサービス）を重視。service mapsはenterprise visibility（エンタープライズの可視性）を提供し、特定のサービスをサポートするためにどのCIがcriticalかを理解できる。
+
+IT Operations とビジネスユーザー間のギャップ：IT はサービスをインフラにマッピングすることが困難だった。Service Mappingはこのギャップを解消する。マップなしではカスタマーポータルなどのサービスがダウンした理由をほぼ特定できない。
+
+90%の自動化：最も効果的なCMDBは自動化ツールでpopulatedされる。CMDBデータの90%は自動的に投入されるべきで、残り10%は適切なガバナンス後に手動更新する。
+
+Application Service（アプリケーションサービス）：展開されたシステム・アプリケーション・製品スタックを論理的に表すサービスタイプ。親クラス [cmdb_ci_service_auto] またはそのサブクラスに格納。環境ごと（Dev・Test・QA・Prod）・地理的地域ごと（AMS・EMEA・APJ）・組織ごと（HR・Marketing・Sales）に作成可能。
+
+Application Serviceのタイプ：Service Mapping（Top-Down）・Dynamic CI Group・Tag-based
+
+CSDMとの関係：Accurate Service Modeling（CSDMフレームワークと一致）・Enhanced Data Quality（CMDB自動投入によりCSDM標準への準拠）・Dependency Management（サービスヘルス・影響分析の基盤）
+
+主なメリット：Enhanced Visibility・Improved Incident and Problem Management（インシデント根本原因をより速く特定）・Proactive Change Management（変更の影響への洞察）・Enhanced Compliance and Governance`,
+p:[
+["定義","Service MappingはTop-Downアプローチでサービスを構成するCIs間のrelationshipsとdependenciesを自動検出・モデル化してCMDBに投入する","別名：Top-down discovery・Tag-based discovery・ML-powered mapping"],
+["ITのシフト","特定のインフラよりもcritical services（重要なサービス）を重視する方向へシフト","run operations・provide to customers・drive revenues・increase efficiency・create strategies"],
+["ギャップの解消","ITはサービスをインフラにマッピングすることが困難だった。Service Mappingはこのギャップを解消する","マップなしではサービスダウンの原因特定がほぼ不可能"],
+["90%の自動化","最も効果的なCMDBは自動化ツールでpopulatedされる。CMDBデータの90%は自動的に投入されるべき","残りの10%は適切なガバナンス後に手動で更新する"],
+["Application Serviceの定義","展開されたシステム・アプリケーション・製品スタックを論理的に表すサービスタイプ","親クラス [cmdb_ci_service_auto] またはそのサブクラスに格納"],
+["Application Serviceの作成軸","環境ごと（Dev・Test・QA・Prod）または地理的地域ごと（AMS・EMEA・APJ）に作成可能","組織またはビジネスライン（HR・Marketing・Sales）を表すことも可能"],
+["Application Serviceのタイプ","Service Mapping（Top-Down）・Dynamic CI Group・Tag-basedの3タイプ","Top-DownはパターンベースおよびML connection suggestionsタイプのマッピングを提供"],
+["CSDMとの関係①","Accurate Service Modeling：サービス内のすべてのコンポーネントを特定・マッピングしCSDMフレームワークと一致させる","Enhanced Data Quality：正確なサービスと依存関係情報でCMDBを自動投入しCSDM標準への準拠を確保"],
+["メリット①","Enhanced Visibility：ITサービスとその基盤インフラの正確なマップを作成しリアルタイムで包括的なビューを提供","Improved Incident and Problem Management：根本原因をより速く特定しダウンタイムを削減"],
+["メリット②","Proactive Change Management：変更の潜在的な影響へのinsightを提供し最小限のリスクで変更を実行可能にする","Enhanced Compliance and Governance：サービスの依存関係とデータフローの明確なマップを提供し規制コンプライアンスと監査要件をサポート"],
+],
+q:[
+{t:"基礎",q:"Service Mappingの定義として正しいものはどれか？",o:["スケジュールベースでネットワークをスキャンするツール","Top-Downアプローチでサービスを構成するCIs間のrelationshipsとdependenciesを自動的に検出・モデル化してCMDBに投入するServiceNowの製品","エージェントをインストールしてリアルタイムでデータを収集するツール","手動でサービスマップを作成するためのツール"],a:1,e:"Service Mapping はTop-Down（トップダウン）アプローチで、サービスを構成するCIs間のrelationships（関係性）とdependencies（依存関係）を自動的に検出・モデル化してCMDBに投入するServiceNowの製品である。"},
+{t:"基礎",q:"Application Serviceが格納される親クラスとして正しいものはどれか？",o:["cmdb_ci_server","cmdb_ci_service_auto（またはそのサブクラス）","cmdb_ci_hardware","cmdb_ci_appl"],a:1,e:"Application Serviceは Application Serviceの親クラス [cmdb_ci_service_auto] またはそのサブクラスに格納される。"},
+{t:"引っ掛け",q:"CMDB効果的なデータ投入における自動化の割合について正しいものはどれか？",o:["10%を自動化し90%を手動で更新するのが推奨","90%は自動的にpopulatedされるべきで残りの10%は手動で更新する。100%の自動化は目標ではない","50%を自動化し50%を手動で更新するのが最適","自動化の割合に特に推奨値はない"],a:1,e:"最も効果的なCMDBは自動化ツールでpopulatedされる。CMDBデータの90%は自動的にpopulatedされるべきであり、残りの10%は適切なガバナンス後に手動で更新する。100%の自動化が目標ではない点に注意。"},
+{t:"試験対策",q:"Service Mappingが解決する主要な課題として最も適切な説明はどれか？",o:["IT機器の財務管理の困難さを解決する","ITがサービスをインフラにマッピングできないギャップを解消し、サービスマップを自動構築することでインシデント根本原因の特定・変更影響分析・コンプライアンス対応を改善する","ネットワークセキュリティの脆弱性を自動修正する","ユーザー権限管理の複雑さを解消する"],a:1,e:"Service Mappingが解決する主要な課題はITがサービスをインフラにマッピングできないギャップである。サービスマップを自動構築することでEnhanced Visibility・Improved Incident and Problem Management・Proactive Change Management・Enhanced Compliance and Governanceが実現される。"},
+]});
+
+// ─── Course 4 Lesson 2 ───────────────────────────────
+L.push({c:"Course 4",l:"4-2",t:"Introduction to CMDB Health（CMDB健全性の概要）",
+s:`多くの企業がCMDBを実装しているにもかかわらず、データの運用化に苦戦している。CMDBのhealth issuesはaccuracy・completeness・reliabilityにdownstream effects（下流への影響）をもたらす。
+
+重要な名言：「You can't manage what you can't measure.（測定できないものは管理できない）」― Peter Drucker
+
+CMDB Health Dashboardの3スコアカード：
+1. Completeness（完全性）：required・recommendedフィールドデータの投入状況へのinsightを提供。使用メトリクス：Recommended・Required
+2. Compliance（コンプライアンス）：auditsと呼ばれる確立された標準とポリシーへのCMDBの準拠状況の可視性を提供。使用メトリクス：Audit
+3. Correctness（正確性）：CMDB内のデータが正確でIT環境の真の状態を反映しているかを検証。使用メトリクス：Duplicate・Orphan・Staleness
+
+全体スコアの計算：個々のメトリクスの平均ではない。すべての定義されたメトリクス基準を通過したCIのパーセンテージ。例：個々メトリクスが93%・100%・96%でも全体スコアが89%になる場合がある。
+
+Health Inclusion Rules：管理者がCMDB Health Dashboardの評価に含めるCIクラスを定義できるconfiguration settings。組織が管理責任を持つCIクラスのみのメトリクスを計算するよう設定することがbest practice。利点：Selective Class Tracking・Granular Control・Customizable Metrics・Operator-Based Rules（「is a」でクラス階層全体を含める）
+
+CMDB Group Health Dashboard：CMDBグループの集約されたヘルスレポートのcentralized view。グループ内すべてのCIの全体的な健全性を表示。クラスを切り替えなくてもすべてのCIクラスの健全性メトリクスを一箇所で表示可能。
+
+チェックリスト：①Prevent bad data（baseline identification rulesの有効性確保・定期レビュー）②Regularly review the CMDB Health Dashboard（duplicate・stale CIの特定とタスク割り当て）③Conduct data quality reviews（Managed By Group・Support Group・Serial Numberなどの欠落確認）`,
+p:[
+["背景","多くの企業がCMDBを実装しているが健全性メトリクスへのeasy visibilityと制御の欠如からデータの運用化に苦戦","CMDB health issuesはaccuracy・completeness・reliabilityにdownstream effects（下流への影響）をもたらす"],
+["重要な名言","「You can't manage what you can't measure.（測定できないものは管理できない）」― Peter Drucker","CMDBヘルス管理の根拠となる重要な考え方"],
+["Completeness（完全性）スコアカード","required・recommendedフィールドデータの投入状況へのinsightを提供","使用メトリクス：Recommended・Required"],
+["Compliance（コンプライアンス）スコアカード","auditsと呼ばれる確立された標準とポリシーへのCMDBの準拠状況の可視性を提供","使用メトリクス：Audit"],
+["Correctness（正確性）スコアカード","CMDB内のデータが正確でIT環境の真の状態を反映しているかを検証","使用メトリクス：Duplicate（重複）・Orphan（孤立）・Staleness（陳腐化）"],
+["スコアカードの計算方法","全体スコアはすべての定義されたメトリクス基準を通過したCIのパーセンテージを表す","個々のメトリクスの平均ではない。例：93%・100%・96%でも全体が89%になる場合がある"],
+["Health Inclusion Rules","管理者がCMDB Health Dashboardの評価に含めるCIクラスを定義できるconfiguration settings","組織が管理責任を持つCIクラスのみのメトリクスを計算するよう設定することがbest practice"],
+["Health Inclusion Rulesの利点","Selective Class Tracking・Granular Control・Customizable Metrics・Operator-Based Rules（「is a」でクラス階層全体を含める）","メトリクスごとに特定フィルターを適用可能（例：Correctnessには適用するがCompletenessには適用しない）"],
+["CMDB Group Health Dashboard","CMDBグループの集約されたヘルスレポートのcentralized view（一元化されたビュー）を提供","グループ内すべてのCIの全体的な健全性を表示。クラスを切り替えなくてもすべてのCIクラスの健全性を一箇所で確認可能"],
+["チェックリスト①","Prevent bad data：baseline identification rulesが有効であることを確保し、CIの作成・更新に関わる手動プロセスと自動化方法を定期的にレビュー","悪いデータが入らないよう最初から防ぐことが最重要"],
+["チェックリスト②","Regularly review the CMDB Health Dashboard：duplicate・stale CIデータなどの問題を特定しCIオーナーやmanaged by groupにタスクを割り当て","問題をタイムリーに対処するための定期的なレビュー"],
+["チェックリスト③","Conduct data quality reviews：Managed By Group・Support Group・Serial Numberなどの重要フィールドの欠落を特定","data quality reviewsによりmissing informationを発見"],
+],
+q:[
+{t:"基礎",q:"CMDB Health Dashboardの3スコアカードとそれぞれが使用するメトリクスの正しい組み合わせはどれか？",o:["Completeness→Audit / Compliance→Recommended・Required / Correctness→Duplicate・Orphan・Staleness","Completeness→Recommended・Required / Compliance→Audit / Correctness→Duplicate・Orphan・Staleness","Completeness→Duplicate・Orphan / Compliance→Recommended・Required / Correctness→Audit","すべてのスコアカードが同じメトリクスを使用する"],a:1,e:"正しい組み合わせ：Completeness→Recommended・Required / Compliance→Audit / Correctness→Duplicate・Orphan・Staleness。各スコアカードが異なるメトリクスを使用してCMDBの異なる側面を評価する。"},
+{t:"基礎",q:"スコアカードの全体パーセンテージの計算方法として正しいものはどれか？",o:["個々のメトリクスの平均値","すべての定義されたメトリクス基準を通過したCIのパーセンテージ。例：個々メトリクスが93%・100%・96%でも全体スコアが89%になる場合がある","最低スコアのメトリクスの値","最高スコアのメトリクスの値"],a:1,e:"スコアカードの全体パーセンテージはすべての定義されたメトリクス基準を通過したCIのパーセンテージを表す。個々のメトリクスの平均ではない。"},
+{t:"引っ掛け",q:"Health Inclusion Rulesを設定するbest practiceとして正しいものはどれか？",o:["すべてのCIクラスを含める（フィルタリングなし）","組織が管理責任を持つCIクラスのみのメトリクスを計算するよう設定する。Operator-Based Rules（「is a」など）を活用してクラス階層全体を効率的に含めることができる","有償ライセンスが必要なためHealth Inclusion Rulesは使用しない","Health Inclusion Rulesは一度設定したら変更不要"],a:1,e:"Health Inclusion RulesのBest Practiceは組織が管理責任を持つCIクラスのみのメトリクスを計算するよう設定すること。Operator-Based Rulesを活用してCIクラスの階層全体を効率的に含めることができる。"},
+{t:"試験対策",q:"Healthy CMDB維持のための3つのチェックリストとして正しいものはどれか？",o:["セキュリティ設定・バックアップ・監査","Prevent bad data（悪いデータの防止）・Regularly review the CMDB Health Dashboard（定期的なヘルスダッシュボードのレビュー）・Conduct data quality reviews（データ品質レビューの実施）","コスト削減・効率化・自動化","ユーザー管理・ライセンス管理・セキュリティ管理"],a:1,e:"チェックリスト：①Prevent bad data（baseline identification rulesの有効性確保と定期レビュー）②Regularly review the CMDB Health Dashboard（duplicate・stale CIの特定とタスク割り当て）③Conduct data quality reviews（Managed By Group・Support Group・Serial Numberなどの欠落確認）。"},
+]});
+
+// ─── Course 4 Lesson 3 ───────────────────────────────
+L.push({c:"Course 4",l:"4-3",t:"Completeness Scorecard（完全性スコアカード）",
+s:`Completeness Scorecard（完全性スコアカード）はCMDBのCIとCIクラスがどの重要なデータを欠いているかを追跡するツール。Recommended・Requiredの2つのメトリクスを使用する。
+
+重要：ServiceNow base systemはCMDB内のrequiredまたはrecommended CI attributesの事前定義された提案を提供しない。どのフィールドが必須かを決定するのはCMDB管理者と他のステークホルダーの責任。
+
+Required Fields（必須フィールド）：database functionality（データベース機能）として強制。フィールドが空の場合エラーが発生する。システムプロパティglide.required.attribute.enabledはデフォルトでtrue。
+
+Recommended Fields（推奨フィールド）：visibility（可視性）のためにのみ使用。属性が投入されていない場合でもデータベースエラーは発生しない。
+
+推奨事項：support groupなどのフィールドはほとんどのディスカバリツールが収集しないため、requiredではなくrecommendedとして設定することを推奨。
+
+Required Fields の設定方法：CI Class Manager > Hierarchy > クラス検索 > Class Info > Attributes タブ > フィールド > Mandatory チェックボックス > Update。Dictionary Overrideで子クラスにのみrequiredを適用できる（例：Serial NumberをHardwareクラスとその拡張クラスにのみrequiredにする場合）。
+
+Recommended Fields の設定方法：CI Class Manager > Hierarchy > クラス検索 > Health > Completeness > Recommended Fields タブ > フィールドを右側に移動。
+
+Completeness Score 計算ジョブ：CMDB Health Dashboard > CMDB Health Settings > Scheduled Jobs > Completeness Score Calculation。ステータス確認：cmdb_health_metric_status.list
+
+Required フィールドでのIRE統合エラー回避：glide.required.attribute.enabledをfalseに設定（Configuration > CMDB Properties > Identification/Reconciliation Propertiesまたはsys_properties.listから）
+
+メリット：Improved Data Quality・Proactive Issue Identification・Enhanced Visibility・Process Efficiency・Better Compliance・Supports CMDB Governance`,
+p:[
+["定義","Completeness ScorecardはCMDBのCIとCIクラスがどの重要なデータを欠いているかを追跡するツール","Recommended・Requiredの2つのメトリクスを使用する"],
+["重要な前提","ServiceNow base systemはrequiredまたはrecommended CI attributesの事前定義された提案を提供しない","どのフィールドが必須かはCMDB管理者と他のステークホルダーが決定する"],
+["Required Fields（必須フィールド）","database functionality（データベース機能）として強制される。フィールドが空の場合エラーが発生する","システムプロパティglide.required.attribute.enabledはデフォルトでtrue。必須フィールドが空だとエラーが発生する"],
+["Recommended Fields（推奨フィールド）","visibility（可視性）のためにのみ使用される。属性が投入されていない場合でもデータベースエラーは発生しない","データを追跡しながら統合エラーを回避できる"],
+["Required vs Recommendedの選択","support groupなどのフィールドはほとんどのディスカバリツールが収集しないため、requiredではなくrecommendedとして設定することを推奨","requiredに設定するとServiceNow Discovery jobsやインポートが失敗する可能性がある"],
+["Required Fieldsの設定方法","CI Class Manager > Hierarchy > クラス検索 > Class Info > Attributesタブ > フィールド選択 > Mandatoryチェックボックス > Update","Dictionary Overrideを使用することで親クラスに影響を与えずに子クラスにのみrequiredを適用できる"],
+["Dictionary Overrideの用途","子クラスでフィールドをrequiredにする必要があるが、フィールドが親クラスに属する場合に使用","例：Serial NumberをHardwareクラスとその拡張クラスにのみrequiredにする場合（cmdb_ciでは非requiredのため）"],
+["Recommended Fieldsの設定方法","CI Class Manager > Hierarchy > クラス検索 > Health > Completeness > Recommended Fieldsタブ > フィールドを右側に移動","フィールドを右側に移動させてrecommendedとしてマーク"],
+["Completeness Score計算ジョブ","CMDB Health Dashboard > CMDB Health Settings > Scheduled Jobs > Completeness Score Calculationジョブを開く","Execute Nowで即座に実行可能。ステータスはcmdb_health_metric_status.listで確認"],
+["Required フィールドでの統合エラー回避","glide.required.attribute.enabledをfalseに設定（Configuration > CMDB Properties > Identification/Reconciliation Propertiesまたはsys_properties.listから）","または対象フィールドをrequiredではなくrecommendedに変更することも検討"],
+["メリット①","Improved Data Quality・Proactive Issue Identification・Enhanced Visibility","重要フィールドの投入状況を評価し欠落データを早期特定"],
+["メリット②","Process Efficiency・Better Compliance・Supports CMDB Governance","完全なデータを確保することで自動化ワークフロー・規制準拠・ガバナンスポリシーを支援"],
+],
+q:[
+{t:"基礎",q:"Required Fieldsの特性として正しいものはどれか？",o:["visibility（可視性）のためにのみ使用されデータベースエラーは発生しない","database functionality（データベース機能）として強制される。フィールドが空の場合エラーが発生する","ServiceNow Discoveryが自動的に収集する","CI Class Managerでのみ設定できる"],a:1,e:"Required Fields（必須フィールド）はdatabase functionality（データベース機能）として強制される。フィールドが空の場合エラーが発生する。システムプロパティglide.required.attribute.enabledはデフォルトでtrueに設定されており、必須フィールドが投入されていないとエラーが発生する。"},
+{t:"基礎",q:"Recommended Fieldsの設定方法として正しいものはどれか？",o:["Dictionary Entryで設定する","CI Class Manager > Hierarchy > クラス検索 > Health > Completeness > Recommended Fieldsタブ > フィールドを右側に移動","sys_properties.listから設定する","CMDB Health Dashboard > Scheduled Jobsから設定する"],a:1,e:"Recommended Fieldsの設定方法：CI Class Manager > Hierarchyを選択 > クラスを検索 > Health下のCompletenessを選択 > Recommended Fieldsタブから > すべての希望するフィールドを右側に移動させてrecommendedとしてマークする。"},
+{t:"引っ掛け",q:"glide.required.attribute.enabledシステムプロパティのデフォルト値と動作として正しいものはどれか？",o:["デフォルトでfalse。必須フィールドが空でもエラーは発生しない","デフォルトでtrue。必須フィールドが空だとエラーが発生し、ServiceNow Discovery jobsやインポートが失敗する可能性がある","このプロパティは存在しない","デフォルトでtrue。すべてのフィールドを必須に設定する"],a:1,e:"glide.required.attribute.enabledシステムプロパティはbase systemではデフォルトでtrueに設定されており、必須フィールドが投入されていないとエラーが発生する。これによりServiceNow Discovery jobsやインポートが失敗する可能性がある。"},
+{t:"試験対策",q:"Required FieldsとRecommended Fieldsの最も重要な違いとして正しいものはどれか？",o:["どちらも同じ動作をする","Required Fieldsはdatabase functionalityとして強制されフィールドが空の場合エラーが発生する。Recommended Fieldsはvisibilityのためにのみ使用されエラーは発生しない。Discoveryツールが収集しないフィールドはrecommendedとして設定することを推奨する","Recommended Fieldsの方がRequired Fieldsより重要","Required FieldsはCI Class Managerで、Recommended FieldsはCMDB Health Dashboardで設定する"],a:1,e:"Required FieldsはDatabase functionalityとして強制されフィールドが空の場合エラーが発生する。Recommended FieldsはVisibilityのためにのみ使用されデータベースエラーは発生しない。Discovery toolsが収集しないsupport group等のフィールドはrequiredではなくrecommendedとして設定することを推奨する。"},
+]});
+
+// ─── Course 4 Lesson 4 ───────────────────────────────
+L.push({c:"Course 4",l:"4-4",t:"Compliance Scorecard（コンプライアンススコアカード）",
+s:`Compliance Scorecard（コンプライアンススコアカード）は監査結果に基づきCIが組織の定義した基準に準拠しているかを監査・可視化するツール。使用メトリクス：Audit。
+
+例：すべてのワークステーションにウイルス対策ソフト必要 / すべてのLinuxサーバーに最新パッチ適用 / すべての本番サーバーにサポートグループと管理グループ割り当て。一般的ユースケース：システムアップグレードの管理（OSアップグレードに必要な最小ハードウェア要件を満たしていないサーバーを特定）。
+
+監査は特定フィールドの実際の値を、テンプレートまたはスクリプト監査で定義された期待値と比較する。CIがCMDB Health監査テストに合格するにはすべての監査に準拠が必要。
+
+4つの構成要素：
+①Certification Filter（認証フィルター）：特定タイプのCIから監査の範囲を定義。設定：CI Class Manager > Hierarchy > クラス > Health > Compliance > Certification Filter。Compliance > Filtersからも設定可能。
+②Certification Template（認証テンプレート）：監査に合格するための条件を定義（属性・relationships・参照フィールド値）。設定：CI Class Manager > Health > Compliance > Certificate Template > 監査タイプをDesired Stateに設定 > 保存。Compliance > Templatesからも設定可能。
+③Audit（監査）：認証テンプレートで定義された期待値に対して実際の属性を比較。フォローオンタスクの作成・割り当て可能。設定：CI Class Manager > Health > Compliance > Audit。Compliance > Auditsからも設定可能。
+④Compliance Score Calculation Job：Configuration > Health Preferences > Scheduled Jobs > Compliance Score Calculationジョブ > Activate > Execute Now。ステータス確認：cmdb_health_metric_status.list。管理者ロールで実行が必須。
+
+重要：CMDB Health Dashboardに含めるには監査タイプを「Desired State」に設定が必要。「Compliance」や「Compliance Architecture」などはCMDB Health Dashboardには含まれない。
+
+スクリプト監査：Certification Templateの条件が具体的でない場合の代替手段。certification_adminロールが必要。設定：Compliance > Desired State > Scripted Audits > Audits（CI Class Managerからは作成不可）。コンプライアンススコアカードで計算される監査タイプはDesired State監査とスクリプト監査の2つのみ。
+
+Data Manager Certification Policy vs Desired State監査：前者は属性の手動検証用（non-discoverable data向け）、後者は特定フィールドが空でないかの自動チェック用。`,
+p:[
+["定義","Compliance Scorecardは監査結果に基づきCIが組織の定義した基準に準拠しているかを監査・可視化するツール","使用メトリクス：Audit"],
+["一般的なユースケース","システムアップグレードの管理：OSアップグレードに必要な最小ハードウェア要件を満たしていないサーバーを特定","ウイルス対策ソフト有無・最新パッチ適用状況・サポートグループ割り当てなどのチェック"],
+["構成要素①：Certification Filter","特定のタイプのCIから監査の範囲を定義する","設定：CI Class Manager > Hierarchy > クラス > Health > Compliance > Certification Filter。Compliance > Filtersからも設定可能"],
+["構成要素②：Certification Template","監査に合格するために満たす必要がある条件を定義する（属性・relationships・参照フィールド値）","設定：CI Class Manager > Health > Compliance > Certificate Template。監査タイプをDesired Stateに設定が必須。Compliance > Templatesからも設定可能"],
+["重要：監査タイプ","CMDB Health Dashboardに含めるには監査タイプを「Desired State」に設定する必要がある","「Compliance」や「Compliance Architecture」などの監査タイプはCMDB Health Dashboardには含まれない"],
+["構成要素③：Audit（監査）","認証テンプレートで定義された期待値に対して実際の属性を比較する。フォローオンタスクを作成・割り当て可能","設定：CI Class Manager > Health > Compliance > Audit。Compliance > Auditsからも設定可能"],
+["構成要素④：Compliance Score Calculation Job","Configuration > Health Preferences > Scheduled Jobs > Compliance Score Calculationジョブを開きActivate","Execute Nowで即座実行可能。ステータス確認：cmdb_health_metric_status.list。管理者ロールで実行が必須"],
+["ジョブ実行の注意","管理者ロールを持つユーザーで実行する必要がある","管理者以外が実行した場合、権限が制限されているため結果が不正確になる可能性がある"],
+["スクリプト監査","Certification Templateの条件が具体的でない場合の代替手段。certification_adminロールが必要","設定：Compliance > Desired State > Scripted Audits > Audits（CI Class Managerからは作成不可）"],
+["コンプライアンススコアカードで計算される監査タイプ","Desired State監査とスクリプト監査の2つのみ","他の監査タイプ（Compliance等）はCMDB Health Dashboardに含まれない"],
+["Data Manager Certification Policy vs Desired State監査","Data Manager Certification Policy：属性の手動検証用（non-discoverable data向け） / Desired State監査：特定フィールドが空でないことを自動チェック","例：手動検証→Joe SmithがServerXYZの所有者か確認 / 自動チェック→所有者フィールドが空でないか確認"],
+],
+q:[
+{t:"基礎",q:"CMDB Health DashboardにAuditを含めるために必要な監査タイプの設定として正しいものはどれか？",o:["「Compliance」に設定する","「Compliance Architecture」に設定する","「Desired State」に設定する","「Script」に設定する"],a:2,e:"CMDB Health DashboardにAuditを含めるには監査タイプを「Desired State」に設定する必要がある。「Compliance」や「Compliance Architecture」などの監査タイプはCMDB Health Dashboardには含まれず、他のServiceNow製品で使用することを目的としている。"},
+{t:"基礎",q:"コンプライアンススコアカードを使用するために構成が必要な4つの項目として正しいものはどれか？",o:["Discovery Ranges・MID Server・Scheduled Jobs・Dashboard","Certification Filter・Certification Template・Audit・Compliance Score Calculation Job","Required Fields・Recommended Fields・Audit・Score Job","CI Class Manager・Health Inclusion Rules・Orphan Rules・Staleness Rules"],a:1,e:"コンプライアンススコアカードの4つの構成要素：①Certification Filter（認証フィルター：監査の範囲定義）②Certification Template（認証テンプレート：合格条件の定義・Desired State設定）③Audit（監査：実行設定）④Compliance Score Calculation Job（スコア計算ジョブ・管理者ロールで実行）。"},
+{t:"基礎",q:"Compliance Score Calculation Jobを実行する際の重要な注意点として正しいものはどれか？",o:["任意のユーザーが実行できる","管理者ロールを持つユーザーで実行する必要がある。管理者以外が実行した場合、権限が制限されているため結果が不正確になる可能性がある","スケジュール実行のみが可能","Execute Nowは使用できない"],a:1,e:"Compliance Score Calculation Jobは管理者ロールを持つユーザーで実行する必要がある。管理者以外のユーザーがジョブを実行した場合、そのユーザーの権限が制限されているため、結果が不正確に反映される可能性がある。"},
+{t:"基礎",q:"スクリプト監査（Script Audit）の設定方法として正しいものはどれか？",o:["CI Class Managerから作成できる","Compliance > Desired State > Scripted Audits > Auditsから設定する（CI Class Managerからは作成不可）","CMDB Health Dashboardから作成できる","sys_properties.listから作成できる"],a:1,e:"スクリプト監査の設定方法：Compliance > Desired State > Scripted Audits > Auditsに移動する。CI Class Managerからは作成できない点が重要。ベースシステムには「Data Center Zone Usage」のサンプルスクリプト監査が含まれる。"},
+{t:"引っ掛け",q:"「Compliance」タイプの監査をCMDB Health Dashboardのコンプライアンススコアカードに含める方法として正しいものはどれか？",o:["そのまま設定すれば自動的に含まれる","「Compliance」タイプの監査はCMDB Health Dashboardには含まれない。含めるには監査タイプを「Desired State」に設定する必要がある","監査タイプを「Compliance Architecture」に変更する","Health Inclusion Rulesで設定する"],a:1,e:"「Compliance」や「Compliance Architecture」などの監査タイプはCMDB Health Dashboardには含まれない。CMDB Health Dashboardに含めるには監査タイプを「Desired State」に設定する必要がある。"},
+{t:"意地悪",q:"コンプライアンススコアカードで計算される監査タイプとして正しいものはどれか？",o:["Desired State監査のみ","スクリプト監査のみ","Desired State監査とスクリプト監査の2つのみ","Compliance・Compliance Architecture・Desired State・スクリプト監査の4つ"],a:2,e:"コンプライアンススコアカードで計算される監査タイプはDesired State監査とスクリプト監査の2つのみ。Compliance・Compliance Architectureなどの他の監査タイプはCMDB Health Dashboardには含まれない。"},
+{t:"試験対策",q:"Data Manager Certification PolicyとCMDB Health Dashboard Compliance Desired State監査の違いとして正しいものはどれか？",o:["両者はまったく同じ目的","Data Manager認証ポリシーは属性の手動検証用（non-discoverable dataの検証）。Desired State監査は特定のフィールドが空のままでないことを自動チェック","Data Manager認証ポリシーは自動チェック用。Desired State監査は手動検証用","両者はCMDB Health Dashboardで同一のスコアカードに表示される"],a:1,e:"CMDB Data Manager Certification Policy（認証ポリシー）は属性の手動検証が必要な場合に使用し、所有者・サポートグループ・変更グループなどのnon-discoverable dataを検証するために一般的に使用される。一方、Desired State監査は特定フィールドが空でないことを自動的にチェックする。"},
+]});
+
+// ─── Course 4 Lesson 5 ───────────────────────────────
+L.push({c:"Course 4",l:"4-5",t:"Correctness Scorecard（正確性スコアカード）",
+s:`Correctness Scorecard（正確性スコアカード）はCMDBデータの品質を3つのメトリクス（Duplicates・Orphans・Staleness）で評価する。重複・陳腐化・孤立CIを含むCMDBはユーザーの信頼を損なう可能性がある。
+
+重複メトリクス（Duplicates）：識別ルールに基づいて重複CIを検出し、最も古いCIレコード（作成日基準）がデフォルトで非重複として扱われる。新しいCIは「Duplicate Of」フィールドでフラグ付けされる。独立したCIのみが評価対象（例：ハードウェアレコードなどの非アプリケーションCI）。
+
+孤立メトリクス（Orphans）：他のCIとの必要な関係性を維持しなくなったCIをフラグ付けする。ベースシステムには孤立ルールが存在しない。孤立CIを追跡するには管理者が孤立ルールを自分で作成する必要がある。クラスごとに1つの孤立ルールのみが許可される。
+孤立ルール例：サーバーとの関係がないアプリケーション / WARファイルとの関係がないTomcatアプリケーション / 所有者のないハードウェアデバイス / ESXサーバーとの関係がない仮想マシン
+
+陳腐化メトリクス（Staleness）：指定された期間CMDBで更新されていないCIを検出する。ベースシステムではcmdb_ciクラスレベルで1つの陳腐化ルールが定義されており、CIが60日間更新されていない場合に陳腐化と見なす。更新はsys_updated_onフィールドで判定。
+
+陳腐化ルールのカスタマイズ推奨：ディスカバリー頻度に基づいてクラスごとにカスタマイズ可能。例：ネットワークデバイスが14日ごとにスキャン→21日に設定推奨 / サーバーが毎日検出→7日に設定可能。`,
+p:[
+["定義","Correctness Scorecardは重複（Duplicates）・孤立（Orphans）・陳腐化（Staleness）の3メトリクスでCMDBデータの品質を評価する","重複・陳腐化・孤立CIを含むCMDBはユーザーの信頼を損なう可能性がある"],
+["重複メトリクス（Duplicates）","識別ルールに基づいて重複CIを検出。最も古いCIレコード（作成日基準）がデフォルトで非重複として扱われる","新しいCIは「Duplicate Of」フィールドでフラグ付けされる。独立したCIのみが評価対象（非アプリケーションCI）"],
+["孤立メトリクス（Orphans）","他のCIとの必要な関係性を維持しなくなったCIをフラグ付けする","ベースシステムには孤立ルールが存在しない。管理者が孤立ルールを作成する必要あり。クラスごとに1つのルールのみ設定可能"],
+["孤立ルールの例","サーバーとの関係がないアプリケーション / WARファイルとの関係がないTomcatアプリケーション","所有者のないハードウェアデバイス / ESXサーバーとの関係がない仮想マシン"],
+["陳腐化メトリクス（Staleness）","指定された期間更新されていないCIを検出する。ベースシステムのデフォルトは60日","更新はsys_updated_onフィールドで判定。CIがスキャンされた場合でも（属性変更なしでも）sys_updated_onに最後のスキャンのタイムスタンプが反映される"],
+["陳腐化ルールのカスタマイズ","ディスカバリー頻度に基づいてクラスごとにカスタマイズ可能","例：ネットワークデバイスが14日ごとにスキャン→21日設定推奨 / サーバーが毎日検出→7日設定可能"],
+["根本原因分析","どのディスカバリーソースや所有者がCMDB内の重複レコードに最も寄与しているかを特定できる","根本原因分析に役立つ情報をCMDB Health Dashboardが提供"],
+],
+q:[
+{t:"基礎",q:"Correctness Scorecard（正確性スコアカード）が評価する3つのメトリクスとして正しいものはどれか？",o:["Required・Recommended・Audit","Completeness・Compliance・Correctness","Duplicates（重複）・Orphans（孤立）・Staleness（陳腐化）","Speed・Scale・Security"],a:2,e:"Correctness Scorecard（正確性スコアカード）はDuplicates（重複）・Orphans（孤立）・Staleness（陳腐化）の3つのメトリクスを使用してCMDBデータの品質を評価する。"},
+{t:"基礎",q:"複数の重複CIが存在する場合にどのCIが正規のレコードとして扱われるか？",o:["最も新しいCIレコード","最も古いCIレコード（作成日基準）がデフォルトで非重複として扱われる","最初に更新されたCIレコード","Discovery Sourceが最も信頼できるCIレコード"],a:1,e:"正確性スコア計算ジョブの実行後、作成日に基づいて最も古いCIレコードがデフォルトで非重複として扱われる。より新しいCIレコードは「Duplicate Of」フィールドで最も古いCIの重複としてフラグ付けされる。"},
+{t:"基礎",q:"孤立メトリクスのベースシステムにおける状態として正しいものはどれか？",o:["ベースシステムには多数の孤立ルールが事前定義されている","ベースシステムには孤立ルールが存在しない。孤立CIを追跡するためには管理者が孤立ルールを自分で作成する必要がある","孤立ルールはHealth Inclusion Rulesに含まれている","孤立ルールはCompleteness Scorecardで管理される"],a:1,e:"ベースシステムには孤立ルールが存在しないことに注意が必要。孤立CIを追跡するには管理者が孤立ルールを作成する必要がある。また孤立ルールはクラスごとに1つのみ設定可能。"},
+{t:"基礎",q:"陳腐化メトリクスのデフォルト閾値として正しいものはどれか？",o:["30日","60日","90日","120日"],a:1,e:"ベースシステムでは、cmdb_ciクラスレベルで1つの陳腐化ルールが定義されており、CIが60日間更新されていない場合に陳腐化と見なされる。ディスカバリー頻度に応じてカスタマイズ可能。"},
+{t:"基礎",q:"陳腐化メトリクスにおいて「更新」はどのフィールドで判定されるか？",o:["sys_created_on（作成日時）","sys_updated_on（最終更新日時）","last_discovered（最終検出日時）","discovery_source（ディスカバリーソース）"],a:1,e:"更新はsys_updated_onフィールドによって決定される。属性の変更なしにServiceNow DiscoveryやサードパーティのディスカバリーツールによってCIがスキャンされた場合でも、sys_updated_onフィールドには最後のスキャンの更新タイムスタンプが反映される。"},
+{t:"引っ掛け",q:"ネットワークデバイスが14日ごとにスキャンされる場合の推奨陳腐化ルール設定として正しいものはどれか？",o:["14日に設定する","21日に設定することを推奨する","60日（デフォルト）のまま使用する","7日に設定する"],a:1,e:"ネットワークデバイスが14日ごとにスキャンされる場合、このクラスの陳腐化ルールを21日に設定することを推奨する（スキャン間隔の約1.5倍）。デフォルトの60日を環境に合わせてカスタマイズすることがbest practice。"},
+{t:"試験対策",q:"Correctness Scorecardの3メトリクスの正しい説明の組み合わせはどれか？",o:["Duplicates→required/recommendedフィールドの欠落 / Orphans→監査への非準拠 / Staleness→重複CI","Duplicates→識別ルールに基づく重複CIの検出（最も古いCIが正規） / Orphans→必要な関係性を持たないCI（ベースにルールなし・クラスごとに1つのみ） / Staleness→指定期間更新されていないCI（デフォルト60日・sys_updated_on判定）","Duplicates→陳腐化CI / Orphans→重複CI / Staleness→孤立CI","すべて同じメトリクスを異なる名前で呼んでいる"],a:1,e:"Duplicates：識別ルールに基づく重複CIの検出（最も古いCIが正規、「Duplicate Of」フィールドで重複をマーク）。Orphans：必要な関係性を持たないCI（ベースシステムにルールなし、クラスごとに1つのみ設定可能）。Staleness：指定期間更新されていないCI（デフォルト60日、sys_updated_onで判定）。"},
+]});
+
+// ─── Course 4 Lesson 6 ───────────────────────────────
+L.push({c:"Course 4",l:"4-6",t:"重複の管理（Managing Duplicates）",
+s:`CMDB内の重複CI（Duplicate CI）は重大なデータ整合性の問題を引き起こす。レポート・インシデント解決・変更管理など全般に影響する。
+
+重複CIの発生原因：①自動ディスカバリーツール（複数ツールが同じCIを異なる方法で識別）②インポートセット（適切な識別・調整ルールなし）③サードパーティ統合（適切な識別ロジックなし）④手動入力（ガバナンス不足・命名規則未遵守）⑤不完全または不正確な識別ルール⑥ガバナンスの欠如
+
+重複の判定：IREがCIが属するクラスの識別ルールに基づいて一致する2つ以上のCIを見つけた場合に重複と判定。ServiceNow Discovery中に重複CIが見つかった場合も同様の処理。最も古いCI（作成日基準）を更新し、重複排除タスクを作成してCMDB Workspaceから確認可能。
+
+重要：Discovery Sourceフィールドが入力済みの重複CIはCMDB Health Dashboard正確性スコアカードでフラグ付けされない（IREがすでに処理済みと判断するため）。ただし再検出・再処理されると重複としてフラグ付けされ重複排除タスクが生成される。
+
+重複排除タスク：潜在的な重複CIが識別されると自動的に作成。①重複の識別②タスクの作成③レビューと解決（マージ・更新・削除）のフロー。レガシーインスタンスはDe-duplication Tasksモジュール、CMDB Workspace導入後はワークスペースから直接表示・解決可能。
+
+システムプロパティ：glide.identification_engine.skip_duplicates（デフォルトtrue）・glide.identification_engine.skip_duplicates.threshold（デフォルト5）。trueかつ重複数がthreshold未満の場合、最も古いCIが一致として選択・更新され、残りは「Duplicate of」フィールドでタグ付けされる。
+
+防止策：識別ルールに焦点を当て、インポート・サードパーティ統合中にIREを活用し、CIレコードの手動作成に関するガバナンスを確立する。`,
+p:[
+["定義","CMDB内の重複CIは重大なデータ整合性の問題を引き起こす","レポート・インシデント解決・変更管理など全般に影響する"],
+["重複発生の原因","①自動ディスカバリーツール ②インポートセット（識別・調整ルールなし） ③サードパーティ統合（識別ロジックなし） ④手動入力（ガバナンス不足）","⑤不完全または不正確な識別ルール ⑥ガバナンスの欠如"],
+["重複の判定","IREが識別ルールに基づいて一致する2つ以上のCIを見つけた場合に重複と判定","最も古いCI（作成日基準）を更新し、重複排除タスクを作成してCMDB Workspaceから確認可能"],
+["Discovery Sourceフィールドと重複フラグ","Discovery Sourceフィールドが入力済みの重複CIはCMDB Health Dashboard正確性スコアカードでフラグ付けされない","IREがすでに処理済みと判断するため。再検出・再処理されると重複としてフラグ付けされる"],
+["重複排除タスクのフロー","①重複の識別（一致する属性に基づく）②タスクの作成（適切なチームに割り当て）③レビューと解決（マージ・更新・削除）","レガシー：De-duplication Tasksモジュール / 新バージョン：CMDB Workspaceから直接表示・解決"],
+["システムプロパティ：skip_duplicates","glide.identification_engine.skip_duplicates（デフォルトtrue）：重複スキップ機能の有効/無効","glide.identification_engine.skip_duplicates.threshold（デフォルト5）：重複処理のしきい値"],
+["システムプロパティの動作","trueかつ重複数がthreshold（デフォルト5）未満の場合、最も古いCIが一致として選択・更新される","残りの重複CIは「Duplicate of」フィールドでタグ付けされる"],
+["防止策","識別ルールに焦点を当て、インポート・サードパーティ統合中にIREを活用し、CIレコードの手動作成に関するガバナンスを確立する","重複が発生した場合はServiceNowのツールとプロパティで管理・解決する"],
+],
+q:[
+{t:"基礎",q:"CMDB内で重複CIが発生する原因として原文に記載されているものはどれか？",o:["CIの財務価値の誤入力のみ","自動ディスカバリーツール・インポートセット・サードパーティ統合・手動入力・不完全な識別ルール・ガバナンスの欠如","CMDB Health Dashboardの設定ミスのみ","Service Graph Connectorsの設定ミスのみ"],a:1,e:"重複CIの発生原因：①自動ディスカバリーツール（複数ツールが同じCIを異なる方法で識別）②インポートセット（適切な識別・調整ルールなし）③サードパーティ統合（適切な識別ロジックなし）④手動入力（命名規則・識別ルール未遵守）⑤不完全または不正確な識別ルール⑥ガバナンスの欠如。"},
+{t:"基礎",q:"Discovery Sourceフィールドが入力済みの重複CIのCMDB Health Dashboard正確性スコアカードでの扱いとして正しいものはどれか？",o:["常に重複としてフラグ付けされる","Discovery Sourceフィールドが入力済みの場合、IREがすでに処理済みと判断するためスコアカードはフラグ付けしない。ただし再検出・再処理されると重複としてフラグ付けされる","手動でフラグ設定が必要","Duplicate Ofフィールドでのみ確認できる"],a:1,e:"Discovery Sourceフィールドが入力済みの重複CIはCMDB Health Dashboard正確性スコアカードでフラグ付けされない。IREがすでに処理済みと判断するためである。ただし、後日再検出されてIREによって再処理されると、重複としてフラグ付けされ重複排除タスクが生成される。"},
+{t:"基礎",q:"glide.identification_engine.skip_duplicates.thresholdのデフォルト値として正しいものはどれか？",o:["1","3","5","10"],a:2,e:"glide.identification_engine.skip_duplicates.thresholdのデフォルト値は5に設定されている。重複CIの数がこのしきい値より少ない場合に重複スキップ機能が動作する。"},
+{t:"引っ掛け",q:"glide.identification_engine.skip_duplicatesがtrueかつ重複CIの数がthreshold未満の場合の動作として正しいものはどれか？",o:["すべての重複CIが自動削除される","重複CIの中で最も古いもの（作成日基準）が一致として選択・更新される。残りは「Duplicate of」フィールドでタグ付けされる","すべての重複CIが保持される","最も新しいCIが正規として選択される"],a:1,e:"glide.identification_engine.skip_duplicatesがtrueで重複CIの数がthresholdより少ない場合、最も古いCIが一致として選択・更新され、残りの重複CIは「Duplicate of」フィールドでタグ付けされる。"},
+{t:"意地悪",q:"重複排除タスクへのアクセス方法の変化として正しいものはどれか？",o:["常にCMDB Workspaceからのみアクセスできた","レガシーインスタンスではDe-duplication Tasksモジュールからのみ。CMDB Workspace導入後はワークスペースから直接表示・解決できるようになった","常にDe-duplication Tasksモジュールからのみアクセスできる","CI Class Managerからアクセスできる"],a:1,e:"レガシーインスタンスでは重複排除タスクはDe-duplication Tasksモジュールからのみアクセスできた。CMDB Workspaceの導入により、重複排除タスクはワークスペースから直接表示および解決できるようになった。"},
+{t:"試験対策",q:"IREによる重複処理の仕組みとして最も適切な説明はどれか？",o:["IREは重複を自動削除する","IREが識別ルールに基づいて一致する2つ以上のCIを検出 → 最も古いCI（作成日基準）が正規として選択・更新 → 残りは「Duplicate of」フィールドでタグ付け → 重複排除タスクが生成 → CMDB Workspaceまたはレガシーモジュールで管理","IREは重複を検出するがタスクは生成しない","IREは重複を検出した場合すべてのCIを保持する"],a:1,e:"IREによる重複処理：①識別ルールに基づいて一致する2つ以上のCIを検出②最も古いCI（作成日基準）が正規として選択・更新③残りは「Duplicate of」フィールドでタグ付け④重複排除タスクが生成⑤CMDB Workspace（新）またはDe-duplication Tasksモジュール（レガシー）で管理する。"},
+]});
+
+// ─── Course 4 Lesson 7 ───────────────────────────────
+L.push({c:"Course 4",l:"4-7",t:"重複の修復（Remediation of Duplicates）",
+s:`重複CIの処理が重要な理由：①データの整合性と正確性（情報に基づいた意思決定のため）②IT運用の改善（インシデント・変更管理プロセスの混乱防止）③レポートとコンプライアンスの強化（正確なレポートと規制遵守）④より良い意思決定（信頼性の高いデータによる分析・予測）
+
+主要な修復ツール：
+1. 重複CIリメディエーター（Duplicate CI Remediator）：ウィザード形式のツール。管理者が潜在的な重複を確認し、保持するメインCIを選択し、重複から関連データをマージできる。コンプライアンスとトレーサビリティのための監査証跡を維持。重複排除プロセスの多くを自動化。
+レガシー：De-duplication Tasksモジュールからアクセス / 新バージョン：CMDB Workspaceから直接表示・解決
+
+2. 重複排除テンプレート（De-Duplication Templates）：事前構成された一貫した修復を重複排除タスクに一括でクラスごとに適用。CMDB Workspaceの重複排除ダッシュボードで作成・ライブラリ管理・テンプレート実行が可能。単一の操作で複数の重複排除タスクを修復できる。
+
+重要な更新：重複を示すフィールドがDiscovery sourceフィールドからDuplicate ofフィールドに変更。理由：Discovery sourceフィールドの値を、レコードを更新した最後のDiscoveryソースで保持するため。
+
+Now Assist for CMDB：生成AIの力をCMDB管理にもたらす。AI駆動の重複CI検出と修復提案を提供。管理者をステップバイステップの解決プロセスに導く。重複排除テンプレートを活用して単一の操作で複数の重複排除タスクを修復できる。
+
+用語：Main CI（メインCI）＝重複マージ時に保持される正規のCIレコード / Duplicate Ofフィールド＝重複CIが参照する正規CIを示すフィールド / Merge（マージ）＝複数の重複CIのデータを1つのメインCIに統合するプロセス。`,
+p:[
+["重複処理の重要性①","データの整合性と正確性：信頼できるデータで情報に基づいた意思決定が可能になる","IT運用の改善：インシデント・変更管理プロセスの混乱とエラーを防止"],
+["重複処理の重要性②","レポートとコンプライアンスの強化：正確なレポートと規制遵守の実現","より良い意思決定：信頼性の高いデータによる分析・予測の質向上"],
+["重複CIリメディエーター","ウィザード形式のツール。管理者が潜在的な重複を確認し、保持するメインCIを選択し、重複から関連データをマージできる","コンプライアンスとトレーサビリティのための監査証跡を維持。重複排除プロセスの多くを自動化する"],
+["重複排除テンプレート","事前構成された一貫した修復を重複排除タスクに一括でクラスごとに適用できる","CMDB Workspaceの重複排除ダッシュボードで作成・ライブラリ管理・テンプレート実行が可能。単一の操作で複数タスクを修復できる"],
+["重要な更新：フィールド変更","重複を示すフィールドがDiscovery sourceフィールドからDuplicate ofフィールドに変更された","変更理由：Discovery sourceフィールドの値を、レコードを更新した最後のDiscoveryソースで保持するため"],
+["Now Assist for CMDB","生成AIの力をCMDB管理にもたらし、AI駆動の重複CI検出と修復提案を提供","管理者をステップバイステップの解決プロセスに導く。重複排除テンプレートを活用して単一操作で複数タスクを修復できる"],
+["アクセス方法の変化","レガシー：De-duplication Tasksモジュール / 新バージョン：CMDB Workspace（重複排除ダッシュボード）","CMDB Workspaceで重複排除テンプレートを作成しライブラリに整理できる"],
+],
+q:[
+{t:"基礎",q:"重複CIリメディエーター（Duplicate CI Remediator）の説明として正しいものはどれか？",o:["一括で重複を自動処理するテンプレートツール","管理者がCMDB内の重複CIを効率的に管理・解決するためのウィザード形式のツール。重複レコードの識別・調整・マージに対する体系的なアプローチを提供し、コンプライアンスとトレーサビリティのための監査証跡を維持する","ネットワークをスキャンするツール","CIの財務価値を管理するツール"],a:1,e:"重複CIリメディエーターはウィザード形式のツール。管理者が潜在的な重複を確認し、保持するメインCIを選択し、重複から関連データをマージできる。コンプライアンスとトレーサビリティのための監査証跡を維持しながら重複排除プロセスの多くを自動化する。"},
+{t:"基礎",q:"重複を示すフィールドの変更に関して原文に記載されている内容として正しいものはどれか？",o:["「Duplicate of」フィールドから「Discovery source」フィールドに変更された","「Discovery source」フィールドから「Duplicate of」フィールドに変更された。変更理由：Discovery sourceフィールドに最後のDiscoveryソース情報を保持するため","フィールドの変更はなく同じフィールドを使用している","「Managed by」フィールドに変更された"],a:1,e:"重複を示すフィールドはDiscovery sourceフィールドからDuplicate ofフィールドに変更された。変更理由：Discovery sourceフィールドの値を、レコードを更新した最後のDiscoveryソースで保持するためである。"},
+{t:"基礎",q:"Now Assist for CMDBが重複CI管理に提供する機能として正しいものはどれか？",o:["手動での重複確認のみをサポート","生成AIの力を活用してAI駆動の重複CI検出と修復提案を提供。管理者をステップバイステップの解決プロセスに導き、重複排除テンプレートを活用して単一操作で複数の重複排除タスクを修復できる","ネットワークをリアルタイムでスキャンする","CIの財務価値を自動計算する"],a:1,e:"Now Assist for CMDBは生成AIの力をCMDB管理にもたらす。AI駆動の重複CI検出と修復提案を提供し、管理者をステップバイステップの解決プロセスに導く。重複排除テンプレートを活用して単一の操作で複数の重複排除タスクを修復できる。"},
+{t:"引っ掛け",q:"重複CIリメディエーターと重複排除テンプレートの使い分けとして正しいものはどれか？",o:["両者はまったく同じ機能を提供する","重複CIリメディエーターは個別の重複を詳細に確認・マージするウィザード形式向け。重複排除テンプレートは事前定義ルールでクラスごとに大量の重複を一括処理する場合に適している","重複排除テンプレートは個別処理向け、重複CIリメディエーターは一括処理向け","Now Assist for CMDBがあれば両者は不要"],a:1,e:"重複CIリメディエーターは個別の重複を確認・調整・マージするウィザード形式のツールで詳細なレビューに適している。重複排除テンプレートは事前構成された一貫した修復を重複排除タスクに一括でクラスごとに適用でき、大量の重複を効率的に処理できる。"},
+{t:"試験対策",q:"重複CIの修復ツール（重複CIリメディエーター・重複排除テンプレート・Now Assist for CMDB）の特徴として最も適切な説明はどれか？",o:["3つはすべて同じ機能を提供する","重複CIリメディエーター（個別修復・ウィザード形式）/ 重複排除テンプレート（一括修復・事前定義ルールでクラスごとに適用・CMDB Workspaceの重複排除ダッシュボードで管理）/ Now Assist for CMDB（AI駆動・自動検出と修復提案・ステップバイステップガイド）","重複排除テンプレートが最も重要なツールであり他は不要","Now Assist for CMDBは有償ライセンスが不要"],a:1,e:"重複CIリメディエーター（個別修復・ウィザード形式・監査証跡維持）・重複排除テンプレート（一括修復・CMDB Workspaceの重複排除ダッシュボードで作成・管理・単一操作で複数タスク修復）・Now Assist for CMDB（AI駆動・自動重複CI検出と修復提案・ステップバイステップガイド）の3つがそれぞれ異なる用途で提供されている。"},
+]});
+
+// ─── Course 4 Lesson 8 ───────────────────────────────
+L.push({c:"Course 4",l:"4-8",t:"CIの再分類（CI Reclassification）",
+s:`CI再分類（Reclassification）はCIがあるクラスから別のクラスに移動するプロセス。インポートまたは手動で入力されたCIデータが間違ったテーブルに格納される場合がある。ServiceNowにはこれを効果的に処理する機能がある。
+
+デフォルトではCIは自動的に再分類される。自動再分類が無効な場合は再分類タスクが生成され手動レビュー・再分類が可能。
+
+再分類のシナリオ例：管理者が300件のサーバーレコードをServer [cmdb_ci_server]テーブルに直接インポート → 2週間後にDiscoveryを実装 → DiscoveryがIREを通してCIを処理 → Server テーブルからWindows Server・Linux ServerテーブルへCIレコードが自動的にアップグレード・再分類される。
+
+再分類の3タイプ：
+・Upgrade（アップグレード）：CIをクラス階層内でより具体的な（下位の）子クラスに移動。例：Server [cmdb_ci_server] → Linux Server [cmdb_ci_linux_server]
+・Downgrade（ダウングレード）：CIをクラス階層内でより一般的な（上位の）親クラスに移動。例：Linux Server [cmdb_ci_linux_server] → Server [cmdb_ci_server]
+・Switch（スイッチ）：CIをクラス階層内で別のブランチのクラスに移動。例：Linux Server [cmdb_ci_linux_server] → Windows Server [cmdb_ci_win_server]
+
+基本再分類システムプロパティ（すべてデフォルトtrue）：
+・glide.class.upgrade.enabled：アップグレードの自動化を制御
+・glide.class.downgrade.enabled：ダウングレードの自動化を制御
+・glide.class.switch.enabled：スイッチの自動化を制御
+
+重要：自動CI再分類が有効な場合（デフォルト）、CIクラスのダウングレードおよびスイッチ操作はデータ損失につながる可能性がある。
+
+自動再分類が無効な場合：識別プロセス中に自動的に再分類されないCIに対して再分類タスクが作成される。割り当てられた管理者はタスクを確認してCIを特定し、再分類すべきかどうかを決定する必要がある。
+
+追加の制御プロパティ：glide.identification_engine.update_without_switch_enabled / glide.identification_engine.update_without_downgrade_enabled / glide.identification_engine.update_without_upgrade_enabled`,
+p:[
+["定義","CI再分類（Reclassification）はCIがあるクラスから別のクラスに移動するプロセス","インポートまたは手動で入力されたCIデータが間違ったテーブルに格納される場合に使用"],
+["デフォルト動作","デフォルトではCIは自動的に再分類される（glide.class.upgrade/downgrade/switch.enabledはすべてデフォルトtrue）","自動再分類が無効な場合は再分類タスクが生成され手動レビュー・再分類が可能"],
+["Upgrade（アップグレード）","CIをクラス階層内でより具体的な（下位の）子クラスに移動する","例：Server [cmdb_ci_server] → Linux Server [cmdb_ci_linux_server]。データ損失リスク低"],
+["Downgrade（ダウングレード）","CIをクラス階層内でより一般的な（上位の）親クラスに移動する","例：Linux Server [cmdb_ci_linux_server] → Server [cmdb_ci_server]。データ損失の可能性あり"],
+["Switch（スイッチ）","CIをクラス階層内で別のブランチのクラスに移動する","例：Linux Server [cmdb_ci_linux_server] → Windows Server [cmdb_ci_win_server]。データ損失の可能性あり"],
+["基本システムプロパティ","glide.class.upgrade.enabled・glide.class.downgrade.enabled・glide.class.switch.enabled（すべてデフォルトtrue）","trueの場合に再分類が自動的に実行される"],
+["重要な注意","自動CI再分類が有効な場合（デフォルト）、ダウングレードおよびスイッチ操作はデータ損失につながる可能性がある","アップグレードはより具体的なクラスへの移動のためデータ損失リスクは低い"],
+["自動無効時の動作","識別プロセス中に自動的に再分類されないCIに対して再分類タスクが作成される","割り当てられた管理者はタスクを確認してCIを特定し再分類すべきかどうかを決定する"],
+["典型的なシナリオ","管理者が300件のサーバーをServer テーブルにインポート → 2週間後にDiscoveryを実装 → IREがCIを処理","Server テーブルからWindows Server・Linux ServerテーブルへCIレコードが自動的にアップグレード・再分類される"],
+],
+q:[
+{t:"基礎",q:"再分類の3つのタイプとして正しいものはどれか？",o:["Create・Update・Delete","Upgrade（アップグレード）・Downgrade（ダウングレード）・Switch（スイッチ）","Import・Export・Transform","Discover・Identify・Reconcile"],a:1,e:"再分類の3つのタイプ：Upgrade（アップグレード：より具体的な子クラスへ移動。例：Server→Linux Server）・Downgrade（ダウングレード：より一般的な親クラスへ移動。例：Linux Server→Server）・Switch（スイッチ：別ブランチのクラスへ移動。例：Linux Server→Windows Server）。"},
+{t:"基礎",q:"ダウングレードとスイッチに関する重要な注意点として正しいものはどれか？",o:["ダウングレードとスイッチはデータ損失の心配なく自由に実行できる","自動CI再分類が有効になっている場合、CIクラスのダウングレードおよびスイッチ操作はデータ損失につながる可能性がある","ダウングレードはデータ損失の可能性があるが、スイッチは安全","アップグレードはデータ損失の可能性があるが、ダウングレードは安全"],a:1,e:"重要な注意：自動CI再分類が有効になっている場合（デフォルト）、CIクラスのダウングレードおよびスイッチ操作はデータ損失につながる可能性がある。アップグレードはより具体的なクラスへの移動のためデータ損失のリスクは低い。"},
+{t:"基礎",q:"自動再分類が無効の場合に発生することとして正しいものはどれか？",o:["CIが自動的に正しいクラスに移動する","識別プロセス中に自動的に再分類されないCIに対して再分類タスクが作成され、管理者が手動でレビュー・判断する必要がある","CMDBが全体的に停止する","CIが自動削除される"],a:1,e:"自動CI再分類が無効になっている場合、識別プロセス中に自動的に再分類されないCIに対して再分類タスクが作成される。割り当てられたServiceNow管理者はこれらのタスクを確認してCIを特定し、CIを再分類すべきかどうかを決定する必要がある。"},
+{t:"基礎",q:"再分類を制御する基本システムプロパティとして正しいものはどれか？",o:["glide.cmdb.reclassification.enabled・glide.cmdb.downgrade.enabled","glide.class.upgrade.enabled・glide.class.downgrade.enabled・glide.class.switch.enabled","glide.identification_engine.reclassification・glide.cmdb.class.change","glide.required.attribute.enabled・glide.cmdb.enabled"],a:1,e:"再分類を制御する基本システムプロパティはglide.class.upgrade.enabled（アップグレードの自動化）・glide.class.downgrade.enabled（ダウングレードの自動化）・glide.class.switch.enabled（スイッチの自動化）の3つ。すべてデフォルトでtrueに設定されている。"},
+{t:"引っ掛け",q:"CI再分類の典型的なシナリオとして正しいものはどれか？",o:["管理者が300件のサーバーレコードをServer テーブルにインポート後、Discoveryが実装されIREを通じてWindows Server・Linux ServerテーブルへCIが自動アップグレードされる","管理者が重複CIをマージするためにリメディエーターを使用する","孤立CIに関係性を追加するためのタスクが生成される","陳腐化したCIが自動的に削除される"],a:0,e:"典型的なシナリオ：管理者が300件のサーバーレコードをServer [cmdb_ci_server]テーブルに直接インポート → 2週間後にDiscoveryを実装 → DiscoveryがIREを通してCIを処理 → ServerテーブルからWindows Server・Linux ServerテーブルへCIレコードが自動的にアップグレード・再分類される。"},
+{t:"試験対策",q:"再分類の3タイプとデータ損失リスクの組み合わせとして最も適切なものはどれか？",o:["すべてのタイプでデータ損失リスクがある","Upgrade（Server→Linux Server：データ損失リスク低） / Downgrade（Linux Server→Server：データ損失の可能性あり） / Switch（Linux Server→Windows Server：データ損失の可能性あり）","ダウングレードのみデータ損失リスクがある","アップグレードのみデータ損失リスクがある"],a:1,e:"再分類のリスク：Upgrade（より具体的な子クラスへ→データ損失リスク低）・Downgrade（より一般的な親クラスへ→データ損失の可能性あり）・Switch（別ブランチへ→データ損失の可能性あり）。ダウングレードとスイッチはデータ損失につながる可能性があるため注意が必要。"},
+]});
+
+// ─── Course 5 Lesson 1 ───────────────────────────────
+L.push({c:"Course 5",l:"5-1",t:"Data Manager（データマネージャー）",
+s:`CMDB Data Manager は CI（構成アイテム）のエンドオブライフ操作と認証の一括管理のための policy-driven framework（ポリシー駆動型フレームワーク）である。
+
+含まれるポリシー：
+・Retire・Archive・Delete（エンドオブライフポリシー）
+・Attestation（証明）
+・Certification（認証）
+
+時間の経過とともに大規模なCMDBは大量の古くなったCIを蓄積し全体的なパフォーマンスに悪影響を与える可能性がある。Data Manager は CIライフサイクル操作を自動化・管理するポリシーを作成・公開・管理する機能を提供し、CMDBが健全で効率的な運用状態を維持することを保証する。大規模なCMDBに対してスケーラブルであり、クラウドベース環境の急速な変化に適応可能。
+
+【ユースケース】
+・データアーカイブ（Data Archive）
+・データ削除（Data Delete）
+・定期的な証明と認証（Periodic Attestation and Certification）
+・ライフサイクル管理（Lifecycle Management）：CIをアクティブから廃止ステータスへなどライフサイクルのさまざまなステージを通じてCIの移行を自動化
+
+【レガシー Data Manager】
+Configuration > CMDB Data Manager からアクセスできる。Yokohama リリースまでに非推奨（deprecated）となり、ユーザーは CMDB Workspace の新しい Data Manager を使用することが求められる。
+
+【CMDB Workspace からアクセス可能な Data Manager（新しい Data Manager）】
+CMDB Workspace を通じてアクセスでき UI Builder で設計されている。レガシー Data Manager で作成されたポリシーは新しい Data Manager と完全に互換性がある。CMDB Workspace バージョン 6.0.1 以降、Certification ポリシーをサポートするようになった。
+
+【CMDB Data Manager を使用する前に】
+CSDM標準に従い、CIは廃止の状態からアーカイブまたは削除へと進行する。CIはアーカイブまたは削除される前に、まず廃止されてエンドオブライフステージにある必要がある。
+
+【Managed By Group の活用】
+Data Manager ポリシータスクが正しく割り当てられるようにするには Managed By Group を活用することを推奨する。この属性値は ServiceNow Discovery や Service Mapping によって自動的に検出されない（non-discoverable data）。
+
+【Data Manager のロール】
+・data_manager_admin（管理者ロール）
+・data_manager_user（ユーザーロール）`,
+p:[
+["定義","CMDB Data ManagerはCIのエンドオブライフ操作と認証の一括管理のためのpolicy-driven framework","含むポリシー：Retire・Archive・Delete（エンドオブライフ）・Attestation・Certification"],
+["ユースケース","データアーカイブ・データ削除・定期的な証明と認証・ライフサイクル管理","大規模なCMDBに対してスケーラブルでクラウドベース環境の急速な変化に適応可能"],
+["レガシー Data Manager","Configuration > CMDB Data Manager からアクセス。Yokohamaリリースまでに非推奨","ユーザーはCMDB Workspaceの新しいData Managerを使用することが求められる"],
+["新しい Data Manager","CMDB Workspaceを通じてアクセス。UI Builderで設計。ベースライン分析を提供","レガシーData Managerで作成されたポリシーと完全に互換性がある"],
+["Certificationポリシー","CMDB Workspace バージョン6.0.1以降サポート","既存の廃止・アーカイブ・削除・Attestationポリシーに追加"],
+["使用前の重要事項","CIはアーカイブまたは削除される前に、まず廃止されてエンドオブライフステージにある必要がある","CSDM標準に従い廃止→アーカイブまたは削除の順で進行"],
+["ライフサイクルマッピング確認事項","①環境に合わせてマッピングを調整・追加 ②カスタムレガシー値のマッピングを確認 ③ライフサイクルコントロールで構成されていることを確認 ④アクティブ化されていることを確認","アクティブ化前にすべての確認が必要"],
+["Managed By Group","Data Managerポリシータスクが正しく割り当てられるようにするには活用を推奨","Discovery・Service Mappingでは自動検出されない。テクニカルサービスオファリング・動的CIグループ・CI Class Managerで維持可能"],
+["Data Managerのロール","data_manager_admin（管理者）とdata_manager_user（ユーザー）の2つ","適切なCMDB管理者およびユーザーにいずれかのロールを割り当てる"],
+],
+q:[
+{t:"基礎",q:"CMDB Data Manager が含むポリシーとして正しいものはどれか？",o:["Retire・Archive・Delete・Attestation・Certification","Create・Update・Delete・Attestation","Retire・Archive・Delete・Discovery","Install・Configure・Delete・Certification"],a:0,e:"CMDB Data Managerが含むポリシーはRetire・Archive・Delete（エンドオブライフ）・Attestation・Certificationの5種類。"},
+{t:"基礎",q:"CMDB Data Manager のユースケースとして正しくないものはどれか？",o:["データアーカイブ","データ削除","CIの自動検出","ライフサイクル管理"],a:2,e:"CMDB Data Managerのユースケース：データアーカイブ・データ削除・定期的な証明と認証・ライフサイクル管理。CIの自動検出はDiscoveryの機能であり含まれない。"},
+{t:"基礎",q:"CertificationポリシーがサポートされるようになったCMDB Workspaceのバージョンはどれか？",o:["5.0.0以降","6.0.0以降","6.0.1以降","7.0.0以降"],a:2,e:"CMDB Workspace バージョン6.0.1以降、既存の廃止・アーカイブ・削除・Attestationポリシーに加えてCertificationポリシーをサポートするようになった。"},
+{t:"基礎",q:"CSDM標準に従ったCIのライフサイクル進行として正しいものはどれか？",o:["アーカイブ→廃止→削除","削除→廃止→アーカイブ","廃止→アーカイブまたは削除","運用中→削除→廃止"],a:2,e:"CSDM標準に従い廃止→アーカイブまたは削除の順で進行する。CIはアーカイブまたは削除される前にまず廃止されてエンドオブライフステージにある必要がある。"},
+{t:"基礎",q:"Data Manager の2つのロールとして正しいものはどれか？",o:["cmdb_admin と cmdb_user","data_manager_admin と data_manager_user","policy_admin と policy_user","lifecycle_admin と lifecycle_user"],a:1,e:"Data Managerのロール：data_manager_admin（管理者ロール）とdata_manager_user（ユーザーロール）の2つ。"},
+{t:"基礎",q:"Data Manager ポリシータスクの割り当てに推奨されるフィールドはどれか？",o:["Support Group","Change Group","Managed By Group（DiscoveryやService Mappingでは自動検出されない）","Assigned to"],a:2,e:"Data Managerポリシータスクが正しく割り当てられるようにするにはManaged By Groupを活用することを推奨する。DiscoveryやService Mappingでは自動検出されないnon-discoverable data。"},
+{t:"引っ掛け",q:"レガシーData Managerについて正しい記述はどれか？",o:["Washingtonリリースで非推奨となる","Yokohamaリリースまでに非推奨となる。ユーザーはCMDB Workspaceの新しいData Managerを使用することが求められる","既に完全に削除されている","今後も継続してサポートされる"],a:1,e:"レガシーData ManagerはYokohamaリリースまでに非推奨（deprecated）となる。ユーザーはCMDB Workspaceの新しいData Managerを使用することが求められる。"},
+{t:"引っ掛け",q:"CIをアーカイブする前に必要な条件として正しいものはどれか？",o:["CIがDraft（下書き）状態","CIはまず廃止（Retired）されてエンドオブライフステージにある必要がある","CIの関係性をすべて削除する","特に事前条件はない"],a:1,e:"CSDM標準に従い、CIはアーカイブまたは削除される前にまず廃止（Retired）されてエンドオブライフステージにある必要がある。"},
+{t:"意地悪",q:"新しいData Managerについて誤っている記述はどれか？",o:["UI Builderで設計されている","ベースライン分析を提供する","レガシーData Managerで作成されたポリシーとは互換性がない","ワークフローベースのインターフェースを導入している"],a:2,e:"新しいData ManagerはレガシーData Managerで作成されたポリシーと完全に互換性がある。「互換性がない」が誤り。"},
+{t:"意地悪",q:"ライフサイクルマッピングをアクティブ化する前に確認が不要な事項はどれか？",o:["環境に合わせてマッピングを調整・追加","カスタムレガシー値のマッピングを確認","Discovery patternの設定を確認","すべてのマッピングがアクティブ化されていることを確認"],a:2,e:"アクティブ化前の確認事項：①マッピング調整②カスタムレガシー値確認③ライフサイクルコントロールで構成確認④アクティブ化確認。Discovery patternの確認は含まれない。"},
+{t:"試験対策",q:"Managed By Group属性について正しい記述はどれか？",o:["ServiceNow Discoveryによって自動的に検出される","Service Mappingによって自動的に検出される","ServiceNow DiscoveryやService Mappingでは自動検出されないnon-discoverable data","Data Managerによって自動的に設定される"],a:2,e:"Managed By GroupはServiceNow DiscoveryやService Mappingによって自動的に検出されないnon-discoverable data。テクニカルサービスオファリング・動的CIグループ・CI Class Managerを活用することで維持できる。"},
+]});
+
+// ─── Course 5 Lesson 2 ───────────────────────────────
+L.push({c:"Course 5",l:"5-2",t:"CMDB Query Builder（クエリビルダー）",
+s:`CMDB Query Builder は、ユーザーが SQL コードを記述することなく複雑なデータベースクエリを視覚的に作成できるツールである。リレーションシップを持つ複数のテーブルにまたがるクエリを構築する際に特に役立つ。
+
+【クエリタイプ（3種類）】
+1. CMDB Query：CIクラスとリレーションシップ・参照についてインフラストラクチャをクエリする。オプションで非CMDBテーブルのコンテキストを追加可能。
+2. Service Mapping Query：アプリケーションサービスをクエリする。パターンを定義してそのパターンを持つアプリケーションサービスマップをクエリする。
+3. Combination Query：保存されたService MappingクエリをCMDBクエリに組み込むことで2つのクエリタイプを組み合わせる。
+
+【インターフェース】
+CIクラスをドラッグするキャンバスを提供し、CIクラス間にAND/OR操作を追加してクエリするリレーションシッププロパティを定義する。構築・保存したクエリを使用してCMDBグループにCIを入力し、グループ内のすべてのCIにまとめてアクションを適用できる。
+
+【レポートのエクスポート】
+クエリ結果ペインからリストコンテキストメニューを選択しExportを選択して希望するエクスポート形式（PDF等）を選ぶ。
+
+【スケジュールクエリ】
+定期的にスケジュールされた時間にクエリを実行するスケジュールクエリを作成できる。出力は電子メールで個人またはグループに送信され、クエリ結果は添付ファイルとして送られる（zip圧縮オプションあり）。
+
+【クエリのインポート/エクスポート】
+CMDB Query Builder の定義はエクスポートとインポートを使用してインスタンス間で移行できる（例：開発→テスト→本番）。
+
+【システムプロパティ】
+CMDB Query Builder の動作を制御するシステムプロパティは Configuration > CMDB Properties > Query Builder Properties からアクセスできる。`,
+p:[
+["定義","SQLコードを記述せずに複雑なデータベースクエリを視覚的に作成できるツール","複数テーブルにまたがるリレーションシップを持つクエリ構築に特に有用"],
+["インターフェース","CIクラスをドラッグするキャンバスを提供。AND/OR操作とリレーションシッププロパティを定義","構築・保存したクエリでCMDBグループにCIを入力しアクションを一括適用可能"],
+["CMDB Query","CIクラスとリレーションシップ・参照についてインフラストラクチャをクエリ","オプションで非CMDBテーブルのコンテキストを追加可能"],
+["Service Mapping Query","アプリケーションサービスをクエリ。パターンを定義してマップをクエリ","例：Linux Serverを利用しているすべてのサービスを検索"],
+["Combination Query","CMDB QueryとService Mapping Queryを組み合わせる","保存されたService MappingクエリをCMDBクエリに組み込む"],
+["レポートエクスポート","クエリ結果からPDF等の形式でレポートを生成可能","クエリ結果ペイン→コンテキストメニュー→Export"],
+["スケジュールクエリ","定期的にクエリを実行し結果を電子メールで送信","添付ファイルのzip圧縮オプションあり"],
+["インポート/エクスポート","クエリ定義をインスタンス間で移行可能","開発→テスト→本番へのクエリ移行に使用"],
+["システムプロパティ","Configuration > CMDB Properties > Query Builder Properties からアクセス","sys_properties.listで検索も可能"],
+],
+q:[
+{t:"基礎",q:"CMDB Query Builderの主な特徴として正しいものはどれか？",o:["SQLコードの記述が必須","単一テーブルのクエリのみ対応","SQLコードを記述せずに複雑なクエリを視覚的に作成できる","コマンドラインインターフェースのみ提供"],a:2,e:"CMDB Query BuilderはユーザーがSQLコードを記述することなく複雑なデータベースクエリを視覚的に作成できるツール。複数テーブルにまたがるリレーションシップを持つクエリ構築に特に有用。"},
+{t:"基礎",q:"CMDB Query Builderで使用できる3つのクエリタイプとして正しいものはどれか？",o:["CMDB Query・Service Mapping Query・Combination Query","Infrastructure Query・Application Query・Mixed Query","CI Query・Relationship Query・Service Query","Table Query・Class Query・Reference Query"],a:0,e:"3つのクエリタイプ：CMDB Query（CIクラスとリレーションシップをクエリ）・Service Mapping Query（アプリケーションサービスをクエリ）・Combination Query（2つを組み合わせる）。"},
+{t:"基礎",q:"スケジュールクエリについて正しい記述はどれか？",o:["結果はダッシュボードにのみ表示","電子メールで送信され添付ファイルのzip圧縮オプションがある","結果は自動的にCMDBに保存","1回のみ実行可能"],a:1,e:"スケジュールクエリの結果は電子メールで個人またはグループに送信され、クエリ結果は添付ファイルとして送られる（zip圧縮オプションあり）。"},
+{t:"基礎",q:"CMDB Query Builderのシステムプロパティにアクセスする正しい方法はどれか？",o:["System Definition > Scripts","Configuration > CMDB Properties > Query Builder Properties","CMDB Workspace > Settings","Administration > Properties"],a:1,e:"CMDB Query BuilderのシステムプロパティはConfiguration > CMDB Properties > Query Builder Propertiesからアクセスできる。"},
+{t:"基礎",q:"CMDB QueryとService Mapping Queryの違いとして正しいものはどれか？",o:["CMDB QueryはアプリサービスをクエリしService Mapping Queryはインフラをクエリする","CMDB QueryはCIクラスとリレーションシップでインフラをクエリ（非CMDBテーブルのコンテキスト追加可能）しService Mapping Queryはパターンを定義してアプリサービスマップをクエリする","両者は同じ機能を提供する","CMDB Queryのみが利用可能でService Mapping Queryは廃止された"],a:1,e:"CMDB Query：CIクラスとリレーションシップ・参照についてインフラストラクチャをクエリ（オプションで非CMDBテーブルのコンテキスト追加可能）。Service Mapping Query：パターンを定義してアプリケーションサービスマップをクエリ。"},
+{t:"引っ掛け",q:"CMDB Queryについて正しい記述はどれか？",o:["非CMDBテーブルのコンテキストは追加できない","オプションで非CMDBテーブルのコンテキストを追加可能","アプリケーションサービスのみをクエリする","Service Mappingデータのみをクエリする"],a:1,e:"CMDB QueryはCIクラスとリレーションシップ・参照についてインフラストラクチャをクエリし、オプションで非CMDBテーブルのコンテキストを追加可能。"},
+{t:"引っ掛け",q:"CMDB Query Builderのクエリをインスタンス間で移行する方法として正しいものはどれか？",o:["Update Setのみ使用する","エクスポートとインポート機能を使用して移行できる（例：開発→テスト→本番）","手動でクエリを再作成する必要がある","移行はサポートされていない"],a:1,e:"CMDB Query Builderの定義はエクスポートとインポートを使用してインスタンス間で移行できる。"},
+{t:"意地悪",q:"Combination Queryについて誤っている記述はどれか？",o:["CMDB QueryとService Mapping Queryを組み合わせる","保存されたService MappingクエリをCMDBクエリに組み込む","新規のService Mapping Queryのみ使用可能で保存されたクエリは使用不可","複数テーブルにまたがるクエリを実行できる"],a:2,e:"Combination Queryは保存されたService MappingクエリをCMDB Queryに組み込むことで2つのクエリタイプを組み合わせる。「新規のみで保存済みは不可」は誤り。"},
+{t:"試験対策",q:"CMDB Query Builderのスケジュールクエリ機能について、正しい記述の組み合わせはどれか？",o:["定期的にクエリを実行でき電子メールで送信（zip圧縮オプションあり）・複数人へ送信可能","結果はCSV形式でのみ送信・1名にのみ送信可能","結果はダッシュボードにのみ表示","スケジュール実行は不可で都度手動実行が必要"],a:0,e:"スケジュールクエリは①定期的にスケジュールされた時間にクエリを実行②結果を電子メールで個人またはグループに送信③添付ファイルのzip圧縮オプションあり。"},
+]});
+
+// ─── Course 5 Lesson 3 ───────────────────────────────
+L.push({c:"Course 5",l:"5-3",t:"Unified Map（統合マップ）",
+s:`Unified Map 機能は、選択したCI（ホームノード）を中心として、CI（構成アイテム）とそれらの間のリレーションシップの階層マップをグラフィカルに表示する。Dependency View と Application Service マップの多くの機能を単一のマップ体験に統合している。
+
+CMDB Workspace の一部として含まれ、継続的に機能強化を受けている。
+
+【有用な製品】
+・Incident Management
+・Problem Management
+・Change Management
+・Event Management
+
+【主な機能要素（6つ）】
+マップキャンバス・コンテンツコントロール・ツールボックス・コンテキストサイドパネル・ミニマップナビゲーター・タイムライン
+
+【Unified Map の利点】
+・CIがリレーションシップと参照によって他のCIにどのように接続されているかを視覚的に表示し、変更の影響を理解するのに役立つ
+・アプリケーションサービスの構成も表示するため、Event Management や Incident Management などの製品で役立つ
+・履歴の変更を確認し、CIを簡単にフィルタリングできる
+
+【アクセス方法】
+CMDB Workspace に移動 → Home ビューから Quick Links の下にある Unified Map を選択 → CI検索フィールドでマッピングされたアプリケーションサービスを検索
+
+ノードバッジはインシデントまたは変更の存在を示す。`,
+p:[
+["定義","選択したCI（ホームノード）を中心としてCIとリレーションシップの階層マップをグラフィカルに表示","Dependency ViewとApplication Serviceマップの機能を単一のマップ体験に統合"],
+["含まれる製品","CMDB Workspaceの一部として含まれる","継続的に機能強化を受けている"],
+["有用な製品","Incident・Problem・Change・Event Management","マップ上のノードはCIを表し、線はCI間の接続を表す"],
+["主な機能要素","マップキャンバス・コンテンツコントロール・ツールボックス・コンテキストサイドパネル・ミニマップナビゲーター・タイムライン","6つの機能要素で構成される"],
+["利点①","変更の影響を理解するためにCIの接続関係を視覚的に表示","リレーションシップと参照による接続を表示"],
+["利点②","アプリケーションサービスの構成を表示","Event Management・Incident Managementで役立つ"],
+["利点③","履歴の変更を確認しCIを簡単にフィルタリング可能","Application CIのみ表示などのフィルタリングが可能"],
+["アクセス方法","CMDB Workspace→Home→Quick Links→Unified Map","CI検索フィールドでアプリケーションサービスを検索"],
+["ノードバッジ","インシデントまたは変更の存在を示す","マップペインにCIとリレーションシップのレイアウトを表示"],
+],
+q:[
+{t:"基礎",q:"Unified Mapの主な特徴として正しいものはどれか？",o:["テキストベースのCI一覧を表示する","選択したCIを中心としてCIとリレーションシップの階層マップをグラフィカルに表示する","Discoveryパターンを編集する","CMDBスキーマを変更する"],a:1,e:"Unified Map機能は選択したCI（ホームノード）を中心として、CIとリレーションシップの階層マップをグラフィカルに表示する。Dependency ViewとApplication Serviceマップの機能を単一のマップ体験に統合している。"},
+{t:"基礎",q:"Unified Mapはどの製品の一部として提供されているか？",o:["Service Mapping","Discovery","CMDB Workspace","Event Management"],a:2,e:"Unified MapはCMDB Workspaceの一部として含まれており、継続的に機能強化を受けている。"},
+{t:"基礎",q:"Unified Mapが特に有用な製品として正しくないものはどれか？",o:["Incident Management","Problem Management","Software Asset Management","Change Management"],a:2,e:"Unified Mapが有用な製品はIncident Management・Problem Management・Change Management・Event Management。Software Asset ManagementはUnified Mapの主要な対象製品ではない。"},
+{t:"基礎",q:"Unified MapにアクセスするためのServiceNowでの正しい手順はどれか？",o:["Configuration > Unified Map","CMDB Workspace > Home > Quick Links > Unified Map","Discovery > Maps > Unified Map","Service Mapping > Unified Map"],a:1,e:"Unified Mapへのアクセス方法：CMDB Workspaceに移動 > HomeビューのQuick Links下にあるUnified Mapを選択 > CI検索フィールドでマッピングされたアプリケーションサービスを検索。"},
+{t:"基礎",q:"Unified Mapのノードバッジが示す情報として正しいものはどれか？",o:["CIの価格情報","インシデントまたは変更の存在","Discoveryスケジュール","ソフトウェアライセンスの状態"],a:1,e:"ノードバッジはインシデントまたは変更の存在を示す。マップペインにはCIとリレーションシップのグラフィカルなレイアウトが表示される。"},
+{t:"引っ掛け",q:"Unified Mapの機能要素として含まれないものはどれか？",o:["マップキャンバス","ミニマップナビゲーター","タイムライン","SQLエディター"],a:3,e:"Unified Mapの主な機能要素はマップキャンバス・コンテンツコントロール・ツールボックス・コンテキストサイドパネル・ミニマップナビゲーター・タイムラインの6つ。SQLエディターは含まれない。"},
+{t:"引っ掛け",q:"Unified MapがEvent ManagementとIncident Managementで役立つ理由として正しいものはどれか？",o:["財務データを表示するから","アプリケーションサービスの構成を表示するから","ソフトウェアライセンスを管理するから","ハードウェアの減価償却を計算するから"],a:1,e:"Unified Mapはアプリケーションサービスの構成を表示するため、Event ManagementやIncident Managementなどの製品で役立つ。"},
+{t:"意地悪",q:"Unified Mapについて正しい記述をすべて含むものはどれか？",o:["Dependency ViewとApplication Serviceマップの機能を統合している。CMDB Workspaceの一部。選択したCIを中心として階層マップを表示する","Discovery専用のツールでCMDB Workspaceとは無関係","テキストベースの一覧表示のみを提供する","CMDB Health Dashboardの一部である"],a:0,e:"Unified Mapの正しい説明：Dependency ViewとApplication Serviceマップの機能を統合。CMDB Workspaceの一部として含まれる。選択したCI（ホームノード）を中心として階層マップを表示する。"},
+{t:"試験対策",q:"メールサービスの障害が発生した際、ITサポートチームが根本原因を特定するためにUnified Mapを使用する際の最も役立つ機能はどれか？",o:["新しいCIを作成する機能","CIの接続関係を視覚的に表示しインシデントや変更の存在をノードバッジで確認する機能","Discoveryスケジュールを変更する機能","ソフトウェアライセンスを確認する機能"],a:1,e:"Unified Mapは変更の影響を理解するためにCIの接続関係を視覚的に表示し、ノードバッジでインシデントや変更の存在を示す。履歴の変更を確認しCIを簡単にフィルタリングできる。"},
+]});
+
+// ─── Course 5 Lesson 4 ───────────────────────────────
+L.push({c:"Course 5",l:"5-4",t:"CMDB and CSDM Data Foundations Dashboards",
+s:`CMDB and CSDM Data Foundations Dashboards は、CMDB と Common Service Data Model（CSDM）の主要な基盤指標に関する洞察を提供するダッシュボードを含む ServiceNow ストアアプリケーションである。
+
+【CMDB Data Foundations Dashboard】
+CMDB内のさまざまな構成とカスタマイズを評価しデータの品質と安定性を確保する。重要なデータが有効で適切に構成されていることを検証し、潜在的な実装リスクを特定し可視化する。ギャップを強調しリスク修復をガイドするプレイブックを提供。
+
+【CSDM Data Foundations Dashboard】
+フレームワークが適切に実装され価値を提供していることを確認するためにCSDMの主要な指標を評価する。
+
+【インストールとアクセス】
+System Applications > All Available Applications > All に移動 → CMDB and CSDM Data Foundations Dashboards ストアアプリケーションを検索してインストール。Configuration > CMDB Data Foundations Dashboard または CSDM Data Foundations Dashboard に移動。または CMDB Workspace の Management タブからアクセス。
+
+【スケジュールジョブ】
+インストール後、最初はデータが表示されない。スケジュールジョブが自動実行されるまで待つか、System Definition > Scheduled Jobs で「Get Well」を含むジョブを検索してExecute Nowを選択して手動実行。
+
+【修復プレイブック】
+各プレイブックは指標の概要・問題の概要・対処の重要性・スコアの修正/改善方法を提供する。
+
+【Data Foundations Dashboards と CMDB Health Dashboard の違い】
+・Data Foundations Dashboards：構成不可。固定メトリクスでカスタマイズ不可
+・CMDB Health Dashboard：表示・除外したいデータのタイプに完全な柔軟性を提供
+
+Data Foundation DashboardメトリクスはServiceNow Health Scan Definitionsのサブセットである。ダッシュボード上部セクション：コンプライアンス準拠CIのパーセンテージとして表示。下部セクション：非コンプライアンスCIのタイル。`,
+p:[
+["定義","CMDBとCSDMの主要な基盤指標に関する洞察を提供するServiceNowストアアプリケーション","CMDB Data Foundations DashboardとCSDM Data Foundations Dashboardの2つを含む"],
+["CMDB Data Foundations Dashboard","CMDB内の構成とカスタマイズを評価しデータの品質と安定性を確保","重要データの検証・実装リスクの特定・問題防止・プレイブック提供"],
+["CSDM Data Foundations Dashboard","CSDMの主要な指標を評価しフレームワークが適切に実装されていることを確認","必要情報の検証・リレーションシップ確認・プレイブック提供"],
+["インストール","System Applications > All Available Applications > Allから検索してインストール","Configuration配下またはCMDB Workspace Managementタブからアクセス"],
+["スケジュールジョブ","インストール後はデータ表示されない。スケジュールジョブ実行後に表示開始","手動実行：System Definition > Scheduled Jobsで「Get Well」を検索してExecute Now"],
+["修復プレイブック","CMDBのデータ品質を管理・改善しCSDMに準拠するための構造化ガイドライン","指標の概要・問題の概要・対処の重要性・スコア修正/改善方法を提供"],
+["Data Foundations vs CMDB Health","Data Foundations：構成不可・固定メトリクス。CMDB Health：完全な柔軟性","主な違いはカスタマイズ可能性"],
+["指標の計算方法","ServiceNowドキュメントまたはScript Includes（GetWell）で確認","上部：コンプライアンス準拠CIのパーセンテージ。下部：非コンプライアンスCIのタイル"],
+["Health Scanとの関係","Data Foundation DashboardメトリクスはServiceNow Health Scan Definitionsのサブセット","標準HealthScanで見られる多くの重要指標を強調"],
+],
+q:[
+{t:"基礎",q:"CMDB and CSDM Data Foundations Dashboardsの提供形態として正しいものはどれか？",o:["基本システムに標準で含まれる","ServiceNowストアアプリケーションとして提供される","有償のプレミアムアドオン","サードパーティ製品"],a:1,e:"CMDB and CSDM Data Foundations DashboardsはServiceNowストアアプリケーションとして提供される。インストールはSystem Applications > All Available Applications > Allから行う。"},
+{t:"基礎",q:"CMDB Data Foundations Dashboardをインストールする場所として正しいものはどれか？",o:["System Definition > Plugins","System Applications > All Available Applications > All","Configuration > CMDB Properties","CMDB Workspace > Settings"],a:1,e:"インストール方法：System Applications > All Available Applications > All に移動し、CMDB and CSDM Data Foundations Dashboardsストアアプリケーションを検索してインストール。"},
+{t:"基礎",q:"修復プレイブックが提供する内容として正しくないものはどれか？",o:["指標の概要","問題の概要と対処の重要性","スコアの修正/改善方法","自動修復スクリプト"],a:3,e:"修復プレイブックが提供するのは指標の概要・問題の概要・対処の重要性・スコアの修正/改善方法の4つ。自動修復スクリプトの自動実行は含まれない。"},
+{t:"基礎",q:"Data Foundations DashboardsとCMDB Health Dashboardの主な違いとして正しいものはどれか？",o:["Data Foundationsは構成可能だがCMDB Healthは固定","Data Foundationsは固定メトリクスでCMDB Healthは完全な柔軟性がある","両方とも同じカスタマイズ性を持つ","CMDB Healthは固定メトリクスでData Foundationsは柔軟"],a:1,e:"Data Foundations Dashboards：構成不可・固定メトリクスでカスタマイズ不可。CMDB Health Dashboard：表示・除外したいデータのタイプに完全な柔軟性を提供。"},
+{t:"基礎",q:"Data Foundation DashboardメトリクスとHealth Scan Definitionsの関係として正しいものはどれか？",o:["Health Scan Definitionsとは無関係","Health Scan Definitionsの完全なコピー","Health Scan Definitionsのサブセットである","Health Scan Definitionsを置き換えるものである"],a:2,e:"Data Foundation DashboardメトリクスはServiceNow Health Scan Definitionsのサブセットである。標準HealthScanで見られる多くの重要指標を強調している。"},
+{t:"引っ掛け",q:"Data Foundations Dashboardsインストール後にデータが表示されない場合の対処法として正しいものはどれか？",o:["アプリケーションを再インストールする","スケジュールジョブが自動実行されるまで待つか、System Definition > Scheduled Jobsで「Get Well」を含むジョブを手動実行する","ServiceNowサポートに連絡する","CMDBを再構築する"],a:1,e:"インストール後はスケジュールジョブが実行されるまでデータは表示されない。手動実行する場合はSystem Definition > Scheduled Jobsで「Get Well」を含むジョブを検索してExecute Nowを選択する。"},
+{t:"意地悪",q:"CSDM Data Foundations Dashboardが確認する内容として正しいものはどれか？",o:["Discoveryパターンの正確性","CSDMフレームワークが適切に実装され価値を提供していること・必要情報の利用可能性・リレーションシップの確認","ソフトウェアライセンスの使用状況のみ","ハードウェア資産の減価償却"],a:1,e:"CSDM Data Foundations Dashboardは①CSDMフレームワークを使用するServiceNow製品の完全な利点を実現するために必要な情報が利用可能であることを検証②サービスが意味のある戦略的決定をサポートするために必要なリレーションシップを持っていることを確認③ギャップを特定しリスクの修復をガイドするプレイブックを提供する。"},
+{t:"試験対策",q:"「Hardware CIs with Serial Number」指標が62.1%を表示している場合の意味として正しいものはどれか？",o:["62.1%のCIが非コンプライアンス状態","スコープ内のCIの62.1%がシリアル番号を持っている（コンプライアンス準拠）","62.1%のCIがDiscoveryによって検出されていない","62.1%のCIがRetired状態"],a:1,e:"ダッシュボード上部セクションには指標のスコープ内のCIのスキャン結果がコンプライアンス準拠CIのパーセンテージとして表示される。62.1%はスコープ内のCIの62.1%がシリアル番号を持っている（準拠している）ことを意味する。"},
+]});
+
+// ─── Course 5 Lesson 5 ───────────────────────────────
+L.push({c:"Course 5",l:"5-5",t:"Intelligent Search（インテリジェント検索）",
+s:`Intelligent Search は、CMDB管理者とユーザーがCMDBで自然言語クエリ（NLQ: Natural Language Query）を実行できるようにし、複雑なCMDBデータモデルに精通する必要をなくす。CMDB Query Builder の使用方法を知らなくても複雑なマルチテーブルクエリを実行できる。
+
+【主な機能】
+・平易な言葉で検索クエリを入力すると、テーブル名・部分フレーズ・過去の検索用語を含む動的な提案を受け取る
+・事前設定されたサンプル検索がすぐに使用できる状態で利用可能
+・最新の5件の検索にアクセスでき、各個人向けにパーソナライズされている
+
+【Intelligent Search と CMDB Query Builder の統合】
+システムプロパティ glide.cmdb.query.nlq.activated によって管理され、デフォルトで有効。CMDBクエリが複数のテーブルを含む場合「View in Query Builder」ボタンが表示される。選択すると CMDB Query Builder が開き、クエリがキャンバス上に完全に構築される。
+
+【サンプル検索】
+CMDB管理者（sn_cmdb_admin ユーザーロール）は NLQ Sample Search テーブルのレコードを直接編集することでサンプル検索を変更できる。
+
+・サンプル検索は NLQ Sample Search [sn_cmdb_ws_nlq_sample_search] テーブルに保存
+・参照されるテーブルは NLQ Sample Search Table [sn_cmdb_ws_nlq_sample_search_table] テーブルに保存
+・サンプル検索への変更は CMDB Workspace と CMDB Query Builder の両方に反映される`,
+p:[
+["定義","CMDB管理者とユーザーがCMDBで自然言語クエリ（NLQ）を実行できる機能","複雑なCMDBデータモデルに精通する必要がない"],
+["利点","CMDB Query Builderの使用方法を知らなくても複雑なマルチテーブルクエリを実行可能","平易な言葉で検索クエリを入力"],
+["動的な提案","入力時にテーブル名・部分フレーズ・過去の検索用語を含む提案を受け取る","検索プロセスを合理化"],
+["サンプル検索","事前設定されたサンプル検索がすぐに使用可能","最新の5件の検索にアクセス可能（個人向けにパーソナライズ）"],
+["Query Builder統合","システムプロパティ glide.cmdb.query.nlq.activated で管理（デフォルト有効）","複数テーブルを含むクエリで「View in Query Builder」ボタン表示"],
+["統合後の機能","クエリの洗練・Query Builderの理解深化・スケジュール設定が可能","Query Builderでクエリがキャンバス上に完全構築される"],
+["サンプル検索の編集","sn_cmdb_adminロールがNLQ Sample Searchテーブルで直接編集可能","変更はCMDB WorkspaceとQuery Builderの両方に反映"],
+["保存テーブル","サンプル検索：sn_cmdb_ws_nlq_sample_search、参照テーブル：sn_cmdb_ws_nlq_sample_search_table","Filter navigatorでsn_cmdb_ws_nlq_sample_search.listと入力してアクセス"],
+],
+q:[
+{t:"基礎",q:"Intelligent Searchの主な特徴として正しいものはどれか？",o:["SQLコードの記述が必須","自然言語クエリ（NLQ: Natural Language Query）を実行できる","コマンドラインのみで使用可能","単一テーブルのみ検索可能"],a:1,e:"Intelligent SearchはCMDB管理者とユーザーがCMDBで自然言語クエリ（NLQ）を実行できるようにする。複雑なCMDBデータモデルに精通する必要がない。"},
+{t:"基礎",q:"Intelligent Searchで入力時に受け取る動的な提案として正しくないものはどれか？",o:["テーブル名","部分フレーズ","過去の検索用語","SQLクエリコード"],a:3,e:"動的な提案はテーブル名・部分フレーズ・過去の検索用語の3つ。SQLクエリコードの提案は行われない。"},
+{t:"基礎",q:"サンプル検索を編集できるロールとして正しいものはどれか？",o:["cmdb_user","data_manager_user","sn_cmdb_admin（CMDB管理者）","itil"],a:2,e:"CMDB管理者（sn_cmdb_adminユーザーロール）はNLQ Sample Searchテーブルのレコードを直接編集することでサンプル検索を変更できる。"},
+{t:"基礎",q:"Intelligent Searchのサンプル検索が保存されるテーブルはどれか？",o:["cmdb_sample_search","sn_cmdb_ws_nlq_sample_search","nlq_search_samples","cmdb_query_samples"],a:1,e:"サンプル検索はNLQ Sample Search [sn_cmdb_ws_nlq_sample_search]テーブルに保存される。参照されるテーブルはNLQ Sample Search Table [sn_cmdb_ws_nlq_sample_search_table]テーブルに保存される。"},
+{t:"基礎",q:"Intelligent SearchとCMDB Query Builderの統合について正しいものはどれか？",o:["統合は存在しない","システムプロパティ glide.cmdb.query.nlq.activated で管理（デフォルト有効）。複数テーブルを含むクエリで「View in Query Builder」ボタンが表示される","統合は有償オプション","統合はデフォルトで無効"],a:1,e:"CMDB用Intelligent SearchはCMDB Query Builderと統合されており、システムプロパティ glide.cmdb.query.nlq.activated によって管理（デフォルトで有効）。CMDBクエリが複数のテーブルを含む場合「View in Query Builder」ボタンが表示される。"},
+{t:"引っ掛け",q:"Intelligent Searchについて正しい記述はどれか？",o:["CMDB Query Builderの知識が必須","CMDB Query Builderの使用方法を知らなくても複雑なマルチテーブルクエリを実行できる","単一テーブルのクエリのみ対応","技術者専用の機能"],a:1,e:"Intelligent SearchはCMDB Query Builderの使用方法を知らなくても複雑なマルチテーブルクエリを実行できる。複雑なCMDBデータモデルに精通する必要をなくす。"},
+{t:"意地悪",q:"サンプル検索の変更がどこに反映されるか、正しいものはどれか？",o:["CMDB Workspaceにのみ反映","CMDB Query Builderにのみ反映","CMDB WorkspaceとCMDB Query Builderの両方に反映される","変更は反映されない"],a:2,e:"サンプル検索への変更はCMDB WorkspaceとCMDB Query Builderの両方に反映される。"},
+{t:"意地悪",q:"Intelligent Searchの最新の検索履歴アクセスについて正しいものはどれか？",o:["最新の10件の検索にアクセスできる","最新の5件の検索にアクセスでき、各個人向けにパーソナライズされている","検索履歴は保存されない","すべての検索履歴にアクセスできる"],a:1,e:"Intelligent Searchは最新の5件の検索にアクセスでき、各個人向けにパーソナライズされている。"},
+{t:"試験対策",q:"Intelligent Searchで複数テーブルを含むクエリを実行した場合に表示されるボタンと動作として正しいものはどれか？",o:["「Export Results」ボタンが表示されCSVでダウンロードされる","「View in Query Builder」ボタンが表示されCMDB Query Builderでクエリがキャンバス上に完全に構築される","「Save Query」ボタンが表示されクエリが自動保存される","「Run Again」ボタンが表示されクエリが再実行される"],a:1,e:"CMDBクエリが複数のテーブルを含む場合「View in Query Builder」ボタンが表示される。選択するとCMDB Query Builderが開き、クエリがキャンバス上に完全に構築される。"},
+]});
+
+// ─── Course 5 Lesson 6 ───────────────────────────────
+L.push({c:"Course 5",l:"5-6",t:"Product Views（製品ビュー）",
+s:`健全で成熟し、適切にメンテナンスされたCMDBは、ServiceNow AIプラットフォームでの成功の重要なコンポーネントであり、ITサービスマネジメントやその他多くのエンタープライズプロセスにとって価値ある意思決定支援ツールである。
+
+【健全なCMDBとServiceNow ITSMの効果】
+・インシデント解決が38%高速化
+・失敗した変更が82%減少
+・問題管理で解決されたインシデントが604%増加
+・適切に構成されたCMDBによりITコストを最大40%削減
+
+【Incident Management】
+CMDBからの情報をインシデントの回復やサービスとインフラストラクチャCIのステータス通知に活用する。CI属性の入力によりAssignment Group（Support Group）などのルーティング詳細を決定する。Impacted Services関連リストにServicesとService Offeringsを表示。
+
+【Change Management】
+CMDBに保存された情報を使用して変更要求（RFC）を評価・承認する。CI間のリレーションシップでビジネスアプリケーションとサービスへの影響分析を提供する。
+
+【Event Management】
+サードパーティの監視ツールからインフラストラクチャイベントのアラートを収集する。DiscoveryによってIT関連情報を収集し、アラートをCIにマッピングする。イベント相関・自動応答の機能を提供。
+
+【Asset Management】
+CMDBを入力する際、ハードウェア資産についてCI対資産の同期が発生する。SAMはCMDBに保存されたデータに基づいてソフトウェアライセンスの使用を最適化する。コスト管理（過小利用資産の特定）・ライフサイクル管理（耐用年数終了・ライセンス期限を自動フラグ）。
+
+内部ユーザーがデータ正確性への信頼を失うと独自のデータソースを使用しServiceNowの有効性が損なわれる。一般的な問題：重複したCI・古いCI・不完全なCI。`,
+p:[
+["健全なCMDBの重要性","ServiceNow AIプラットフォームでの成功の重要なコンポーネント。ITSMやエンタープライズプロセスの意思決定支援ツール","正確で最新かつ包括的なデータを提供して他のServiceNow製品を強化"],
+["効果（ITSM）","インシデント解決38%高速化・失敗した変更82%減少・問題管理で解決されたインシデント604%増加","適切に構成されたCMDBでITコストを最大40%削減可能"],
+["Incident Management","CMDBからの情報をインシデント回復とステータス通知に活用","Configuration Item属性でルーティング詳細を決定。Impacted Services関連リストを表示"],
+["Change Management","CMDBに保存された情報で変更要求（RFC）を評価・承認","CI間のリレーションシップでビジネスアプリケーションとサービスへの影響分析を提供"],
+["Event Management","サードパーティ監視ツールからアラートを収集しCIにマッピング","イベント相関：CMDBでイベントをCIおよびサービスと相関。自動応答：イベント発生時に自動化アクション"],
+["Asset Management","ハードウェア資産についてCI対資産の同期が発生。SAMがソフトウェアライセンス使用を最適化","コスト管理：過小利用資産の特定。ライフサイクル管理：耐用年数終了・ライセンス期限を自動フラグ"],
+["データ品質の重要性","内部ユーザーがデータ正確性への信頼を失うと独自のデータソースを使用しServiceNowの有効性が損なわれる","一般的な問題：重複したCI・古いCI・不完全なCI"],
+],
+q:[
+{t:"基礎",q:"健全なCMDBとServiceNow ITSMによる効果として正しい数値はどれか？",o:["インシデント解決38%高速化・失敗した変更82%減少・問題管理で解決されたインシデント604%増加","インシデント解決50%高速化・失敗した変更70%減少・問題管理500%増加","インシデント解決25%高速化・失敗した変更90%減少・問題管理300%増加","インシデント解決40%高速化・失敗した変更80%減少・問題管理600%増加"],a:0,e:"健全なCMDBとServiceNow ITSMの効果：インシデント解決が38%高速化・失敗した変更が82%減少・問題管理で解決されたインシデントが604%増加。適切に構成されたCMDBでITコストを最大40%削減できる。"},
+{t:"基礎",q:"Incident ManagementがCMDBから得る情報の活用方法として正しいものはどれか？",o:["ソフトウェアライセンスの購入","インシデント回復とステータス通知。CI属性でルーティング詳細（Support Group等）を決定。Impacted Services関連リストを表示","ハードウェアの発注","従業員の評価"],a:1,e:"Incident ManagementはCMDBからの情報をインシデントの回復やサービスとインフラストラクチャCIのステータス通知に活用する。CI属性でAssignment Group（Support Group）などのルーティング詳細を決定。Impacted Services関連リストにServicesとService Offeringsを表示。"},
+{t:"基礎",q:"Change ManagementがCMDBを活用する主な目的として正しいものはどれか？",o:["CIを自動的に作成する","変更要求（RFC）を評価・承認しCI間のリレーションシップでビジネスアプリケーションとサービスへの影響分析を提供する","Discoveryパターンを管理する","ソフトウェアライセンスを追跡する"],a:1,e:"Change ManagementはCMDBに保存された情報を使用して変更要求（RFC）を評価・承認する。CMDBにはCI間のリレーションシップが含まれ、ビジネスアプリケーションとサービスに対する影響分析を提供する。"},
+{t:"基礎",q:"Asset ManagementにおけるCMDBの役割として正しいものはどれか？",o:["ハードウェア資産についてCI対資産の同期が発生する。SAMがソフトウェアライセンス使用を最適化","ソフトウェアライセンスのみを直接追跡する","消耗品を追跡する","従業員の勤怠を管理する"],a:0,e:"CMDBを入力する際、ハードウェア資産についてCI対資産の同期が発生する。SAMはCMDBに保存されたデータに基づいてソフトウェアライセンスの使用を最適化する。コスト管理・ライフサイクル管理も提供。"},
+{t:"引っ掛け",q:"Event ManagementにおけるCMDBの役割として正しくないものはどれか？",o:["アラートをCIにマッピング","イベントをCIおよびサービスと相関","イベント発生時に自動化アクションを可能にする","ソフトウェアライセンスの使用状況を監視する"],a:3,e:"Event Managementの役割はアラートをCIにマッピング・イベントをCIおよびサービスと相関・イベント発生時に自動化アクション。ソフトウェアライセンスの使用状況監視はSAM（Software Asset Management）の役割。"},
+{t:"引っ掛け",q:"健全なCMDBとITSMの効果について、誤っている数値はどれか？",o:["インシデント解決が38%高速化","失敗した変更が82%減少","問題管理で解決されたインシデントが604%増加","ITコストを最大60%削減（原文では40%）"],a:3,e:"原文では「適切に構成されたCMDBによりITコストを最大40%削減できる」。60%という数値は誤り。その他の数値（38%・82%・604%）は正しい。"},
+{t:"意地悪",q:"CMDBデータの一般的な問題として原文に記載されているものはどれか？",o:["重複したCI・古いCI・不完全なCI","過剰に詳細なCI・文書化されすぎたCI","コストが高すぎるCI・セキュリティが弱いCI","速度が遅いCI・容量が小さいCI"],a:0,e:"CMDBデータの一般的な問題は重複したCI・古いCI・不完全なCI。内部ユーザーがデータ正確性への信頼を失うと独自のデータソースを使用しServiceNowの有効性が損なわれる。"},
+{t:"試験対策",q:"Incident ManagementフォームでCIを選択した際に自動入力される可能性があるフィールドと関連リストの正しい組み合わせはどれか？",o:["Assignment Group（Support Groupから）・Impacted Services関連リストにServicesとService Offerings","Incident Category・Related CIs関連リストにハードウェア情報","Priority・Affected Users関連リストにユーザー一覧","Resolution Code・Change Requests関連リストに変更履歴"],a:0,e:"CIのConfiguration Item属性の入力によりAssignment Group（Support Group）などのルーティング詳細を決定する。依存関係を通じてサービスへの影響に関する洞察を提供し、Impacted Services関連リストにServicesとService Offeringsを表示する。"},
+]});
+
+// ═══ Course 6 Scenarios ═══════════════════════════════
+
+L.push({c:"Course 6",l:"6-1",t:"Activate Health Dashboard",
+s:`Activate Health Dashboard`,
+p:[],
+q:[
+{t:"基礎",q:"Cloud DimensionsがCMDBヘルスダッシュボードジョブを有効化する際、各ジョブで必ず確認すべき設定はどれか？",o:["Execution Typeを「Scheduled」に変更する","Active（アクティブ）チェックボックスが選択されていることを確認する","Run Asフィールドに管理者名を入力する","Notification設定をEmailに変更する"],a:1,e:"各CMDBヘルスダッシュボードジョブを有効化する際、Active（アクティブ）チェックボックスが選択されていることを確認する。失敗フィードバック「Did you activate the three scheduled jobs?」に対応する。"},
+{t:"基礎",q:"CMDBヘルスダッシュボードジョブへのナビゲーションパスとして正しいものはどれか？",o:["System Definition > Scheduled Jobs > CMDB Health","Configuration > Health Preferences > Scheduled Jobs","CMDB Workspace > Settings > Jobs","CI Class Manager > Health > Scheduled Jobs"],a:1,e:"CMDBヘルスダッシュボードジョブへのアクセス：Configuration > Health Preferences > Scheduled Jobs。ここで各スコア計算ジョブを開いてActivateし、Execute Nowで手動実行できる。"},
+{t:"基礎",q:"ジョブ実行後にメトリクスの完了状態を確認するために移動すべきテーブルはどれか？",o:["cmdb_ci.list","sys_trigger.list","cmdb_health_metric_status.list","cmdb_health_rule.list"],a:2,e:"ジョブ実行後の確認先はcmdb_health_metric_status.list。ここで9つのメトリクスのステータスが「complete（完了）」であることを確認する。"},
+{t:"基礎",q:"シナリオ1の検証でcmdb_health_metric_status.listに表示されるべき完了ステータスのメトリクス数として正しいものはどれか？",o:["3つ","6つ","9つ","12つ"],a:2,e:"検証条件：「9つのメトリクスが完了（complete）ステータスで表示されていること」。3スコアカード（完全性・コンプライアンス・正確性）それぞれに複数のメトリクスが含まれ合計9つになる。"},
+{t:"基礎",q:"CMDBヘルスダッシュボードの結果を確認するナビゲーションパスとして正しいものはどれか？",o:["Configuration > CMDB Health Dashboard","System Definition > CMDB Metrics","CMDB Workspace > Management > CMDB Health","CI Class Manager > Health > Scores"],a:2,e:"CMDBヘルスダッシュボードへのアクセス：CMDB Workspace > Management（管理）> CMDB Health（CMDBヘルス）。ここで各メトリクスのヘルススコアが表示されていることを確認する。"},
+{t:"基礎",q:"完全性（Completeness）および正確性（Correctness）スコアカードに含まれるCIの範囲として正しいものはどれか？",o:["1.5K","2.5K","3.01K","5.0K"],a:2,e:"要件に「The scope of CIs that are part of the Completeness and Correctness scorecards should be 3.01K」と明記されている。"},
+{t:"重要注記",q:"「The Compliance metric value may differ from what is displayed including the overall health score.」が意味することとして正しいものはどれか？",o:["Complianceジョブは実行しなくてよい","Complianceメトリクスの値は他のスコアカードと異なる場合があり全体的なヘルススコアも異なる可能性がある。これは想定内の動作","Complianceスコアは常に0%で表示される","Complianceスコアが異なる場合はジョブを再実行する必要がある"],a:1,e:"Complianceメトリクスの値が他と異なることは想定内の動作。Certification FilterやAudit設定によって生じる。他の検証条件（9メトリクス完了・3.01K）が満たされていれば問題ない。"},
+{t:"試験対策",q:"シナリオ1でCMDB管理者が行うべき正しい手順の順序はどれか？",o:["cmdb_health_metric_status.listで確認→ジョブを有効化→Execute Now","Configuration > Health Preferences > Scheduled Jobsで各ジョブをActivate→Execute Now→ジョブ完了まで待機→cmdb_health_metric_status.listで9メトリクス完了確認→CMDB Workspace > Management > CMDB Healthで結果確認","CMDB Workspaceでスコア確認→ジョブを有効化→Execute Now","Completeness・Correctnessのみ実行しComplianceは省略する"],a:1,e:"正しい手順：①Configuration > Health Preferences > Scheduled Jobsで各ジョブをActivate②Execute Now③ジョブ完了まで待機④cmdb_health_metric_status.listで9メトリクス完了確認⑤CMDB Workspace > Management > CMDB Healthで確認⑥Completeness・Correctnessの範囲が3.01Kであることを確認"}
+]});
+L.push({c:"Course 6",l:"6-2",t:"Create CMDB Group",
+s:`Create CMDB Group`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ2でCMDB Groupを作成する際のタイプ（Type）として正しいものはどれか？",o:["CI Class","Discovery","Health","Compliance"],a:2,e:"CMDB Groupを作成する際、タイプは「Health」を選択する必要がある。タイプを間違えると失敗フィードバック「Is it of type 'Health'?」に対応するエラーとなる。"},
+{t:"基礎",q:"シナリオ2でCMDB Groupのグループ名として正しいものはどれか？",o:["Unix and Windows","Windows and Unix Servers","Unix and Windows Servers","Unix Windows Servers Group"],a:2,e:"グループ名は「Unix and Windows Servers」と完全一致（EXACTLY）で入力する必要がある。失敗フィードバック「Did you name the new group EXACTLY as described in the instructions?」に対応する。"},
+{t:"基礎",q:"シナリオ2でCMDB Groupに含める対象クラスとして正しいものはどれか？",o:["Windows Server・Linux Server・Unix Serverの3クラス","AIX Server・HPUX Server・Solaris Server・Windows Serverの4クラス","Windows Server・Solaris Serverの2クラス","すべてのServerクラス"],a:1,e:"対象クラスはUNIX Server系（AIX Server・HPUX Server・Solaris Server）とWindows Serverの合計4クラス。Encoded Query（エンコードクエリ）と条件で設定する。"},
+{t:"基礎",q:"シナリオ2でCMDB Groupを作成後にShow All CIボタンを押して確認すべき件数として正しいものはどれか？",o:["100件","123件","146件","200件"],a:2,e:"Hint：「Show All CIボタンを選択し、Load More Resultsボタンを選択し、146のWindows・Unix・Solaris・AIXサーバーが返されることを確認してから続行する」。146件が正しい件数。"},
+{t:"基礎",q:"シナリオ2でCMDB Groupを作成後にスケジュールジョブを実行するナビゲーションパスとして正しいものはどれか？",o:["Configuration > Health Preferences > Scheduled Jobs","CMDB Workspace > Management > CMDB Health > CMDB Health settings","CI Class Manager > Health > Jobs","System Definition > Scheduled Jobs"],a:1,e:"シナリオ2の要件：「CMDB Workspace > Management > CMDB Health > CMDB Health settingsから、Completeness・Compliance・CorrectnessのScheduled Jobsを実行する」"},
+{t:"検証",q:"シナリオ2の検証条件として正しいものはどれか？",o:["Unix and Windows Servers HealthグループのCMDB Health Dashboardにスコアが表示される。スコープはCompliance以外は146件","CMDB Health GroupにUnix and Windows Serversが存在し、全体的なCompleteness・Compliance・CorrectnessスコアなどのメトリクスとともにCMDB Health Groupが確認できる。スコープは146件（Complianceは変動あり）","スコープが200件のメトリクスが表示される","Completenessスコアのみが表示される"],a:1,e:"検証条件：「Unix and Windows Servers HealthグループにCompleteness・Compliance・Correctnessスコアを含むメトリクスが表示されること。スコープは146件（Complianceメトリクスは変動する可能性あり）」"},
+{t:"試験対策",q:"CMDB Groupでエンコードクエリ（Encoded Query）を使用する理由として最も適切なものはどれか？",o:["グループに単一クラスのみを追加するため","複数の異なるクラス（AIX・HPUX・Solaris・Windows）を条件と組み合わせて一つのグループにまとめるため","Discovery Scheduleを設定するため","Health Inclusion Rulesを置き換えるため"],a:1,e:"Encoded Queryは複数の異なるCIクラスを条件と組み合わせて一つのCMDB Groupにまとめる際に使用する。シナリオ2ではAIX・HPUX・Solaris・Windows Serverの4クラスを組み合わせるために必要。"},
+{t:"基礎",q:"シナリオ2でCMDB Groupを作成する際にNavigateすべき場所として正しいものはどれか？",o:["CI Class Manager > CMDB Groups","CMDB Workspace > Management > CMDB Groups または Configuration > CMDB Health > CMDB Groups","System Properties > CMDB Groups","Health Preferences > Groups"],a:1,e:"CMDB Groupの作成はCMDB Workspace > Management > CMDB Groups または Configuration > CMDB Health > CMDB Groupsからアクセスして新規グループを作成する。"},
+{t:"引っ掛け",q:"CMDB Groupを使用する際のBestPractice（ベストプラクティス）として最も適切なものはどれか？",o:["すべてのCIをひとつのグループにまとめる","組織が管理責任を持つCIクラスのみをグループに含め、Health Inclusion Rulesと組み合わせてスコアカードの評価範囲を意味あるメトリクスに絞り込む","グループは必要最小限の1つのみ作成する","CMDB Groupは作成せずHealth Inclusion Rulesのみを使用する"],a:1,e:"CMDB Groupを使用すると複数クラスを統合したビューを提供でき、組織が管理責任を持つCIクラスのみに絞り込んだ意味のあるメトリクスを確認できる。シナリオ2でもUnix・Windows Serverという管理対象クラスのみをグループ化している。"}
+]});
+L.push({c:"Course 6",l:"6-3",t:"Configure Schedule for Health Dashboard Job",
+s:`Configure Schedule for Health Dashboard Job`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ3でCMDBヘルスダッシュボードジョブを1日2回実行するスケジュール設定として正しいものはどれか？",o:["毎日1回午前9時に実行","毎日午前7時と午後7時の2回実行","毎週月曜日と木曜日に実行","毎時間実行"],a:1,e:"要件：「本日を開始日として、午前7時と午後7時の1日2回実行するように設定する」。3つのジョブ（Completeness・Compliance・Correctness）すべてに同じスケジュールを設定する。"},
+{t:"基礎",q:"シナリオ3で設定するジョブの実行頻度として正しいものはどれか？",o:["1日1回","1日2回（午前7時と午後7時）","1週間に2回","1時間ごと"],a:1,e:"要件：「activate and configure the following CMDB Health Dashboard jobs to execute two times a day at 7am and 7pm starting today」。1日2回・午前7時と午後7時・本日開始が正しい設定。"},
+{t:"基礎",q:"シナリオ3の検証で各CMDBヘルスダッシュボードジョブを開いて確認すべき内容として正しいものはどれか？",o:["ジョブがActiveであることのみ確認する","ジョブが1日2回・午前7時と午後7時に実行するように設定されていることを確認する","ジョブの実行結果のログを確認する","cmdb_health_metric_status.listで9メトリクスを確認する"],a:1,e:"検証条件：「Open each of the CMDB Health Dashboard scheduled jobs and verify they will execute two times a day at 7am and 7pm starting today」。各ジョブを開いてスケジュール設定を確認する。"},
+{t:"試験対策",q:"シナリオ3でステークホルダーが「ヘルスダッシュボードを1日2回更新したい」と決定した理由として最も適切なものはどれか？",o:["ジョブの実行が遅いため複数回実行が必要だから","グループヘルスダッシュボードのメトリクスは最後に実行されたジョブのデータしか反映されないため、より頻繁に更新することでデータの鮮度を保つため","コンプライアンス要件で1日2回の実行が義務付けられているから","ServiceNowの推奨設定が1日2回だから"],a:1,e:"シナリオ：「Cloud Dimensions understands the metrics on the Group Health Dashboard are only as current as the last executed job.」グループヘルスダッシュボードのメトリクスは最後に実行されたジョブの時点のデータのみ反映されるため、より頻繁な実行でデータの鮮度を保つ。"}
+]});
+L.push({c:"Course 6",l:"6-4",t:"Configure Recommended Fields",
+s:`Configure Recommended Fields`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ4でServerクラスに設定する推奨フィールド（Recommended Fields）として正しい組み合わせはどれか？",o:["Serial Number・IP Address・MAC Addressの3つ","Location・Owned by・Support groupの3つ","Managed By Group・Change Group・Assignment Groupの3つ","Department・Company・Cost Centerの3つ"],a:1,e:"要件：「configure the following recommended fields for the Server class：Location・Owned by・Support group」。この3つをCI Class Managerでサーバークラスに推奨フィールドとして設定する。"},
+{t:"基礎",q:"シナリオ4で推奨フィールドを設定する際のナビゲーションとして正しいものはどれか？",o:["Configuration > CMDB Properties > Recommended Fields","CI Class Manager で Server クラスを選択し推奨フィールドを設定する","CMDB Workspace > Management > Recommended Fields","System Properties > CMDB > Recommended Fields"],a:1,e:"推奨フィールドの設定方法：CI Class Manager > Hierarchy > クラス（Server）を検索 > Health > Completeness > Recommended Fieldsタブ > フィールドを右側に移動。"},
+{t:"検証",q:"シナリオ4の検証結果として正しいものはどれか？",o:["146件すべてのCIが推奨フィールドを持っている","Recommendedメトリクスが赤で表示され、グループ内146件のCIのうち110件が1つ以上の推奨フィールドを欠いている","Recommendedメトリクスが緑で表示される","36件のCIが推奨フィールドを欠いている"],a:1,e:"検証条件：「Recommendedメトリクスが赤で表示され、146件のCIのうち110件が1つ以上の推奨フィールドを欠いている（110 of 146 CIs are missing one or more of the recommended fields）」"},
+{t:"Good Practice",q:"シナリオ4のGood Practiceとして「Discoveryソリューションで自動取得できないフィールドのデータ収集プロセスを定義することを推奨する」とされているが、その例として原文に記載されているフィールドはどれか？",o:["IP Address・MAC Address・Serial Number","Location・Owned by・Support group","Department・Company・Cost Center","Operational Status・Install Status"],a:1,e:"Good Practice：「Location・Owned by・Support groupのようなDiscoveryソリューションで自動取得できないフィールドのデータ収集プロセスを定義することを推奨する。また、IREが使用するSerialNumberなどのフィールドも空のままにすべきではない。」"},
+{t:"試験対策",q:"シナリオ4の要件で推奨フィールドを設定した後に実行するジョブとして正しいものはどれか？",o:["CMDB Health Dashboard - Compliance Score Calculation","CMDB Health Dashboard - Correctness Score Calculation","CMDB Health Dashboard - Completeness Score Calculation","すべての3つのジョブを実行する"],a:2,e:"要件：「After the recommended fields are configured, execute the CMDB Health Dashboard - Completeness Scorecard job.」推奨フィールドはCompleteness（完全性）スコアカードのメトリクスのため、Completeness Score Calculationジョブを実行する。"}
+]});
+L.push({c:"Course 6",l:"6-5",t:"Configure Desired State Audit Rule",
+s:`Configure Desired State Audit Rule`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ5でCertification Filter（認証フィルター）の設定として正しいものはどれか？",o:["「Windows Servers Filter」という名前でUNIXサーバーすべてを含む","「Windows Servers Filter」という名前でCMDB内すべてのWindowsサーバーを含む（監査の範囲を定義）","「All Servers Filter」という名前ですべてのサーバークラスを含む","「Windows 2012 Filter」という名前で特定バージョンのWindowsのみを含む"],a:1,e:"Certification Filter要件：「Named Windows Servers Filter and includes all Windows Servers. The certification filter defines the scope of the audit which in this case includes all Windows Servers in the CMDB」"},
+{t:"基礎",q:"シナリオ5でCertification Template（認証テンプレート）に含めるOSバージョンとして正しいものはどれか？",o:["Windows 2008・Windows 2012・Windows 2016","Windows 2012 R2 Standard・Windows 2016 Standard・Windows 2019 Datacenter","Windows 2016 Standard・Windows 2019 Datacenter・Windows 2022","Windows 2012 R2・Windows 2016・Windows 2019・Windows 2022の4つ"],a:1,e:"Certification Template要件：「certification attribute conditions for Operating Systems that are Windows 2012 R2 Standard, Windows 2016 Standard, Windows 2019 Datacenter」の3つのOSを含む。"},
+{t:"基礎",q:"シナリオ5でDesired State監査がパスすべきWindowsサーバーの条件として正しいものはどれか？",o:["すべてのWindowsサーバーがパスする","Windows 2012 R2 Standard・Windows 2016 Standard・Windows 2019 Datacenterを実行しているサーバーのみがパスし、それ以外はすべて失敗する","Windows 2019 Datacenterのみがパスする","Windows 2012 R2 Standardのみが失敗する"],a:1,e:"検証条件：「Windows Servers that are Windows 2012 R2 Standard, Windows 2016 Standard, and Windows 2019 Datacenter should pass the audit. All other Windows Servers should fail the audit.」"},
+{t:"基礎",q:"シナリオ5でCertification Filter・Certification Template・Auditを設定する場所として正しいものはどれか？",o:["Configuration > Compliance > Audits","CI Class Manager でWindowsサーバークラスを選択し Health > Compliance配下で設定する","CMDB Workspace > Management > Compliance","sys_audit.listから直接作成する"],a:1,e:"Desired State監査の設定方法：CI Class Manager > Hierarchy > Windows Server クラス > Health > Compliance > Certification Filter / Certification Template / Auditそれぞれを設定する。"},
+{t:"試験対策",q:"シナリオ5で作成する監査のタイプ（Audit Type）として正しいものはどれか？",o:["Compliance（コンプライアンス）","Compliance Architecture（コンプライアンスアーキテクチャ）","Desired State（望ましい状態）","Scripted Audit（スクリプト監査）"],a:2,e:"CMDB Health DashboardのComplianceスコアカードに含めるには、監査タイプを「Desired State（望ましい状態）」に設定する必要がある。「Compliance」や「Compliance Architecture」はCMDB Health Dashboardには含まれない。"}
+]});
+L.push({c:"Course 6",l:"6-6",t:"Display Audit Results on Compliance Scorecard",
+s:`Display Audit Results on Compliance Scorecard`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ6でベースシステムの監査（Base System Audits）をどうすべきか？",o:["すべて削除する","Compliance > Desired State > Auditsでアクティブなすべてのベースシステム監査を非アクティブ（Active=false）にする（自分が作成した1つの監査のみアクティブに保つ）","すべてそのまま残す","設定変更は不要"],a:1,e:"要件：「Deactivate (mark as active-false) ALL base system audits that are shown as active from Compliance > Desired State > Audits. NOTE: Keep the 1 audit you created as active.」自作の1つのみアクティブにする。"},
+{t:"検証",q:"シナリオ6の検証結果として正しいものはどれか？",o:["146件のWindows Serverすべてが監査に合格","54件の123件中のWindowsサーバーが監査に失敗し（44%が失敗）、Complianceスコアは56%となる","100%のWindowsサーバーが監査に合格","123件のWindows Serverすべてが監査に失敗"],a:1,e:"検証条件：「54 of 123 Windows Servers or 44% failed the audit resulting in a Compliance score of 56%」。なお、シナリオ9（Remediate Duplicates）を先に実施した場合は54/122と表示される。"},
+{t:"引っ掛け",q:"シナリオ9（Remediate Duplicates）を先に完了した場合、シナリオ6の監査メトリクスはどのように表示されるか？",o:["変わらず54/123で表示される","54/122と表示される（重複が除去されたため合計が1件減る）","53/122と表示される","55/123と表示される"],a:1,e:"注記：「If you performed the task titled, Remediate Duplicates, before completing this task, your audit metric will display 54/122 instead.」重複排除により合計件数が123→122に減少するため54/122と表示される。"},
+{t:"試験対策",q:"シナリオ6でベースシステムの監査を非アクティブにする理由として最も適切なものはどれか？",o:["ベースシステムの監査は古いため使用できないから","不要な監査結果がComplianceスコアカードに表示されるのを防ぎ、自社で作成したWindowsサーバー監査の結果のみをスコアカードに表示するため","ベースシステムの監査はサポートされていないから","非アクティブにしないとジョブが実行できないから"],a:1,e:"要件：「to prevent unwanted audit results from displaying on the compliance scorecard, Cloud Dimensions wants to deactivate any baseline audits provided by ServiceNow and only have the Windows Server audit active.」自作監査の結果のみをスコアカードに表示するために不要な監査を非アクティブにする。"}
+]});
+L.push({c:"Course 6",l:"6-7",t:"Create Orphan Rule",
+s:`Create Orphan Rule`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ7でOrphan Rule（孤立ルール）を設定するクラスとして正しいものはどれか？",o:["Server（サーバー）クラス","Windows Serverクラス","Email Serverクラス","Application（アプリケーション）クラス"],a:2,e:"要件：「From the Email Server class, configure an orphan rule that specifies a relationship...」Email Serverクラスに孤立ルールを設定する。"},
+{t:"基礎",q:"シナリオ7で設定するOrphan Ruleのリレーションシップ条件として正しいものはどれか？",o:["Depends on::Used by の関係を持たないEmail Serverを孤立とする","Runs On::Runs の関係でServer [cmdb_ci_server] に接続されていないEmail Serverを孤立とする","Hosted on::Hosts の関係を持たないEmail Serverを孤立とする","Parent::Child の関係を持たないEmail Serverを孤立とする"],a:1,e:"要件：「configure an orphan rule that specifies a relationship to determine which Email Server applications do not have a Runs On::Runs relationship to a Server [cmdb_ci_server]」"},
+{t:"検証",q:"シナリオ7の検証結果として正しいものはどれか？",o:["11件すべてのEmail Serverが孤立と判定される","11件のEmail Serverのうち7件が孤立（4件は孤立していない）","4件のEmail Serverが孤立と判定される","0件が孤立と判定される"],a:1,e:"検証条件：「7 of 11 email server records are orphans (4 of 11 are not)」。孤立ルール設定後にHealth Dashboard Correctness Scorecardジョブを実行して結果を確認する。"},
+{t:"試験対策",q:"シナリオ7でOrphan Ruleを設定した後に実行するジョブとして正しいものはどれか？",o:["Completeness Score Calculationジョブ","Compliance Score Calculationジョブ","Correctness Score Calculationジョブ","すべての3つのジョブを実行する"],a:2,e:"要件：「execute the Health Dashboard Correctness Scorecard job to calculate the results and display them on the CMDB Health Dashboard for the Email Server class.」孤立はCorrectnessスコアカードのメトリクスのためCorrectnessジョブを実行する。"}
+]});
+L.push({c:"Course 6",l:"6-8",t:"Create Staleness Rules",
+s:`Create Staleness Rules`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ8でWindowsサーバーの陳腐化（Staleness）の閾値として正しいものはどれか？",o:["3日","7日","14日","30日"],a:1,e:"要件：「Windows Servers are considered stale after 7 days」。Windowsサーバーは7日間更新されていない場合に陳腐化と見なす。"},
+{t:"基礎",q:"シナリオ8でUnixサーバーの陳腐化（Staleness）の閾値として正しいものはどれか？",o:["7日","10日","14日","30日"],a:2,e:"要件：「Unix Servers are considered stale after 14 days」。Unixサーバーは14日間更新されていない場合に陳腐化と見なす。"},
+{t:"引っ掛け",q:"シナリオ8の検証で表示される陳腐化メトリクスの数値（例：20/146）について正しい説明はどれか？",o:["20が陳腐化したCIの数を示す","分子（20）が非陳腐化（Healthy）のCI数を示す。実際の数値はインスタンスのプロビジョニング時期とタスク実施時期によって異なる","146が陳腐化したCIの数を示す","数値は変動しない固定値"],a:1,e:"注記：「The Healthy value is the number of non-stale CIs in the CMDB for Windows and Unix Servers. (Example: 20/146 means that 20 CIs are non-stale, actual numbers will vary). The Staleness metric number varies depending on when your instance was provisioned.」"},
+{t:"試験対策",q:"ベースシステムのデフォルト陳腐化ルールはどのクラスに設定されており、何日が閾値か？",o:["Windows Serverクラスに7日が設定されている","cmdb_ci（Configuration Item）ベースクラスに60日が設定されており、すべての拡張クラスに適用される","Serverクラスに30日が設定されている","陳腐化ルールはベースシステムには存在しない"],a:1,e:"ベースシステムではcmdb_ci（Configuration Item）のベースクラスレベルで1つの陳腐化ルールが定義されており、CIが60日間更新されていない場合に陳腐化と見なされる。すべての拡張クラスに適用される。シナリオ8ではクラス固有の陳腐化ルールを追加設定する。"}
+]});
+L.push({c:"Course 6",l:"6-9",t:"Remediate Duplicates",
+s:`Remediate Duplicates`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ9で重複CIの修復に使用するツールとして正しいものはどれか？",o:["CMDB Health Dashboard","Duplicate CI Remediator wizard（重複CIリメディエーターウィザード）（De-duplication tasksから）","CI Class Manager","System Properties"],a:1,e:"要件：「using the Duplicate CI Remediator wizard (De-duplication tasks), remediate the duplicate Windows Server CI found on the de-duplication task list」。重複CIリメディエーターウィザードを使用する。"},
+{t:"基礎",q:"シナリオ9でMain CI（メインCI）として保持すべきCIはどれか？",o:["最も最近更新されたCIレコード","作成日（Creation Date）に基づいて最も古いCIレコード","最も多くのリレーションシップを持つCIレコード","Discovery Sourceが設定されているCIレコード"],a:1,e:"要件：「Retain the main CI which is the oldest CI record based on creation date」。作成日に基づいて最も古いCIを正規のCIとして保持する。"},
+{t:"基礎",q:"シナリオ9で重複CIから引き継ぐ（非メインCI側から使用する）属性として正しいものはどれか？",o:["IPアドレス・MACアドレス・ホスト名","Cost Center・Company・Assigned toの値","Serial Number・Model・Manufacturer","Support Group・Change Group・Managed By Group"],a:1,e:"要件：「Use the cost center, company, and assigned to values from the duplicate record (non-main CI)」。コスト管理・会社・担当者の情報は非メインCI（重複レコード）の値を使用する。"},
+{t:"検証",q:"シナリオ9の検証でCMDB Health Dashboard Correctness Scorecardに表示されるべき重複メトリクスの値として正しいものはどれか？",o:["100 of 122 records display as healthy（非重複）","122 of 122 records display as healthy（非重複）","0 of 122 records display as healthy","146 of 146 records display as healthy"],a:1,e:"検証条件：「From the Duplicate metric, verify only 122 of 122 records display as healthy (non-duplicates).」重複排除後は122件すべてが非重複として表示される。"},
+{t:"検証",q:"シナリオ9の検証でWindows ServerリストでOWA-SD-01に関して確認すべき属性の組み合わせとして正しいものはどれか？",o:["Cost Center: IT Support / Company: ACME Japan / Assigned to: John Smith","Cost Center: Customer Support / Company: ACME Australia / Assigned to: Kyle Ferri","Cost Center: Customer Support / Company: ACME USA / Assigned to: Kyle Ferri","Cost Center: Finance / Company: ACME Australia / Assigned to: Kyle Ferri"],a:1,e:"検証条件：「verify there is only one record for Server OWA-SD-01 with: Cost Center: Customer Support / Company: ACME Australia / Assigned to: Kyle Ferri」非メインCI（重複レコード）の値が引き継がれている。"},
+{t:"試験対策",q:"シナリオ9で重複排除タスクの最終状態として確認すべきステートはどれか？",o:["Open（未解決）","Work in Progress（作業中）","Closed Complete（クローズ完了）","Cancelled（キャンセル）"],a:2,e:"検証条件：「From the De-Duplication Task list verify the Windows task displays with a State of Closed Complete.」重複排除完了後はClosed Completeステートになる。"}
+]});
+L.push({c:"Course 6",l:"6-10",t:"Configure Reclassification System Property",
+s:`Configure Reclassification System Property`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ10で再設定する3つのシステムプロパティとして正しいものはどれか？",o:["glide.cmdb.duplicate.enabled / glide.cmdb.orphan.enabled / glide.cmdb.stale.enabled","glide.class.upgrade.enabled / glide.class.downgrade.enabled / glide.class.switch.enabled","glide.identification_engine.upgrade / glide.identification_engine.downgrade / glide.identification_engine.switch","glide.cmdb.reclassify.upgrade / glide.cmdb.reclassify.downgrade / glide.cmdb.reclassify.switch"],a:1,e:"要件：「reconfigure the 3 reclassification system properties」。3つのプロパティ：glide.class.upgrade.enabled（アップグレード）・glide.class.downgrade.enabled（ダウングレード）・glide.class.switch.enabled（スイッチ）。"},
+{t:"基礎",q:"シナリオ10でシステムプロパティを設定した後の検証条件として正しいものはどれか？",o:["3つのプロパティすべてがtrueに設定されていることを確認する","3つのプロパティ（class upgrade・downgrade・switch）がすべてfalseに設定されていることを確認する","1つのプロパティだけfalseに設定する","プロパティは変更せずデフォルトのままにする"],a:1,e:"検証条件：「verify the system properties for class upgrade, downgrade, and class switch are set to false.」3つのプロパティをすべてfalseに設定することで、自動再分類が無効になり再分類タスクが生成される。"},
+{t:"試験対策",q:"シナリオ10でCloud Dimensionsが再分類システムプロパティをfalseに設定したい理由として最も適切なものはどれか？",o:["自動再分類を完全に禁止するため","CIのインポート後にDiscoveryによって再分類が必要になる場合、自動的に再分類するのではなく手動介入（再分類タスクの生成）を優先したいため","再分類ルールを削除するため","再分類のパフォーマンスを向上させるため"],a:1,e:"シナリオ：「Cloud Dimensions prefers to have more of a manual intervention regarding possible CIs that need reclassification.」プロパティをfalseにすることで自動再分類が無効になり代わりに再分類タスクが生成され手動での確認・処理が可能になる。"}
+]});
+L.push({c:"Course 6",l:"6-11",t:"Build Simple Query",
+s:`Build Simple Query`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ11でCMDB Query Builderを使用して作成するクエリの名前として正しいものはどれか？",o:["Windows Servers Query","Windows 2012 2016 2019","Windows 2012, 2016, 2019 Query","All Windows Servers"],a:2,e:"要件：「Build, save, and run a query, named Windows 2012, 2016, 2019 Query, to display the results of only Windows 2012 R2 Standard, Windows 2016 Standard, and Windows 2019 Datacenter」。クエリ名は完全一致で設定する。"},
+{t:"基礎",q:"シナリオ11でクエリを実行した後にDescription（説明）フィールドに入力する内容として正しいものはどれか？",o:["「Windows Query Completed」と入力する","クエリ実行で返されたレコードの件数を入力する","「2012, 2016, 2019」と入力する","クエリの実行日時を入力する"],a:1,e:"要件：「Back in CMDB Query Builder, in the Description field, enter the number of records returned and then save the query again.」クエリ結果の件数をDescriptionフィールドに入力して再保存する。"},
+{t:"試験対策",q:"シナリオ11でCMDB Query Builderのクエリ結果とCompliance Scorecardの監査メトリクスを比較する目的として最も適切なものはどれか？",o:["クエリをエクスポートしてPDFレポートを作成するため","CMDB Query Builderのクエリ結果（Windows 2012・2016・2019の件数）とCompliance Scorecardの監査メトリクス（監査に合格したWindowsサーバーの件数）が一致しているかを検証することで、ヘルスダッシュボードの計算が正確であることを確認するため","スケジュールクエリを設定して自動レポートを送信するため","重複CIを特定するため"],a:1,e:"シナリオ：「Using CMDB Query Builder, they would like to build a saved query to compare and verify the results on the Health Dashboard are calculated correctly.」ヘルスダッシュボードの結果の正確性をQuery Builderのクエリ結果で検証することが目的。"}
+]});
+L.push({c:"Course 6",l:"6-12",t:"Build Query with Non-CMDB Table",
+s:`Build Query with Non-CMDB Table`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ12で作成するクエリの名前として正しいものはどれか？",o:["Incidents with No Owner","Critical Incidents Query","Critical Incidents with No Owner","High Priority Incidents"],a:2,e:"要件：「Build a query named Critical Incidents with No Owner that displays any configuration item that does not have the Owned by field populated, and is associated to a priority 1 - Critical incident」"},
+{t:"基礎",q:"シナリオ12のクエリで使用する2つのコンポーネントの組み合わせとして正しいものはどれか？",o:["CMDBクラス（Windows Server）+ Non-CMDBテーブル（Change Request）","CMDBクラス（Configuration Item：Owned byが空）+ Non-CMDBテーブル（Incident：Priority = 1-Critical）","CMDBクラス（Server）+ Non-CMDBテーブル（Problem）","CMDBクラス（Application）+ Non-CMDBテーブル（Incident）"],a:1,e:"要件：「A CMDB Class > Configuration Item that does NOT have the Owned by field populated + A Non-CMDB Table > Incident item that's priority is 1 - Critical」の2つのコンポーネントを接続してクエリを構築する。"},
+{t:"試験対策",q:"CMDB Query Builderで「Non-CMDBテーブル」（例：Incidentテーブル）のコンテキストを追加できる機能が特に役立つ場面として最も適切なものはどれか？",o:["CMDBのCIクラスのみを検索する場合","CMDBのCIデータと他のServiceNowテーブル（Incident・Change・Problemなど）のデータを組み合わせた複合クエリを実行する場合","Discoveryスケジュールを確認する場合","ユーザーアクセス権を管理する場合"],a:1,e:"CMDB QueryのオプションでNon-CMDBテーブルのコンテキストを追加できる。シナリオ12では「CI（Owned by空）」と「Incident（Priority 1-Critical）」を組み合わせた複合クエリを実行するためにこの機能を使用する。"}
+]});
+L.push({c:"Course 6",l:"6-13",t:"Configure Remediation",
+s:`Configure Remediation`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ13で作成するワークフローのテーブルとして正しいものはどれか？",o:["cmdb_ci（Configuration Item）","incident（Incident）","orphan_ci_remediation（Orphan CI Remediation）","cmdb_health_rule（CMDB Health Rule）"],a:2,e:"要件：「Create and Publish a workflow using: Workflow Table: Orphan CI Remediation [orphan_ci_remediation]」。ワークフローテーブルはOrphan CI Remediationテーブルを指定する。"},
+{t:"基礎",q:"シナリオ13で作成するワークフローの名前として正しいものはどれか？",o:["Orphan Remediation","Remediate Orphan Workflow","Remediate Orphan WF","Orphan CI Workflow"],a:2,e:"要件：「Workflow Name: Remediate Orphan WF」。ワークフロー名は完全一致で「Remediate Orphan WF」とする。"},
+{t:"基礎",q:"シナリオ13でワークフロー実行時にOrphanタスクのShort Descriptionフィールドに書き込まれる内容として正しいものはどれか？",o:["「Orphan CI remediated」と書き込まれる","「Workflow launched for task number [実際のタスク番号]」と書き込まれる（タスク番号はcurrent.numberで取得）","「Workflow completed successfully」と書き込まれる","「Email Server orphan resolved」と書き込まれる"],a:1,e:"要件：「when executed, writes to the short description field of the orphan task the following: 'Workflow launched for task number [actual task number of orphan rule]'。The task number can be obtained using current.number」"},
+{t:"基礎",q:"シナリオ13でCMDB Remediation Rule（CMDBリメディエーションルール）の設定として正しいものはどれか？",o:["Name: Remediate Orphans / Task type: Orphan CI Remediation / Execution: Automatic / Workflow: Remediate Orphan WF","Name: Remediate Orphans / Task type: Orphan CI Remediation / Execution: Manual / Workflow: Remediate Orphan WF","Name: Orphan Rule / Task type: Email Server / Execution: Manual / Workflow: Remediate Orphan WF","Name: Remediate Orphans / Task type: Duplicate CI Remediation / Execution: Manual / Workflow: Remediate Orphan WF"],a:1,e:"要件：「Create a CMDB Remediation Rule: Name: Remediate Orphans / Task type: Orphan CI Remediation / Execution: Manual / Workflow: Remediate Orphan WF」。ExecutionはManual（手動）が正しい。"},
+{t:"試験対策",q:"シナリオ13の検証でリメディエーションルールを適用するEmail ServerのCI名として正しいものはどれか？",o:["AUS01-MAIL","AUS01-EXCH","EXCH-AUS-01","EMAIL-AUS-01"],a:1,e:"検証条件：「Locate and open the orphan task for the Email Server named AUS01-EXCH → Click the Remediate button → Select the Remediate Orphans rule」。対象Email ServerはAUS01-EXCH。"}
+]});
+
+// ═══ Course 7 Scenarios ═══════════════════════════════
+
+L.push({c:"Course 7",l:"7-1",t:"MID Serverを検証する",
+s:`MID Serverを検証する`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ1（MID Serverの検証）でCloud DimensionsがMID Serverを必要とする主な理由として正しいものはどれか？",o:["CMDB Health Dashboardを表示するため","ServiceNow DiscoveryやService Mapping、SCCMなどのサードパーティ検出ツールとの統合、またはAWS・Azure・GCPなどのクラウドリソースの検出を行うため","Reconciliation Ruleを設定するため","CMDB Groupを作成するため"],a:1,e:"MID Serverが必要な主なシナリオ：ServiceNow Discovery・Service Mappingの実行、SCCMなどのサードパーティ検出ツールとの統合、AWS・Azure・GCPなどのクラウドリソースの検出。ファイアウォールやセキュリティ・ネットワークセグメンテーションがある環境で特に重要。"},
+{t:"基礎",q:"シナリオ1の注記「このシミュレーションでは実際の検出を実行する代わりにスクリプトが使用されるため、MID Serverは必要ありません」が意味することとして正しいものはどれか？",o:["MID Serverはすべての実装で不要","実際のCMDB実装ではMID Serverが必要な場合が多いが、このシミュレーション環境ではスクリプトで同じ機能を代替している","MID ServerはServiceNow Discoveryとは無関係","MID Serverは廃止された機能である"],a:1,e:"注記の意味：実際のCMDB実装ではデータが複数のソースから取得されるためMID Serverのインストールと構成が必要な場合が多い。ただしこのシミュレーション環境ではスクリプトが実際の検出の代わりに使用されるためMID Serverは不要。"},
+{t:"試験対策",q:"MID Serverの役割として最も適切な説明はどれか？",o:["CMDBのスコアカードを計算する","ServiceNowインスタンスと組織の内部ネットワークのbridge（橋渡し）として機能し、ファイアウォールやセキュリティがある環境でDiscoveryやデータ統合を可能にする","CMDB Groupを管理する","Reconciliation Ruleを自動実行する"],a:1,e:"MID ServerはServiceNowインスタンスと組織の内部ネットワークのbridge（橋渡し）として機能する。ファイアウォール・セキュリティ・ネットワークセグメンテーションがある環境で特に重要。組織のtrusted network environment内で動作し、機密データが組織外に出ないことを確保する。"}
+]});
+L.push({c:"Course 7",l:"7-2",t:"新しいクラスを作成する",
+s:`新しいクラスを作成する`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ2で新しいクラスを作成する際、テーブル名の命名規則として正しいものはどれか？",o:["cmdb_で始める","u_cmdb_ci_で始める（例：u_cmdb_ci_mongoose_web_server）","ci_cmdb_で始める","custom_cmdb_で始める"],a:1,e:"推奨プラクティス：「新しいCMDBテーブルの名前は、常にu_cmdb_ci_で始めます」。シナリオ2ではu_cmdb_ci_mongoose_web_serverが正しいテーブル名。"},
+{t:"基礎",q:"シナリオ2でMongoose Web Serverクラスが拡張するクラスとして正しいものはどれか？",o:["Server（サーバー）クラス","Application（アプリケーション）クラス","Web Serverクラス","Hardware（ハードウェア）クラス"],a:2,e:"要件：「CI Class Managerを使用して、Web Serverクラスを拡張した新しいクラスを作成する」。Mongoose Web ServerはWeb Serverクラスを拡張（継承）する。"},
+{t:"基礎",q:"シナリオ2でIdentification Rule（識別ルール）の設定として正しいものはどれか？",o:["Name: Mongoose Rule / Applies to: cmdb_ci_server / Dependent: False","Name: Mongoose Web Server rule / Applies to: u_cmdb_ci_mongoose_web_server / Dependent: True","Name: Web Server Rule / Applies to: cmdb_ci_web_server / Dependent: False","Name: Mongoose Web Server rule / Applies to: cmdb_ci_appl / Dependent: True"],a:1,e:"要件：「Identification Rule: Name: Mongoose Web Server rule / Applies to: u_cmdb_ci_mongoose_web_server / Dependent: True」。Dependentをtrueに設定する点が重要。"},
+{t:"基礎",q:"シナリオ2でIdentifier Entries（識別子エントリ）として選択する属性の組み合わせとして正しいものはどれか？",o:["Serial NumberとIP Addressを選択","ClassとRunning process command（実行中のプロセスのコマンド）を選択し、Allow null attributes: false / Allow fallback to parent's rule: false","NameとHostnameを選択","MACアドレスとIPアドレスを選択"],a:1,e:"要件：「選択済み：Class（クラス）・Running process command（実行中のプロセスのコマンド）/ Allow null attributes: false / Allow fallback to parent's rule: false」。実行中のプロセスコマンドで一致を判断する。"},
+{t:"検証",q:"シナリオ2の検証で確認すべき内容として正しいものはどれか？",o:["Discovery Scheduleが設定されていることを確認","①System Definition > Tablesで「Mongoose Web Server」ラベルの新しいクラス/テーブルが作成されていること②Configuration > Identification/Reconciliation > CI IdentifiersでMongose Web Server ruleが作成されていること","CMDBヘルスダッシュボードにMongoose Web Serverが表示されること","Mongoose Web Serverのインシデントが作成されていること"],a:1,e:"検証条件：①System Definition > TablesでMongoose Web Serverラベルの新しいクラス/テーブルが作成されていること②Configuration > Identification/Reconciliation > CI IdentifiersでMongose Web Server ruleが作成されていること"},
+{t:"試験対策",q:"Identification RuleでDependentをtrueに設定する意味として正しいものはどれか？",o:["このルールは他のルールに依存しないことを示す","このルールは別のCIクラス（親クラス）との依存関係を必要とする。Add Dependent Relationshipsを追加することで、Mongoose Web ServerがハードウェアCIと事前に構成された関係を持つことを確認する","このルールは自動的に削除される","このルールはDisabledになっている"],a:1,e:"Dependentをtrueに設定すると、Identification RuleはAdd Dependent Relationships（依存関係性の追加）を必要とする。シナリオ2ではMongoose Web ServerがハードウェアCIに事前に構成されていることを確認するために使用する。"}
+]});
+L.push({c:"Course 7",l:"7-3",t:"Identification Ruleをテストする",
+s:`Identification Ruleをテストする`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ3でIdentification Ruleをテストする方法として正しいものはどれか？",o:["CI Class Managerから直接テストを実行する","System Definition > Scripts - Backgroundにスクリプトを貼り付けて実行する（スクリプトはDiscoveryの代わりにペイロードをシミュレートする）","CMDB Workspaceから実行する","Discovery Scheduleを設定して実行する"],a:1,e:"要件：「System Definition > Scripts - Backgroundに移動し、スクリプトをRun scriptフィールドに貼り付けてRun scriptをクリックする」。スクリプトがMongoose Web ServerをCMDBに統合するサンプルペイロードをシミュレートする。"},
+{t:"基礎",q:"シナリオ3でスクリプトを初回実行した場合のログメッセージが示す内容として正しいものはどれか？",o:["Mongoose Web Serverがすでに存在するため変更なし","Mongoose Web Serverがインサートされ、Identification Ruleに基づいて一致するものが見つからなかった（新規作成された）","スクリプトがエラーで失敗した","Mongoose Web Serverが削除された"],a:1,e:"スクリプト1回目：「Mongoose Web Serverアプリケーションが挿入され、構成したIdentification Ruleに基づいて一致するものが見つからなかったことを示すログメッセージが表示される」→新規作成されたことを示す。"},
+{t:"基礎",q:"シナリオ3でスクリプトを2回目に実行した場合のログメッセージが示す内容として正しいものはどれか？",o:["2つ目のMongoose Web Serverが作成された","Identification Ruleに基づいてMongoose Web Serverで一致するものが見つかり、変更は行われず重複は作成されなかった","スクリプトがエラーで失敗した","Mongoose Web Serverが削除された"],a:1,e:"スクリプト2回目：「構成されたIdentification Ruleに基づいてMongoose Web Serverで一致するものが見つかったため、変更は行われず、重複は作成されなかったことを示すログメッセージが表示される」→識別ルールが正しく機能している。"},
+{t:"検証",q:"シナリオ3の検証で確認すべき内容として正しいものはどれか？",o:["ApplicationsモジュールにMongoose Web Serverが2つ作成されている","①ApplicationsモジュールにCMDB内にMongoose Web Serverが1つだけ作成されていること②OWA-SD-01という名前のサーバーのDependency viewマップでMongoose WebServerとRuns on:Runsの関係があること","Mongoose Web Serverの関係が削除されている","Mongoose Web ServerのDiscovery Sourceが表示されている"],a:1,e:"検証条件：①Applicationsモジュールで1つだけのMongoose Web Serverが作成されていること（スクリプトを2回実行しても1つのみ）②OWA-SD-01のDependency viewマップでMongoose Web ServerとRuns on:Runsの関係があること"},
+{t:"試験対策",q:"シナリオ3でスクリプトを2回実行しても重複が作成されない理由として正しいものはどれか？",o:["スクリプトが2回目は自動的に無効になるから","Identification Ruleが実行中のプロセスコマンド（Running process command）でCMDB内の既存のMongoose Web Serverと一致を検出し、同一CIとして認識するため重複を作成しない","CMDBの容量制限により2つ目が作成されないから","ServiceNowが重複を自動削除するから"],a:1,e:"Identification RuleはRunning process commandを識別子エントリとして使用する。2回目のスクリプト実行時に同じRunning process commandで既存のMongoose Web Serverと一致するため、重複を作成せず既存のCIを更新する（またはスキップする）。"}
+]});
+L.push({c:"Course 7",l:"7-4",t:"バージョンアップグレードのIdentification Ruleをテストする",
+s:`バージョンアップグレードのIdentification Ruleをテストする`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ4でバージョンアップグレードのテストを実行する際、スクリプトの変更内容として正しいものはどれか？",o:["Discovery Sourceの値をLANDeskに変更する","以前のスクリプトのバージョン番号を6.5に変更して実行する","スクリプトのテーブル名を変更する","スクリプトのサーバー名をOWA-SD-02に変更する"],a:1,e:"要件：「Scripts - Backgroundから、提供された以前のスクリプトをRun scriptフィールドに貼り付け、バージョンを6.5に変更して実行します」。バージョン番号のみを変更してスクリプトを再実行する。"},
+{t:"検証",q:"シナリオ4の検証で確認すべき内容として正しいものはどれか？",o:["Mongoose Web Serverが2つ表示される","①Applicationsモジュールでバージョン6.5のMongoose Web Serverが1つだけ表示されること（重複なし）②OWA-SD-01のWindowsサーバーのみがMongoose Web Serverと単一のRuns on:Runs関係を持ち重複する関係がないこと","Mongoose Web Serverが削除されている","バージョン5.5のMongoose Web Serverが残っている"],a:1,e:"検証条件：①バージョン6.5のMongoose Web Serverが1つだけ（重複なし）②OWA-SD-01のWindows ServerとMongoose Web Serverの単一のRuns on:Runs関係（重複関係なし）。Identification RuleがRunning process commandで一致を検出しバージョンを更新したため。"},
+{t:"試験対策",q:"シナリオ4でバージョンアップグレード後も重複が作成されない理由として正しいものはどれか？",o:["バージョン番号が識別子として使用されているから","Identification RuleはRunning process commandで一致を検出する。バージョンが変わっても同じRunning process commandで既存のMongoose Web Serverと一致するため、新規作成ではなくバージョン属性を更新する","スクリプトが古いレコードを自動削除するから","CMDBが同一テーブルへの重複挿入を禁止しているから"],a:1,e:"注記：「Mongoose Web Serverアプリケーションは、スクリプトによってServiceNowに統合されると、実行中のプロセスコマンドに基づいて照合され、アプリケーションのバージョンが更新され、重複は作成されません」。Running process commandが識別子であるためバージョン変更は重複を生まない。"}
+]});
+L.push({c:"Course 7",l:"7-5",t:"同じホストに展開された2番目のMongooseアプリのIdentification Ruleをテストする",
+s:`同じホストに展開された2番目のMongooseアプリのIdentification Ruleをテストする`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ5で2番目のMongoose Web Serverが作成される理由として正しいものはどれか？",o:["スクリプトが強制的に新規レコードを作成するから","2番目のMongoose Web Serverの実行プロセスコマンドが「d:\\\\clouddimensions\\\\mongoose.exe」と異なるため、Identification Ruleが既存のMongoose Web Serverと一致を見つけられず新規CIとして作成する","サーバー名が異なるから","バージョンが異なるから"],a:1,e:"注記：「実行中のプロセスコマンドで一致するものを見つけられなかったため、Identification Ruleにより、2番目のMongoose Web Serverが作成されます」。Running process commandが異なるディレクトリ（d:\\\\clouddimensions\\\\mongoose.exe）のため既存CIと一致せず新規作成される。"},
+{t:"検証",q:"シナリオ5の検証で確認すべき内容として正しいものはどれか？",o:["Applicationsモジュールに1つのMongoose Web Serverのみ表示される","①Applicationsモジュールに2つのMongoose Web Serverアプリケーションが表示されること②OWA-SD-01のDependency viewマップでWindows ServerとRuns on:Runs関係で表示されている2つのMongoose Web Serverアプリケーションがあること","Mongoose Web ServerのすべてのバージョンがRuns on:Runs関係を持つ","Dependency viewにMongoose Web Serverが表示されない"],a:1,e:"検証条件：①Applicationsモジュールに2つのMongoose Web Serverが表示される②OWA-SD-01のDependency viewマップで2つのMongoose Web ServerがWindows ServerとRuns on:Runs関係で表示される。同一ホスト上の異なるディレクトリへの2番目のデプロイが別CIとして作成された。"},
+{t:"試験対策",q:"シナリオ3・4・5のテスト結果からIdentification RuleのRunning process commandを識別子として使用することの特性として正しいものはどれか？",o:["同じホスト上のすべてのMongoose Web Serverを常に1つのCIに統合する","同じRunning process commandは同一CIとして認識（更新）し、異なるRunning process commandは別のCIとして新規作成する。これにより同一サーバー上の異なるディレクトリへのデプロイを個別のCIとして管理できる","バージョンが同じ場合のみ同一CIとして認識する","ホスト名が同じ場合のみ同一CIとして認識する"],a:1,e:"シナリオ3・4・5の結果：同じRunning process command→既存CI更新（重複なし）。異なるRunning process command（異なるディレクトリ）→新規CI作成。つまりRunning process commandで個々のアプリケーションインスタンスを一意に識別できる。"}
+]});
+L.push({c:"Course 7",l:"7-6",t:"2番目のDiscovery Sourceからの統合をテストする",
+s:`2番目のDiscovery Sourceからの統合をテストする`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ6でLANDeskとServiceNowという2つのDiscovery Sourceから同じWindowsサーバーを更新する際、重複レコードが作成されない条件として正しいものはどれか？",o:["両方のDiscovery Sourceが同じRAM値を収集する必要がある","両方のDiscovery Sourceが同じ共通の値（例：Name）を収集し、この属性がIdentification Ruleの識別子エントリとして設定されている必要がある","両方のDiscovery Sourceが同時に実行される必要がある","両方のDiscovery Sourceが同じMID Serverを使用する必要がある"],a:1,e:"注記：「各Discovery sourceがシリアル番号や名前など、両方のDiscovery sourceで同じ共通の値を収集し、この属性がIdentification Ruleの識別子エントリとして設定されなければならない」。共通の識別子で同一CIと認識し重複を防ぐ。"},
+{t:"基礎",q:"シナリオ6でスクリプトで設定するRAM値とDiscovery Sourceとして正しいものはどれか？",o:["RAM: 2048 / Discovery Source: ServiceNow","RAM: 4096 / Discovery Source: LANDesk","RAM: 4096 / Discovery Source: ServiceNow","RAM: 2048 / Discovery Source: LANDesk"],a:1,e:"要件：「Windows Server RAM: 4096 / Discovery Source: LANDesk」。LANDeskは4096、ServiceNowは2048を収集し、2つのDiscovery Sourceを区別する。"},
+{t:"検証",q:"シナリオ6の検証でShow XML機能を使用して確認すべき内容として正しいものはどれか？",o:["RAM値が2048でDiscovery SourceがServiceNowであること","RAM値が4096でDiscovery SourceがLANDeskであること","RAM値が0でDiscovery Sourceが空であること","RAM値が8192でDiscovery SourceがLANDeskであること"],a:1,e:"検証条件：「Show XML（XML表示）でRAM値が4096で、Discovery SourceがLANDeskであることを確認する」。LANDeskから収集されたRAM値4096でCIが更新されている。"},
+{t:"試験対策",q:"シナリオ6でShow XML（XML表示）機能の説明として正しいものはどれか？",o:["CMDBをXML形式でエクスポートする機能","管理者がフォームに表示されない場合でも、レコードとそのすべてのフィールドと値を表示できる便利な機能。ヘッダーを右クリックして選択する","XMLをインポートする機能","ServiceNow APIのドキュメントを表示する機能"],a:1,e:"注記：「Show XML（XML表示）は、フォームに表示されない場合でも、管理者がレコードとそのすべてのフィールドと値を表示するための便利なオプションです」。ヘッダーを右クリック→Show XML（XML表示）を選択してアクセスする。"}
+]});
+L.push({c:"Course 7",l:"7-7",t:"Multisource CMDBを有効化する",
+s:`Multisource CMDBを有効化する`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ7でMultisource CMDB（マルチソースCMDB）を有効化するために必要な2つの手順として正しいものはどれか？",o:["CI Class Managerで設定を変更する","①適切なシステムプロパティ（glide.identification_engine.multisource_enabled）をtrueに設定する②ITOM Discovery License（com.snc.itom.vis.license）プラグインをインストールする","CMDB Health Dashboardから有効化する","Discovery Scheduleを作成する"],a:1,e:"Multisource CMDBの有効化には①システムプロパティ：glide.identification_engine.multisource_enabledをtrueに設定②プラグイン：ITOM Discovery License（com.snc.itom.vis.license）をインストールの2つが必要。"},
+{t:"試験対策",q:"Multisource CMDB（CMDB 360）を有効化することの主なメリットとして正しいものはどれか？",o:["CMDBのパフォーマンスが向上する","CI属性の更新に関与したすべてのDiscovery Sourceと提案された値の完全な履歴を保持できる。Track（追跡）・Revert（元に戻す）・Recompute（再計算）の3つの利点を提供する","重複CIを自動的に削除する","陳腐化ルールを自動設定する"],a:1,e:"Multisource CMDB（CMDB 360）の3つの利点：①Track：様々なDiscovery SourceがCIをどのようにpopulateしているかを追跡②Revert：特定のDiscovery SourceからのCI更新を元に戻す③Recompute：更新されたReconciliation Rulesを使用して属性値を再計算する"}
+]});
+L.push({c:"Course 7",l:"7-8",t:"Multisource CMDBデータを検証する",
+s:`Multisource CMDBデータを検証する`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ8でMultisource CMDBデータを確認するテーブルとして正しいものはどれか？",o:["cmdb_ci.list","cmdb_multisource_data（CMDB 360 Data）テーブル","cmdb_health_metric_status.list","cmdb_datasource_last_update.list"],a:1,e:"検証条件：「Windows Server OWA-SD-01のCMDB 360 Data [cmdb_multisource_data]テーブルから、Discovery SourceであるServiceNowとLANDeskの両方にデータが存在することを確認する」。"},
+{t:"基礎",q:"シナリオ8でOWA-SD-01のWindowsサーバーレコードからCMDB 360データを確認する方法として原文に記載されているものはどれか？",o:["CMDBヘルスダッシュボードから確認する","Related LinksのCMDB 360 Data Preview UIアクションボタンをクリックしてRAMフィールドを検索する、またはCMDB 360 Data関連リストを追加してRAMを表すCol 36を確認する","CI Class Managerから確認する","Show XML（XML表示）から確認する"],a:1,e:"検証方法：①Related LinksのCMDB 360 Data Preview UIアクションボタンをクリックしRAMフィールドを検索②またはCMDB 360 Data関連リストを追加してRAMを表すCol 36を追加して確認。"},
+{t:"試験対策",q:"Multisource CMDBを有効化した後のデータ収集の特性として正しいものはどれか？",o:["最後に更新したDiscovery Sourceのデータのみ保存される","CMDB内のCIを作成および更新するすべてのDiscovery Sourceからのデータがキャプチャされ保存される。これにより選択されなかった低優先度のDiscovery Sourceの値も保持される","データは7日間のみ保持される","管理者が手動でデータを入力する必要がある"],a:1,e:"注記：「Multisource CMDBを有効にすると、CMDB内のCIを作成および更新するすべてのDiscovery SourceからのデータがCMDB MultiSource Data [cmdb_multisource_data]テーブルにキャプチャされます」。低優先度ソースのデータも保持される。"}
+]});
+L.push({c:"Course 7",l:"7-9",t:"Reconciliation Rule（調整ルール）",
+s:`Reconciliation Rule（調整ルール）`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ9でStatic Reconciliation Rule（静的調整ルール）を設定するクラスとして正しいものはどれか？",o:["Server（cmdb_ci_server）クラス","Windows Server（cmdb_ci_win_server）クラス","Email Serverクラス","Configuration Item（cmdb_ci）ベースクラス"],a:1,e:"要件：「CI Class Managerを使用し、Windows Server (cmdb_ci_win_server) クラスをStatic Reconciliation Ruleで更新する必要があります」。Windows Serverクラスに静的調整ルールを設定する。"},
+{t:"基礎",q:"シナリオ9のStatic Reconciliation Ruleの要件として正しいものはどれか？",o:["LANDeskとServiceNowが互いに更新可能","Discovery Source LANDeskのCMDB内のWindows ServerレコードはDiscovery Source ServiceNowによって更新できる。ただしDiscovery Source ServiceNowのWindows ServerレコードはDiscovery Source LANDeskによって更新できない","ServiceNowのみが更新可能でLANDeskは更新不可","LANDeskのみが更新可能でServiceNowは更新不可"],a:1,e:"要件：「Discovery Source LANDeskのCMDB内のWindows ServerレコードはDiscovery Source ServiceNowによって更新できる」かつ「Discovery Source ServiceNowのCMDB内のWindows ServerレコードはDiscovery Source LANDeskによって更新できない」。ServiceNowが高優先度。"},
+{t:"試験対策",q:"Reconciliation Rule（調整ルール）でorder value（オーダー値）と優先度の関係として正しいものはどれか？",o:["order valueが高いほど優先度が高い","order valueが低いほど優先度が高い。例：ServiceNowがorder value最低＝最高優先度を持ち、更新後はLANDeskは同じレコードを更新できない","order valueは優先度に関係ない","すべてのDiscovery Sourceが同じ優先度を持つ"],a:1,e:"Reconciliation RuleではOrder value（オーダー値）が低いほどPriority（優先度）が高い。ServiceNowがorder value最低＝最高優先度を持つ。これによりServiceNowが更新したレコードはLANDeskによる上書きが防がれる。"}
+]});
+L.push({c:"Course 7",l:"7-10",t:"ServiceNowのReconciliation Ruleをテストする",
+s:`ServiceNowのReconciliation Ruleをテストする`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ10でServiceNowからのデータがLANDeskによって最後に更新されたレコードを更新できることを検証する手順として正しいものはどれか？",o:["CMDBヘルスダッシュボードで確認する","Scripts - BackgroundでスクリプトをRun scriptフィールドに貼り付けて実行し、その後Windows Serverモジュールでスクリプト実行前後のRAMとDiscovery Sourceを確認する","CI Class Managerから直接実行する","Discovery Scheduleを実行する"],a:1,e:"要件：「System Definition > Scripts - Backgroundからスクリプトを実行する」。検証：OWA-SD-01のRAMが2048でDiscovery SourceがServiceNowに更新されたことを確認する。"},
+{t:"検証",q:"シナリオ10の検証でOWA-SD-01のWindowsサーバーに表示されるべきRAM値とDiscovery Sourceとして正しいものはどれか？",o:["RAM: 4096 / Discovery Source: LANDesk","RAM: 2048 / Discovery Source: ServiceNow","RAM: 2048 / Discovery Source: LANDesk","RAM: 4096 / Discovery Source: ServiceNow"],a:1,e:"検証条件：「Windows Serverモジュールで、OWA-SD-01という名前のサーバーのRAMが2048で、Discovery SourceがServiceNowであることを確認する」。ServiceNowのReconciliation Ruleが機能し、LANDeskで最後に更新されたレコードをServiceNowが更新できた。"}
+]});
+L.push({c:"Course 7",l:"7-11",t:"LANDeskの調整をテストする",
+s:`LANDeskの調整をテストする`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ11でLANDeskのデータがServiceNowによって最後に更新されたレコードを更新できないことを検証する内容として正しいものはどれか？",o:["OWA-SD-01のRAMが4096に変更されている","OWA-SD-01のRAMが4096ではなく2048のままであること（LANDeskによる更新が阻止された）、およびcmdb_datasource_last_update.listでRAMフィールドがServiceNowによって最後に更新されたことを確認する","OWA-SD-01が削除されている","OWA-SD-01のDiscovery SourceがLANDeskに変更されている"],a:1,e:"検証条件：「OWA-SD-01という名前のサーバーが更新されておらず、RAMが4096ではなく2048のままであること」。また「cmdb_datasource_last_update.listでRAMフィールドがServiceNowによって最後に更新されたことを確認する」。"},
+{t:"引っ掛け",q:"シナリオ11の検証で、LANDeskがレコードを更新できなかったにもかかわらずDiscovery Sourceフィールドがどのように変更されるか？",o:["Discovery SourceはServiceNowのまま変わらない","Discovery SourceフィールドはLANDeskに更新される。これはLANDeskがレコードを更新する許可された最後のソースであったものの、Reconciliation Ruleにより許可されなかったことを反映している","Discovery Sourceフィールドは空になる","Discovery SourceフィールドはServiceNow+LANDeskと表示される"],a:1,e:"注記：「Windows Server レコードでRAMが更新されていなくても、Discovery SourceフィールドはLANDeskに更新されます。Discovery SourceフィールドはLANDeskがレコードを更新する許可された最後のソースであったものの、Reconciliation Rule（調整ルール）により許可されなかったことを反映しています」。"},
+{t:"試験対策",q:"cmdb_datasource_last_update.listテーブルの用途として正しいものはどれか？",o:["すべてのCIの作成履歴を記録する","Reconciliation Ruleがどのデータソースがレコードとそのフィールド属性を最後に更新したかを特定するために使用するData Source Histories（データソース履歴）テーブル。Reconciliation Ruleはこのテーブルを活用する","重複CIを管理するテーブル","孤立CIを管理するテーブル"],a:1,e:"注記：「Reconciliation Rule（調整ルール）はData Source Histories（データソース履歴）[cmdb_datasource_last_update]テーブルを使用して、どのデータソースがレコードとそのフィールド属性を最後に更新したかを特定します」。"}
+]});
+L.push({c:"Course 7",l:"7-12",t:"Data Refresh Ruleを作成する",
+s:`Data Refresh Ruleを作成する`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ12でData Refresh Rule（データ更新ルール）が必要な理由として正しいものはどれか？",o:["LANDeskが常にServiceNowより高い優先度を持つべきだから","ServiceNowがWindows ServerレコードのDiscovery・更新を停止した場合、データが古くなる可能性がある。Data Refresh Ruleにより一定期間内にServiceNowが更新しない場合にLANDeskが更新できるようにする","ServiceNowのReconciliation Ruleを削除するため","LANDeskのみを使用するように切り替えるため"],a:1,e:"シナリオ：「Cloud DimensionsはServiceNowがCMDB内のWindows ServerレコードのDiscovery・更新を停止した場合、時間が経つにつれてデータが古くなることを懸念している」。Data Refresh Ruleにより一定期間（7日）更新がない場合にLANDeskの更新を許可する。"},
+{t:"基礎",q:"シナリオ12でData Refresh Ruleの設定として正しいものはどれか？",o:["Windows Serverレコードが3日以上更新されていない場合にLANDeskからの更新を許可する","Windows Serverレコードが過去7日以内にDiscovery Source ServiceNowによって更新されていない場合にLANDeskからの更新を許可する Data Refresh Ruleを作成する","Windows Serverレコードが30日以上更新されていない場合にLANDeskからの更新を許可する","Windows Serverレコードが常にLANDeskによって更新される"],a:1,e:"要件：「Windows Serverレコードが過去7日以内にDiscovery Source ServiceNowによって更新されていない場合に、LANDeskからの更新を許可するData Refresh Ruleを作成する必要があります」。7日間の期間が重要。"},
+{t:"試験対策",q:"Static Reconciliation Rule・Data Refresh Rule・Identification Ruleの違いとして正しいものはどれか？",o:["3つはすべて同じ機能","Identification Rule：CIを一意に識別するルール。Static Reconciliation Rule：どのDiscovery Sourceがフィールドを更新できるか（優先度）を定義するルール。Data Refresh Rule：高優先度ソースが一定期間内に更新しない場合に低優先度ソースが更新できるようにするルール","Reconciliation RuleはIdentification Ruleの別名","Data Refresh RuleはOrphan Ruleの別名"],a:1,e:"3つのルールの違い：①Identification Rule：CIを一意に識別する②Static Reconciliation Rule：Discovery Sourceの優先度と更新権限を定義③Data Refresh Rule：高優先度ソースが指定期間内に更新しない場合に低優先度ソースの更新を許可。シナリオ9・12・6でそれぞれ使用。"}
+]});
+L.push({c:"Course 7",l:"7-13",t:"Data Refresh Ruleをテストする",
+s:`Data Refresh Ruleをテストする`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ13でData Refresh Ruleのテストに使用するサーバーとして正しいものはどれか？",o:["OWA-SD-01","SPLI-WIN-Server（ServiceNowによって7日以上前に最後に更新されたサーバー）","OWA-SD-02","ANY-WIN-Server"],a:1,e:"要件：「SPLI-WIN-Serverという名前のWindowsServerは、ServiceNowによって7日以上前に最後に更新されたWindowsServerテーブルに既に存在します。このシナリオではServiceNow Discoveryはサーバーとの接続を失っています」。7日以上更新のないSPLI-WIN-Serverをテストに使用する。"},
+{t:"検証",q:"シナリオ13の検証でSPLI-WIN-SERVERに関して確認すべき内容として正しいものはどれか？",o:["RAMが2048に更新されていること","①Windows Serverモジュールで、SPLI-WIN-SERVERのRAMが4096に更新されていること②cmdb_datasource_last_update.listでRAMフィールドがデータソースLANDeskによって最後に更新されたことを確認する","RAMが変更されていないこと","Discovery SourceがServiceNowのままであること"],a:1,e:"検証条件：①SPLI-WIN-SERVERのRAMが4096に更新②cmdb_datasource_last_update.listでRAMフィールドがLANDeskによって最後に更新されたことを確認。Data Refresh Ruleが機能し7日以上更新のないレコードをLANDeskが更新できた。"},
+{t:"試験対策",q:"シナリオ13でData Refresh Ruleが機能した結果として正しいものはどれか？",o:["ServiceNowがSPLI-WIN-SERVERを更新した","Data Refresh Ruleにより、ServiceNowが7日以上更新していないWindows ServerレコードのRAMフィールドをLANDesk（低優先度ソース）が更新できた。これはStatic Reconciliation Ruleの例外として機能する","SPLI-WIN-SERVERが削除された","Reconciliation Ruleが無効化された"],a:1,e:"注記：「Discovery Source LANDeskのWindowsServerレコードは、前のタスクで構成されたData Refresh RuleによりServiceNowによって最後に更新されたWindows Server上のRAMフィールドを更新することができました」。Data Refresh RuleはStatic Reconciliation Ruleの時間ベースの例外として機能する。"}
+]});
+L.push({c:"Course 7",l:"7-14",t:"Dynamic Reconciliation Ruleを作成する",
+s:`Dynamic Reconciliation Ruleを作成する`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ14でDynamic Reconciliation Rule（動的調整ルール）を作成するクラスとして正しいものはどれか？",o:["Server（cmdb_ci_server）クラス","Windows Server（cmdb_ci_win_server）クラス","Email Serverクラス","UNIX Serverクラス"],a:1,e:"要件：「CI Class Managerで、Windows ServerクラスのDynamic Reconciliation Ruleを作成します」。Windows Serverクラスに動的調整ルールを設定する。"},
+{t:"基礎",q:"シナリオ14でRAM属性に設定するルールタイプとして正しいものはどれか？",o:["First Reported（最初の報告）","Largest Value（最大値）","Smallest Value（最小値）","Last Reported（前回の報告）"],a:1,e:"要件：「RAM属性のルールタイプをLargest Value（最大値）に設定します」。Multisource CMDBに保存されているすべてのDiscovery Sourceの値の中で最大値でCMDBを更新する。"},
+{t:"試験対策",q:"Dynamic Reconciliation Ruleが使用できるルールタイプとして原文に記載されているものをすべて含む選択肢はどれか？",o:["First Reported・Last Reported・Most Reportedの3種類","First Reported・Last Reported・Most Reported・Largest Value・Smallest Valueの5種類","First Reported・Largest Valueの2種類のみ","すべての数値フィールドに適用できる任意の計算式"],a:1,e:"原文：「Dynamic Reconciliation Ruleは以下のようなルールタイプに基づいて各フィールドの更新に適用できます：First Reported（最初の報告）・Last Reported（前回の報告）・Most Reported（最近の報告）・Largest Value（最大値）・Smallest Value（最小値）」の5種類。"},
+{t:"引っ掛け",q:"Dynamic Reconciliation RuleのLargest ValueとSmallest Valueルールタイプに関する制限として正しいものはどれか？",o:["すべてのフィールドタイプに適用できる","数値フィールド型にのみ適用できる。これらのルールタイプを使用する場合は属性の選択タブに数値フィールド型のみが表示される","テキストフィールドにのみ適用できる","日付フィールドにのみ適用できる"],a:1,e:"Dynamic Reconciliation RuleのLargest Value・Smallest Valueは数値フィールド型にのみ適用できる。属性の選択タブには数値フィールド型のみが表示される。RAMは数値フィールドのため適用可能。"}
+]});
+L.push({c:"Course 7",l:"7-15",t:"Dynamic Reconciliation Ruleをテストする",
+s:`Dynamic Reconciliation Ruleをテストする`,
+p:[],
+q:[
+{t:"基礎",q:"シナリオ15でDynamic Reconciliation Ruleが適用された結果、OWA-SD-01のRAMフィールドが更新される値として正しいものはどれか？",o:["スクリプトに記載されたServiceNowのRAM値2048","Multisource CMDBに保存されているLANDeskのRAM値4096（最大値のため）","スクリプト実行前のRAM値4096のまま変わらない","RAMが0にリセットされる"],a:1,e:"検証条件：「OWA-SD-01という名前のサーバーのRAMフィールドが、Multisource CMDBに含まれる最大値である4096に更新されていることを確認する」。スクリプトには2048と記載されているが、Largest ValueルールによりMultisource CMDBの最大値4096が適用される。"},
+{t:"引っ掛け",q:"シナリオ15でスクリプトにRAM: 2048が記載されているにもかかわらずOWA-SD-01のRAMが4096になる理由として正しいものはどれか？",o:["スクリプトに誤りがある","Dynamic Reconciliation Rule（Largest Value）がMultisource CMDBのすべてのDiscovery Sourceの値を参照し、最大値（LANDeskの4096）でCMDBを更新するため。スクリプトの値（2048）よりMultisource CMDBの最大値が優先される","ServiceNowが自動的に最大値を選択するから","LANDeskのReconciliation Ruleが優先されるから"],a:1,e:"注記：「Windows Serverレコードには、スクリプトに2048と示されていたにもかかわらず、RAMが4096と表示されます。これは前のタスクで作成されたDynamic Reconciliation Ruleによるものです」。Largest ValueルールがMultisource CMDBのすべての値から最大値を選択する。"},
+{t:"試験対策",q:"Static Reconciliation RuleとDynamic Reconciliation Ruleの主な違いとして正しいものはどれか？",o:["両者は同じ機能を提供する","Static Reconciliation Rule：どのDiscovery Sourceがフィールドを更新できるか（優先度・順序）を定義する。Dynamic Reconciliation Rule：Multisource CMDBのデータを活用してFirst/Last/Most Reported・Largest/Smallest Valueなどの基準に基づいて値を選択する。同一属性に両方がある場合はDynamicが優先される","Static Reconciliation RuleはMultisource CMDBが必要","Dynamic Reconciliation RuleはOrder Valueで優先度を定義する"],a:1,e:"Static Reconciliation RuleはDiscovery Sourceの優先度（Order Value）で更新権限を定義。Dynamic Reconciliation RuleはMultisource CMDBのデータを基にFirst/Last/Most Reported・Largest/Smallest Valueで値を選択。同一属性に両方がある場合はDynamic Reconciliation Ruleが優先される（Dynamic wins over Static）。"}
+]});
 </script>
 </body>
 </html>
