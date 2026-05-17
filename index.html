@@ -519,10 +519,15 @@ function renderQuiz(el, lesson, isReview) {
           if (q.multi.includes(oi)) cls = ' ok';
           else if (qs.wrongs[qi] && qs.wrongs[qi].includes(oi)) cls = ' ng';
         }
-        html += `<button class="opt${cls}${(!done)?'':''}" ${done?'disabled':''} id="mopt_${qkey}_${qi}_${oi}" onclick="toggleMulti('${qkey}',${qi},${oi})">${String.fromCharCode(65+oi)}. ${escHtml(o)}</button>`;
+        const multiKey = qkey + '_' + qi;
+        const alreadySel = (!done && multiSelections[multiKey] && multiSelections[multiKey].has(oi)) ? ' sel-multi' : '';
+        html += `<button class="opt${cls}${alreadySel}" ${done?'disabled':''} id="mopt_${qkey}_${qi}_${oi}" onclick="toggleMulti('${qkey}',${qi},${oi})">${String.fromCharCode(65+oi)}. ${escHtml(o)}</button>`;
       });
       if (!done) {
-        html += `<button class="multi-submit" id="msub_${qkey}_${qi}" onclick="submitMulti('${qkey}',${qi},${isReview},${JSON.stringify(isReview?(errIndices||[]):[])})" disabled>回答する</button>`;
+        const multiKey2 = qkey + '_' + qi;
+        const curSelCount = (multiSelections[multiKey2] && multiSelections[multiKey2].size) || 0;
+        const subDisabled = curSelCount !== q.multi.length ? 'disabled' : '';
+        html += `<button class="multi-submit" id="msub_${qkey}_${qi}" onclick="submitMulti('${qkey}',${qi},${isReview},${JSON.stringify(isReview?(errIndices||[]):[])})" ${subDisabled}>回答する（${curSelCount}/${q.multi.length}選択）</button>`;
       }
     } else {
       // 単一選択問題
@@ -585,7 +590,7 @@ function toggleMulti(qkey, qi, oi) {
     sel.add(oi);
     if (btn) btn.classList.add('sel-multi');
   }
-  // 回答するボタンの有効/無効
+  // 回答するボタンの有効/無効とカウント更新
   const lid = state.activeLesson;
   const lesson = state.lessons.find(l=>l.id===lid);
   if (!lesson) return;
@@ -593,7 +598,9 @@ function toggleMulti(qkey, qi, oi) {
   const q = allQ[qi];
   const subBtn = document.getElementById('msub_' + qkey + '_' + qi);
   if (subBtn && q && q.multi) {
-    subBtn.disabled = sel.size !== q.multi.length;
+    const ready = sel.size === q.multi.length;
+    subBtn.disabled = !ready;
+    subBtn.textContent = '回答する（' + sel.size + '/' + q.multi.length + '選択）';
   }
 }
 
