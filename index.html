@@ -129,6 +129,11 @@ textarea.tinput{min-height:180px;}
 .datasrc-open-btn{cursor:pointer;padding:6px 14px;background:#21262d;border:1px solid #3fb950;color:#3fb950;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;transition:all .15s;margin-left:4px;}
 .datasrc-open-btn:hover{background:#0d2e19;border-color:#56d364;}
 .datasrc-open-btn:disabled{opacity:.4;cursor:default;}
+.opt.sel-multi{border-color:#58a6ff;background:#1f3358;color:#79c0ff;}
+.multi-submit{cursor:pointer;padding:7px 20px;border:1px solid #388bfd;background:#1f3358;color:#58a6ff;border-radius:6px;font-size:13px;font-weight:600;margin-top:6px;font-family:inherit;}
+.multi-submit:hover{background:#263d6a;}
+.multi-submit:disabled{opacity:.4;cursor:default;}
+.multi-hint{font-size:11px;color:#8b949e;margin-bottom:6px;}
 .gist-btn{cursor:pointer;padding:6px 14px;background:#21262d;border:1px solid #8957e5;color:#8957e5;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;transition:all .15s;margin-left:4px;}
 .gist-btn:hover{background:#1a1038;border-color:#a371f7;color:#a371f7;}
 .gist-status{font-size:11px;padding:2px 8px;border-radius:4px;margin-left:4px;display:inline-block;}
@@ -504,24 +509,50 @@ function renderQuiz(el, lesson, isReview) {
       <span class="tbadge t${q.type}">${q.type}</span>
       <div class="qtext">${escHtml(q.q)}</div>`;
 
-    q.opts.forEach((o, oi) => {
-      let cls = '';
-      if (done) {
-        if (oi === q.ans) cls = ' ok';
-        else if (oi === qs.wrongs[qi] && !wasOk) cls = ' ng';
+    const isMulti = Array.isArray(q.multi) && q.multi.length > 0;
+    if (isMulti) {
+      // 複数選択問題
+      html += `<div class="multi-hint">💡 ${q.multi.length}つ選択してください</div>`;
+      q.opts.forEach((o, oi) => {
+        let cls = '';
+        if (done) {
+          if (q.multi.includes(oi)) cls = ' ok';
+          else if (qs.wrongs[qi] && qs.wrongs[qi].includes(oi)) cls = ' ng';
+        }
+        html += `<button class="opt${cls}${(!done)?'':''}" ${done?'disabled':''} id="mopt_${qkey}_${qi}_${oi}" onclick="toggleMulti('${qkey}',${qi},${oi})">${String.fromCharCode(65+oi)}. ${escHtml(o)}</button>`;
+      });
+      if (!done) {
+        html += `<button class="multi-submit" id="msub_${qkey}_${qi}" onclick="submitMulti('${qkey}',${qi},${isReview},${JSON.stringify(isReview?(errIndices||[]):[])})" disabled>回答する</button>`;
       }
-      html += `<button class="opt${cls}"${done?' disabled':''} onclick="answerQ('${qkey}',${qi},${oi},${isReview},${JSON.stringify(isReview ? (errIndices||[]) : [])})">${String.fromCharCode(65+oi)}. ${escHtml(o)}</button>`;
-    });
+    } else {
+      // 単一選択問題
+      q.opts.forEach((o, oi) => {
+        let cls = '';
+        if (done) {
+          if (oi === q.ans) cls = ' ok';
+          else if (oi === qs.wrongs[qi] && !wasOk) cls = ' ng';
+        }
+        html += `<button class="opt${cls}"${done?' disabled':''} onclick="answerQ('${qkey}',${qi},${oi},${isReview},${JSON.stringify(isReview ? (errIndices||[]) : [])})">${String.fromCharCode(65+oi)}. ${escHtml(o)}</button>`;
+      });
+    }
 
     if (done) {
       const expCls = wasOk ? 'exp-ok' : 'exp-ng';
       const label = wasOk ? '✅ 正解！' : '❌ 不正解';
       const annotatedExp = addJpAnnotations(escHtml(q.exp));
-      const annotatedOptCorrect = addJpAnnotations(escHtml(q.opts[q.ans]));
-      const annotatedOptWrong = (!wasOk && qs.wrongs[qi] != null) ? addJpAnnotations(escHtml(q.opts[qs.wrongs[qi]])) : '';
-      const reason = wasOk
-        ? `<span class="exp-label">${label}</span>この選択肢が正解の理由：${annotatedExp}`
-        : `<span class="exp-label">${label}</span>正解は「${String.fromCharCode(65+q.ans)}：${annotatedOptCorrect}」です。<br><br>【なぜ不正解か】あなたは「${String.fromCharCode(65+qs.wrongs[qi])}：${annotatedOptWrong}」を選びましたが、これは誤りです。<br><br>【正解の理由】${annotatedExp}`;
+      let reason = '';
+      if (isMulti) {
+        const correctLabels = q.multi.map(i => String.fromCharCode(65+i)+':'+q.opts[i]).join('・');
+        reason = wasOk
+          ? `<span class="exp-label">${label}</span>正解の組み合わせを選択できました！<br><br>【正解の理由】${annotatedExp}`
+          : `<span class="exp-label">${label}</span>正解は「${correctLabels}」です。<br><br>【正解の理由】${annotatedExp}`;
+      } else {
+        const annotatedOptCorrect = addJpAnnotations(escHtml(q.opts[q.ans]));
+        const annotatedOptWrong = (!wasOk && qs.wrongs[qi] != null) ? addJpAnnotations(escHtml(q.opts[qs.wrongs[qi]])) : '';
+        reason = wasOk
+          ? `<span class="exp-label">${label}</span>この選択肢が正解の理由：${annotatedExp}`
+          : `<span class="exp-label">${label}</span>正解は「${String.fromCharCode(65+q.ans)}：${annotatedOptCorrect}」です。<br><br>【なぜ不正解か】あなたは「${String.fromCharCode(65+qs.wrongs[qi])}：${annotatedOptWrong}」を選びましたが、これは誤りです。<br><br>【正解の理由】${annotatedExp}`;
+      }
       html += `<div class="exp ${expCls}">${reason}</div>`;
       // コメント欄（回答後のみ表示）
       const cKey = lesson.course.replace(/\s/g,'') + '_' + lesson.lesson + '_' + qi;
@@ -537,6 +568,74 @@ function renderQuiz(el, lesson, isReview) {
   });
 
   el.innerHTML = html;
+}
+
+// ── 複数選択問題の処理 ──────────────────────────────────
+const multiSelections = {}; // qkey_qi -> Set of selected indices
+
+function toggleMulti(qkey, qi, oi) {
+  const key = qkey + '_' + qi;
+  if (!multiSelections[key]) multiSelections[key] = new Set();
+  const sel = multiSelections[key];
+  const btn = document.getElementById('mopt_' + qkey + '_' + qi + '_' + oi);
+  if (sel.has(oi)) {
+    sel.delete(oi);
+    if (btn) btn.classList.remove('sel-multi');
+  } else {
+    sel.add(oi);
+    if (btn) btn.classList.add('sel-multi');
+  }
+  // 回答するボタンの有効/無効
+  const lid = state.activeLesson;
+  const lesson = state.lessons.find(l=>l.id===lid);
+  if (!lesson) return;
+  const allQ = lesson.quiz || [];
+  const q = allQ[qi];
+  const subBtn = document.getElementById('msub_' + qkey + '_' + qi);
+  if (subBtn && q && q.multi) {
+    subBtn.disabled = sel.size !== q.multi.length;
+  }
+}
+
+function submitMulti(qkey, qi, isReview, errIndices) {
+  const lid = state.activeLesson;
+  const lesson = state.lessons.find(l=>l.id===lid);
+  if (!lesson) return;
+  const allQ = lesson.quiz || [];
+  const questions = isReview ? errIndices.map(i=>allQ[i]) : allQ;
+  const q = questions[qi];
+  if (!q || !q.multi) return;
+
+  const key = qkey + '_' + qi;
+  const sel = multiSelections[key] || new Set();
+  const selectedArr = [...sel].sort();
+  const correctArr = [...q.multi].sort();
+  const correct = selectedArr.length === correctArr.length &&
+    selectedArr.every((v,i) => v === correctArr[i]);
+
+  const qs = state.quizState[qkey];
+  qs.scores[qi] = correct ? 1 : 0;
+  qs.wrongs[qi] = selectedArr; // 選択したインデックス配列を記録
+
+  const realIdx = isReview ? errIndices[qi] : qi;
+  if (!correct) {
+    if (!state.errors[lid]) state.errors[lid] = new Set();
+    state.errors[lid].add(realIdx);
+  } else {
+    if (isReview && state.errors[lid]) {
+      state.errors[lid].delete(realIdx);
+      if (state.errors[lid].size === 0) delete state.errors[lid];
+    }
+  }
+
+  if (qs.scores.every(s=>s!==null)) qs.done = true;
+  save();
+  renderContent();
+  renderSidebar();
+  setTimeout(() => {
+    const card = document.getElementById('qc_' + qkey + '_' + qi);
+    if (card) card.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }, 100);
 }
 
 function answerQ(qkey, qi, chosen, isReview, errIndices) {
@@ -821,6 +920,7 @@ function normalizeQuiz(quiz) {
     q: q.q,
     opts: q.opts || q.o || [],
     ans: q.ans !== undefined ? q.ans : (q.a !== undefined ? q.a : 0),
+    multi: q.multi || null,  // 複数選択の正解インデックス配列 例: [1,3]
     exp: q.exp || q.e || ''
   }));
 }
