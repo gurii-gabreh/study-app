@@ -1906,6 +1906,656 @@ q:[
 {t:"引っ掛け",q:"同一サーバー上で複数のTomcat Web Serverインスタンスが実行されているが、CMDBに1つのCIレコードしか作成されない問題を解決するために必要な設定の組み合わせとして正しいものはどれか？（2つ選択）",o:["Tomcat Web ServerクラスをPrincipal Class（プリンシパルクラス）としてフラグ付けする","Tomcat Web Serverの識別ルールに構成ファイルパスまたはインストールディレクトリパスをIdentifier Entryとして追加する","glide.identification_engine.skip_duplicates.thresholdを1に設定する","Tomcat Web Serverクラスに新しいReconciliation Rule（調整ルール）を追加する"],a:0,multi:[0, 1],e:"正解はA「Principal Class（プリンシパルクラス）としてフラグ付け」とB「識別ルールにインストールパスを追加」の2つ。Principal Classフラグを設定することでIREが同一ホスト上の複数インスタンスを個別のCIとして認識できる。さらに識別ルールにインストールパスを追加することで、異なるディレクトリの同名アプリを一意に識別できる。（2つ選択問題のため、アプリではAが正解として表示されます）"},
 ]});
 
+
+
+// ─── Course 11: CSDM Fundamentals（動画トランスクリプトより） ───────────────
+// Course 11 Lesson 1
+L.push({c:"Course 11",l:"11-1",t:"用語と初期段階の考慮事項",
+s:`CSDMでは「Application」という言葉に3つの異なるテーブルがある。
+
+①Application（cmdb_ci_appl）：最も古いテーブル。Discoveryがホスト上で検出したインストール済みコード（bits and bytes）を格納。運用目的（Incident・Problem・Change）で使用する operational CI。
+②Business Application（cmdb_ci_business_app）：アプリケーションのポートフォリオリスト。バージョン非依存・non-operational。企業が保有するアプリの一覧管理に使用。
+③Application Service（cmdb_ci_service_auto等）：Business Applicationのインスタンス。CSDMで最重要オブジェクト。dev/QA/prodなど環境ごとのインスタンスを識別。Incident・Problem・Changeで使用するoperational CI。
+
+サービスタイプは3種類：Application Service（Business Applicationのインスタンス）・Business Service（テクノロジーを消費するビジネス機能）・Technology Management Service（テクノロジーの提供者・責任グループを識別）。
+
+CSDM以前は120以上のサービス定義箇所があったが、CSDMが3種類に絞り込んだ。
+
+CSDM5でのリレーション変更：Business ApplicationとApplication ServiceのリレーションがCSDM4の「Consumes::Consumed by」からCSDM5で新しいリレーションに変更（旧リレーションはハードコードされていたため変更が困難だった）。`,
+p:[
+["Applicationテーブルの目的","cmdb_ci_appl：Discoveryが検出したインストール済みコードを格納するoperational CI","Incident・Problem・Changeのチケットに紐付けるCIとして使用"],
+["Business Applicationの目的","バージョン非依存のアプリポートフォリオリスト（non-operational）","企業内の全アプリケーション一覧を管理。エンタープライズアーキテクチャ視点で使用"],
+["Application Serviceの重要性","Business Applicationのデプロイ済みインスタンス（最重要オブジェクト）","dev/QA/prod等の環境ごとに一意に識別。Incident・Problem・Changeで使用するoperational CI"],
+["3種類のサービスタイプ","Application Service・Business Service・Technology Management Service","CSDM以前は120以上あったサービス定義をCSDMが3種類に絞り込んだ"],
+["Business Serviceの役割","テクノロジーを消費するビジネス機能（内部・外部・両方）","テクノロジーに問題が発生した際のビジネスへのインパクト分析に使用"],
+["Technology Management Serviceの役割","テクノロジーの提供者・サポートグループ・責任グループを識別","CIを管理するグループが自分たちをサービスの提供者として認識できるようにする"],
+["CSDM5のリレーション変更","Business Application→Application ServiceのリレーションがCSDM4の「Consumes::Consumed by」から変更","旧リレーションはプラットフォームにハードコードされていたため変更が困難だった"],
+],
+q:[
+{t:"基礎",q:"CSDMにおけるApplication（cmdb_ci_appl）テーブルの主な用途として正しいものはどれか？",o:["企業内のアプリケーションポートフォリオを一覧管理するため","Discoveryがホスト上で検出したインストール済みコード（bits and bytes）を格納するoperational CIのため","Business Applicationのデプロイ済みインスタンスを管理するため","サービスのSLA・OLAを管理するため"],a:1,e:"Application（cmdb_ci_appl）テーブルはDiscoveryがホスト上で検出したインストール済みコード（bits and bytes）を格納する最も古いテーブルで、Incident・Problem・Changeで使用するoperational CIとして機能する。"},
+{t:"基礎",q:"Business Applicationの説明として正しいものはどれか？",o:["Discoveryが自動検出するoperational CI","バージョン非依存のアプリケーションポートフォリオリスト（non-operational）","Business Applicationのデプロイ済みインスタンス","サポートグループが管理するテクノロジーサービス"],a:1,e:"Business Applicationはバージョン非依存のアプリケーションポートフォリオリスト（non-operational）。エンタープライズアーキテクチャの観点から企業が保有するアプリを一覧管理する目的で使用し、Incident・Problem・Changeでは直接使用しない。"},
+{t:"基礎",q:"CSDMで最重要オブジェクトとされるApplication Serviceの説明として正しいものはどれか？",o:["企業内の全アプリを一覧管理するためのnon-operational CI","Discoveryが検出したインストール済みコードを格納するCI","Business Applicationのデプロイ済みインスタンスであり、dev/QA/prod等の環境ごとに識別するoperational CI","テクノロジーの提供者グループを識別するためのCI"],a:2,e:"Application ServiceはBusiness Applicationのデプロイ済みインスタンス。dev・QA・prodなど環境ごとに一意に識別し、Incident・Problem・Changeで使用するoperational CIとして機能する。CSDMで最重要オブジェクトとされる。"},
+{t:"基礎",q:"CSDMが定義する3種類のサービスタイプの組み合わせとして正しいものはどれか？",o:["Application Service・Technical Service・Business Service","Application Service・Business Service・Technology Management Service","Application Service・Managed Service・Business Service","Technical Service・Business Service・Technology Offering"],a:1,e:"CSDMが定義する3種類のサービスタイプはApplication Service・Business Service・Technology Management Service。CSDM以前は120以上あったサービス定義をこの3種類に絞り込んだ。"},
+{t:"引っ掛け",q:"CSDM5でBusiness ApplicationとApplication Serviceのリレーションが変更された理由として正しいものはどれか？",o:["Application Serviceが廃止されたため","旧リレーション「Consumes::Consumed by」がプラットフォームにハードコードされており変更が困難だったため","Business Applicationがoperational CIとして再定義されたため","新しいリレーションの方がパフォーマンスが良いため"],a:1,e:"旧リレーション「Consumes::Consumed by」はプラットフォームにハードコードされており、変更が非常に困難だった。CSDM5でこの問題が解決されリレーションが変更された。"},
+{t:"意地悪",q:"Business ServiceとApplication Serviceの違いとして正しいものはどれか？",o:["Business ServiceはDiscoveryが自動生成し、Application Serviceは手動作成する","Application Serviceはテクノロジーを消費するビジネス機能を表し、Business ServiceはBusiness Applicationのインスタンスを表す","Business ServiceはApplication Serviceを消費するビジネス機能・インパクト分析の対象であり、Application ServiceはBusiness Applicationのデプロイ済みインスタンスである","両者は同じものを指す別名である"],a:2,e:"Business ServiceはApplication Service等のテクノロジーを消費するビジネス機能（インパクト分析の対象）。Application ServiceはBusiness Applicationのデプロイ済みインスタンス（operational CI）。両者は役割が根本的に異なる。"},
+{t:"試験対策",q:"Incident管理でCIを選択する際、どのオブジェクトを選択すべきか正しいものはどれか？",o:["Business Application（バージョン非依存のポートフォリオリスト）","Application（Discoveryが検出したインストール済みコード）またはApplication Service（デプロイ済みインスタンス）","Technology Management Service（責任グループを識別するサービス）","Business Service（ビジネス機能を表すサービス）"],a:1,e:"Incident管理ではoperational CIであるApplication（Discoveryが検出したインストール済みコード）またはApplication Service（デプロイ済みインスタンス）を使用する。Business Applicationはnon-operationalのため直接使用しない。"},
+]});
+// Course 11 Lesson 2
+L.push({c:"Course 11",l:"11-2",t:"Foundationドメイン",
+s:`Foundationドメインは全ドメインで参照される参照データ（referential data）を提供する最重要ドメイン。CIのフィールドから参照されるデータや、CMDBのCIを参照する他のオブジェクトが含まれる。
+
+主要オブジェクト：
+・Business Process：CMDB内のCIクラスだが、ロケーション・ドキュメント・ユーザーなどCMDB外のオブジェクトも参照できる唯一のCIの一つ。そのためFoundationに配置。ビジネス継続性（BCM）の観点でも重要。
+・Knowledge：ライフサイクル全体に渡って重要。AIエージェントの燃料（fuel）として機能。
+・Value Stream：ビジネスが提供する価値の流れ。ハーバード大学の研究を基に15カテゴリが標準提供。Value Stream→Stage→Business Capabilityの階層構造。CMDB外のオブジェクトだがCMDBのオブジェクトを参照。
+・Lifecycle Stage / Stage Status：CSDM4で導入。従来9つ以上あった状態フィールドを整理。クラスごとに異なる値セットを提供。編集不可（カスタマイズ不可）。CSDM5で「End of Operation」ステージを新規追加。
+
+Lifecycleの2区分：
+①有形物（Tangible/Physical）：資産とCMDBのCI両方で共有。アイデア→購入→ビルド→運用→End of Operation→廃棄のフロー。
+②無形物（Intangible/Logical）：CIのみ（廃棄フェーズなし）。Business Service・Business Applicationなどが対象。`,
+p:[
+["Foundationドメインの役割","全ドメインで参照される参照データ（referential data）を提供する最重要ドメイン","他の全ドメインの成功に不可欠な基盤データを格納"],
+["Business Processの特徴","CMDB内のCIクラスだが、ロケーション・ドキュメント・ユーザーなどCMDB外オブジェクトも参照できる","このためFoundationドメインに配置。ビジネス継続性（BCM）観点でも重要"],
+["Knowledgeの役割","ライフサイクル全体で重要な参照データ","AIエージェントの燃料（fuel）として機能し、情報提供・自動化を支援"],
+["Value Streamの構造","Value Stream → Stage → Business Capabilityの階層構造","ハーバード大学の研究を基に15カテゴリが標準提供。CMDB外だがCMDBオブジェクトを参照"],
+["Lifecycle Stageの特徴","クラスごとに異なる値セット。編集・カスタマイズ不可","従来9つ以上あった状態フィールドを整理したCSDM4で導入の機能"],
+["CSDM5の新Stage","End of Operationステージを新規追加","運用終了後から廃棄前の状態（棚卸し評価・廃棄待ち等）を表現するために追加"],
+["有形物ライフサイクル","Ideation→Purchase→Build→Operational→End of Operation→End of Life","資産とCMDBのCI（物理CI）で共有。廃棄（Dispose）フェーズあり"],
+["無形物ライフサイクル","有形物と異なりEnd of Lifeの廃棄フェーズなし","Business Service・Business Applicationなどの論理オブジェクトが対象"],
+],
+q:[
+{t:"基礎",q:"FoundationドメインにBusiness Processが配置される理由として正しいものはどれか？",o:["Business ProcessはCMDB外のオブジェクトだから","Business ProcessはCMDB内のCIクラスだが、ロケーション・ドキュメント・ユーザーなどCMDB外のオブジェクトも参照できる唯一のCIの一つだから","Business Processは全ドメインで最も使用頻度が高いから","Business ProcessはService Consumptionドメインでのみ使用されるから"],a:1,e:"Business ProcessはCMDB内のCIクラスだが、ロケーション・ドキュメント・ユーザーなどCMDB外の複数オブジェクトも参照できる唯一のCIの一つ。CMDBの階層的なCI-CIの関係に留まらないためFoundationドメインに配置される。"},
+{t:"基礎",q:"CSDMのValue Stream（バリューストリーム）に関する記述として正しいものはどれか？",o:["CMDBのCI階層内に格納されるテーブルである","CMDB外のオブジェクトだがCMDBのオブジェクトを参照し、ハーバード大学の研究を基に15カテゴリが標準提供される","DiscoveryによってKBから自動生成されるオブジェクトである","Value StreamはLifecycle StageとStage Statusの親オブジェクトである"],a:1,e:"Value StreamはCMDB外のオブジェクトだがCMDBオブジェクトを参照する。ハーバード大学の研究を基に15カテゴリが標準提供され、Value Stream→Stage→Business Capabilityの階層構造を持つ。"},
+{t:"基礎",q:"Lifecycle Stage / Stage Statusに関する記述として正しいものはどれか？",o:["全クラスで同一の値セットが使用される","クラスごとに異なる値セットが提供され、編集・カスタマイズは不可","管理者が自由にステージを追加・編集できる","CSDM3で初めて導入された機能である"],a:1,e:"Lifecycle Stage / Stage Statusはクラスごとに異なる値セットが提供される。編集・カスタマイズは不可（ServiceNowが管理）。CSDM4で導入された機能。"},
+{t:"基礎",q:"CSDM5でLifecycleに新規追加されたステージはどれか？",o:["End of Service","End of Operation","Pending Retirement","Decommission"],a:1,e:"CSDM5では「End of Operation（運用終了）」ステージが新規追加された。運用状態から廃棄（End of Life）までの間の状態（棚卸し評価・廃棄待ちなど）を表現するために追加された。"},
+{t:"引っ掛け",q:"有形物（Tangible/Physical）と無形物（Intangible/Logical）のLifecycleの違いとして正しいものはどれか？",o:["無形物にはEnd of Operationステージが存在し、有形物には存在しない","有形物には廃棄（End of Life/Dispose）フェーズがあるが、無形物にはない","両者のLifecycleは完全に同一である","有形物はCMDBでのみ管理され、無形物は資産管理でのみ管理される"],a:1,e:"有形物（物理CI・資産）にはEnd of Life（廃棄）フェーズが存在するが、無形物（Business Service・Business Applicationなどの論理オブジェクト）には廃棄フェーズが存在しない。これが両者の主な違い。"},
+{t:"試験対策",q:"FoundationドメインでKnowledge（ナレッジ）が重視される理由として正しいものはどれか？",o:["KnowledgeはCMDB内の唯一のテーブルだから","KnowledgeはLifecycle全体にわたって重要であり、AIエージェントの燃料（fuel）として機能するから","KnowledgeはDiscoveryの設定情報を格納するから","KnowledgeはService Deliveryドメインでのみ使用されるから"],a:1,e:"KnowledgeはCSDMのLifecycle全体にわたって重要な参照データ。特にAIエージェントの燃料（fuel）として機能し、情報提供・自動化・人間インターフェースを支援することが動画で強調されている。"},
+]});
+// Course 11 Lesson 3
+L.push({c:"Course 11",l:"11-3",t:"Ideation & Strategyドメイン",
+s:`Ideation & StrategyドメインはCSDM5で新規追加されたドメイン（CSDM4には存在しなかった）。アイデアの発生からビジネス判断までを管理する。
+
+6つのオブジェクト：Product Idea・Strategic Plan・Goal・Business Capability（一部）・Value Stream（参照）・Product/Product Feature。
+
+CSDM5での追加理由：アイデアの段階からライフサイクルを管理するため。投資判断・ミッション・ビジョン・組織価値の定義に使用。
+
+関連製品：Strategic Portfolio Management（SPM）・Enterprise Architecture（旧APM、2024年後半にリネーム）・Digital Portfolio Management（DPM）
+
+DPMはほぼ全てのCSDMデータを活用する最も包括的な製品の一つ。CSDM全ドメインのデータを可視化（クリスマスツリーのように）する。`,
+p:[
+["Ideation & Strategyの新規性","CSDM5で新規追加されたドメイン（CSDM4には存在しなかった）","ライフサイクルの起点となるアイデア発生から戦略立案までをカバー"],
+["主要オブジェクト","Product Idea・Strategic Plan・Goal・Business Capability・Value Stream参照・Product/Product Feature","これらのオブジェクトが戦略的ポートフォリオ管理の基盤"],
+["Enterprise Architectureへの改名","APM（Application Portfolio Management）が2024年後半にEnterprise Architectureに改名","真のEA（Enterprise Architecture）機能として進化"],
+["DPMの特徴","Digital Portfolio Management：ほぼ全CSDMドメインのデータを活用する最も包括的な製品","データが投入されるとクリスマスツリーのライトのように各機能が点灯する"],
+],
+q:[
+{t:"基礎",q:"Ideation & StrategyドメインがCSDMで新規追加されたのはどのバージョンか？",o:["CSDM 2","CSDM 3","CSDM 4","CSDM 5"],a:3,e:"Ideation & StrategyドメインはCSDM5で初めて追加された新規ドメイン。CSDM4には存在しなかった。"},
+{t:"基礎",q:"APM（Application Portfolio Management）がEnterprise Architectureに改名されたのはいつか？",o:["2023年初頭","2024年後半","CSDM5リリース時","改名はまだ行われていない"],a:1,e:"APM（Application Portfolio Management）は2024年後半にEnterprise Architecture（EA）に改名された。真のEA機能として進化した形での名称変更。"},
+{t:"基礎",q:"Digital Portfolio Management（DPM）に関する説明として正しいものはどれか？",o:["Service Deliveryドメインのデータのみを使用する製品","ほぼ全てのCSDMドメインのデータを活用する最も包括的な製品の一つ","Discoveryデータの可視化専用ツール","Foundationドメインのデータのみを管理する製品"],a:1,e:"DPMはほぼ全てのCSDMドメインのデータを活用する最も包括的な製品の一つ。データが投入されるとクリスマスツリーのライトのように各機能が点灯するとトランスクリプトで説明されている。"},
+{t:"試験対策",q:"Ideation & Strategyドメインで主に使用される製品の組み合わせとして正しいものはどれか？",o:["Discovery・Service Mapping・IntegrationHub ETL","Strategic Portfolio Management・Enterprise Architecture（旧APM）・Digital Portfolio Management","ITSM・GRC・Customer Service Management","CMDB Health Dashboard・Data Manager・Query Builder"],a:1,e:"Ideation & Strategyドメインで主に使用される製品はStrategic Portfolio Management（SPM）・Enterprise Architecture（旧APM）・Digital Portfolio Management（DPM）。"},
+]});
+// Course 11 Lesson 4
+L.push({c:"Course 11",l:"11-4",t:"Design & Planningドメイン",
+s:`Design & Planningドメインは投資対象の定義・計画を管理するドメイン（Enterprise Architecture/旧APMが主管）。CSDM4からの変更なし。
+
+主要オブジェクト：
+・Business Capability：企業が「何を行うか」を定義。サブケイパビリティに分解可能な階層構造。People・Process・Technologyの視点で分析。
+・Business Application：アプリケーションポートフォリオ。TCO（Total Cost of Ownership）の管理。Dev/QA/Prod環境を含む全インスタンスと基盤インフラを把握。
+・Information Object [cmdb_ci_information_object]：Business Applicationが扱うデータの種類を論理的に記述。PII→GDPR/HIPAA、クレジットカード情報→PCI監査を自動トリガー。CA・Erwinなどのツールを置き換えるものではない。ガバナンス・コンプライアンス目的の概念的・論理的エンティティ。
+
+関連製品：Enterprise Architecture（APM）・Digital Portfolio Management（DPM）・Integrated Risk Management（IRM/GRC）`,
+p:[
+["Business Capabilityの定義","企業が「何を行うか」を定義する戦略的プランニングの概念","サブケイパビリティに分解可能な階層構造。People・Process・Technologyの3視点で分析"],
+["Business ApplicationのTCO管理","Dev/QA/Prodなど全インスタンスと基盤インフラのTotal Cost of Ownershipを管理","アプリを廃止する際に影響するハードウェア・全環境を把握するために使用"],
+["Information Objectの役割","Business Applicationが扱うデータ種類を論理的に記述するCIクラス[cmdb_ci_information_object]","PII→GDPR/HIPAA、クレジットカード→PCIなどの監査要件を自動トリガー"],
+["Information Objectの位置づけ","ガバナンス・コンプライアンス目的の概念的・論理的エンティティ","CA・Erwinなどのデータモデリングツールを置き換えるものではない"],
+],
+q:[
+{t:"基礎",q:"Business Capability（ビジネスケイパビリティ）の説明として正しいものはどれか？",o:["Discoveryが検出したサーバーのスペックを定義するCI","企業が「何を行うか」をPeople・Process・Technologyの視点で定義し、サブケイパビリティに分解できる戦略的概念","Business Applicationのデプロイ済みインスタンスを識別するCI","テクノロジーの責任グループを識別するサービス"],a:1,e:"Business Capabilityは企業が「何を行うか」を定義する戦略的プランニングの概念。People・Process・Technologyの3視点で分析し、サブケイパビリティに分解可能な階層構造を持つ。"},
+{t:"基礎",q:"Information Object（情報オブジェクト）のテーブル名として正しいものはどれか？",o:["cmdb_ci_information_model","cmdb_ci_information_object","cmdb_ci_data_object","cmdb_ci_info_class"],a:1,e:"Information Objectのテーブル名はcmdb_ci_information_object。Business Applicationが扱うデータの種類を論理的に記述するCIクラス。"},
+{t:"引っ掛け",q:"Information ObjectとCA・Erwinなどのデータモデリングツールの関係として正しいものはどれか？",o:["Information ObjectはCA・Erwinを完全に置き換えるツールである","Information ObjectはCA・Erwinなどを置き換えるものではなく、ガバナンス・コンプライアンス目的の概念的・論理的エンティティである","Information ObjectはCA・Erwinと同期する専用コネクターを使用する","Information ObjectはCA・Erwinより詳細なデータ定義を提供する"],a:1,e:"Information ObjectはCA・Erwinなどのデータモデリングツールを置き換えるものではない。ガバナンス・コンプライアンス目的のための概念的・論理的エンティティとして機能し、アプリが扱うデータ種類に基づく監査要件のトリガーに特化している。"},
+{t:"試験対策",q:"HIPAAコンプライアンス監査のため患者診断記録を処理するビジネスアプリケーションを特定する場合、使用すべきCIクラスはどれか？",o:["cmdb_ci_business_app","cmdb_ci_data_domain","cmdb_ci_information_object","cmdb_ci_db_instance"],a:2,e:"cmdb_ci_information_object（Information Object）を使用する。Business Applicationが扱うデータ種類（患者診断記録はPII→HIPAAに該当）を論理的に記述してアプリに関連付けることで、HIPAAコンプライアンス監査要件が自動トリガーされる。"},
+]});
+// Course 11 Lesson 5
+L.push({c:"Course 11",l:"11-5",t:"Build & Integrateドメイン",
+s:`Build & Integrateドメインは開発・統合活動の可視性を提供するドメイン。
+
+主要オブジェクト：
+・STLC Component（Software Development Lifecycle Component）：モノリシックなビジネスアプリを個々に開発されたパーツ（マイクロサービス・API等）に分解する際に使用。任意（オプション）の使用。大規模・複雑なアプリのみで使用推奨。
+・DevOps Change Data Model（旧有料→CSDM5から無償）：開発活動の詳細（何を開発しているか・どのアプリに対してか・どのパッケージとしてリリースされるか）を提供。ServiceNow内での開発ではなく、外部開発プラットフォームとの統合。
+・AIデータ（新規）：CIクラスではなく資産（Asset）レコードとして管理。デプロイ可能なパッケージ（deployable）を表す。AI Control Towerと連携予定。`,
+p:[
+["STLC Componentの用途","モノリシックなビジネスアプリを個々の開発パーツ（マイクロサービス・API等）に分解","任意（オプション）の使用。大規模・複雑なアプリのみで使用推奨"],
+["DevOps Change Data ModelのCSDM移行","旧有料機能（paywall）がCSDM5から無償に","外部開発プラットフォームとの統合でビルド活動の可視化を提供"],
+["AIデータの管理方法","CIクラスではなく資産（Asset）レコードとして管理","デプロイ可能なパッケージ（deployable）を表す。AI Control Towerと連携予定"],
+],
+q:[
+{t:"基礎",q:"STLC Component（Software Development Lifecycle Component）の使用目的として正しいものはどれか？",o:["全てのビジネスアプリケーションに必須のオブジェクト","モノリシックなビジネスアプリを個々に開発されたパーツ（マイクロサービス・API等）に分解するためのオプションオブジェクト","Discoveryが自動生成するインフラ構成のCI","Application Serviceとリレーションを持つ唯一のオブジェクト"],a:1,e:"STLC Componentはモノリシックなビジネスアプリを個々に開発されたパーツ（マイクロサービス・API等）に分解するためのオプションオブジェクト。全てのアプリで必須ではなく、大規模・複雑なアプリのみで使用を推奨。"},
+{t:"基礎",q:"Build & IntegrateドメインにおけるAIデータの管理方法として正しいものはどれか？",o:["CMDBのCIクラスとして管理","資産（Asset）レコードとして管理。CIクラスではない","Business Applicationの拡張フィールドとして管理","Discoveryが自動検出するApplicationテーブルで管理"],a:1,e:"Build & IntegrateドメインのAIデータはCIクラスではなく資産（Asset）レコードとして管理される。デプロイ済みインスタンスではなくデプロイ可能なパッケージ（deployable）を表すため。"},
+{t:"引っ掛け",q:"DevOps Change Data ModelがCSDM5で変更された点として正しいものはどれか？",o:["ServiceNow内部での開発が可能になった","旧有料機能（paywall）がCSDM5から無償で利用可能になった","STLCをリプレイスする新機能として導入された","外部開発プラットフォームとの統合が廃止された"],a:1,e:"DevOps Change Data ModelはCSDM5で有料機能（paywall）から無償に変更された。ServiceNowでの開発ではなく外部開発プラットフォームとの統合でビルド活動の可視化を提供する。"},
+]});
+// Course 11 Lesson 6
+L.push({c:"Course 11",l:"11-6",t:"Service Deliveryドメイン",
+s:`Service Deliveryドメインは最も一般的に使用されるドメイン。Discoveryが大量のCIをCMDBに投入するドメイン。
+
+重要な変更点（CSDM5）：
+・Service Instance（旧: Application Service）：最上位テーブルはcmdb_ci_service_auto。「Application Service」から「Service Instance」にリネーム。Application Serviceは引き続きタイプの一つとして存在。
+
+Service Instanceの6タイプ（CSDM5で追加）：
+①Application Service（既存）
+②Data Service Instance（新規）
+③Network Service Instance（新規）
+④Connection Service Instance（新規）
+⑤Facility Service Instance（新規）
+⑥Operational Process Service Instance（新規）
+※新規5タイプは現時点でデータモデルのみ。UIや機能はAustralia+リリースで予定。
+
+Service Delivery Network：Service Instanceを提供するために必要な全CIの集合体（概念。特定のオブジェクトではない）。
+
+Technology Management Service / Technology Management Offering（旧: Technology Service / Technology Service Offering）にリネーム。
+
+Dynamic CI Group：プログラム的にCIをグループ化。パッチ管理等で活用。
+
+API専用クラス：CSDM5で新規追加。
+
+AIのCI分類：AI Function（クラウドで発見）・AI Application（オンプレミスで発見）。`,
+p:[
+["Service Instanceへのリネーム","cmdb_ci_service_autoが「Application Service」から「Service Instance」にリネーム","Application Serviceは引き続きService Instanceのタイプの一つとして存在"],
+["Service Instanceの新規5タイプ","Data・Network・Connection・Facility・Operational Process Service Instance","現時点ではデータモデルのみ。UIや機能はAustralia+リリースで提供予定"],
+["Service Delivery Networkの定義","Service Instanceを提供するために必要な全CIの集合体（概念・特定のオブジェクトではない）","Service Mappingや発見でこの集合体が形成される"],
+["Technology Management Service/Offeringのリネーム","旧: Technology Service / Technology Service Offering → Technology Management Service / Technology Management Offering","CIを管理するグループを識別する意図をより明確に表現"],
+["Dynamic CI Groupの特徴","プログラム的な手法でCIをグループ化（手動関連付け不要）","パッチ管理等で活用可能"],
+["AIのCI分類","AI Function（クラウドで発見されたAI）とAI Application（オンプレミスで発見されたAI）","Discovery結果の配置場所によって区別"],
+],
+q:[
+{t:"基礎",q:"CSDM5でcmdb_ci_service_autoが改名された名称として正しいものはどれか？",o:["Application Service","Business Service","Service Instance","Technology Management Service"],a:2,e:"cmdb_ci_service_autoはCSDM5で「Application Service」から「Service Instance」にリネームされた。Application Serviceは引き続きService Instanceのタイプの一つとして存在する。"},
+{t:"基礎",q:"CSDM5で新規追加されたService Instanceのタイプとして含まれないものはどれか？",o:["Data Service Instance","Network Service Instance","Business Service Instance","Facility Service Instance"],a:2,e:"CSDM5で新規追加されたService Instanceのタイプは、Data・Network・Connection・Facility・Operational Processの5種類。Business Service Instanceは新規タイプに含まれない（Business ServiceはService Consumptionドメインのオブジェクト）。"},
+{t:"基礎",q:"CSDM5で新規追加されたService Instance5タイプの現在の状態として正しいものはどれか？",o:["全機能が実装済みで即座に使用可能","データモデルのみ。UIや機能はAustralia+リリースで提供予定","Discovery設定が自動的に構成される","Event Management・Change Managementで既に使用可能"],a:1,e:"CSDM5で追加された新規5タイプのService Instanceは現時点ではデータモデルのみ。UIや機能はAustralia+リリースで提供予定。"},
+{t:"基礎",q:"Technology Management Service / Technology Management Offeringへの改名前の名称として正しいものはどれか？",o:["Business Service / Business Service Offering","Technical Service / Technical Service Offering","Technology Service / Technology Service Offering","IT Management Service / IT Service Offering"],a:2,e:"CSDM5でTechnology Service / Technology Service OfferingがTechnology Management Service / Technology Management Offeringにリネームされた。"},
+{t:"引っ掛け",q:"Dynamic CI GroupとService Delivery Networkの違いとして正しいものはどれか？",o:["両者は同じオブジェクトを指す","Dynamic CI Groupはプログラム的にCIをグループ化する機能、Service Delivery NetworkはService Instanceを提供するCIの集合体（概念）","Service Delivery NetworkはCMDBの特定テーブル、Dynamic CI Groupは概念的なもの","Dynamic CI GroupはService Consumptionドメインのオブジェクト"],a:1,e:"Dynamic CI GroupはプログラムでCIをグループ化する実際の機能（パッチ管理等で活用）。Service Delivery NetworkはService Instanceを提供するCIの集合体を表す概念であり、特定のCMDBオブジェクトではない。"},
+{t:"試験対策",q:"CloudベースのAIを検出した場合、CMDBのどのクラスに格納されるか？",o:["AI Application","AI Function","Application（cmdb_ci_appl）","Business Application"],a:1,e:"クラウドで発見されたAIはAI Function、オンプレミスで発見されたAIはAI Applicationに格納される。"},
+]});
+// Course 11 Lesson 7
+L.push({c:"Course 11",l:"11-7",t:"Service Consumptionドメイン",
+s:`Service Consumptionドメインは、テクノロジーを消費するビジネス側の視点を定義するドメイン。CSDM4からの変更なし・ラベル変更なし。
+
+主要オブジェクト：Business Service・Business Service Offering
+
+Service Classification：Business ServiceをはじめとするService系テーブルに設定する分類属性。フィルタリング・レポーティングに使用。Business Serviceには「Business Service」の分類値を設定。
+
+ビジネスサービス構築のポイント：
+・テクノロジーの詳細ではなくビジネスの観点で定義する
+・内部・外部・両方のいずれかに分類（Used Internally/Externally/Both）
+・SLA・OLAの管理が可能（Offeringに設定）
+・Subscriber（加入者）の識別：グループ・部門・その他エンティティ
+
+ビジネスサービスの定義はITの専門家だけでは困難。ビジネスサイドのステークホルダーを巻き込む必要がある。
+
+Service Builder：ビジネスサービスとオファリングを構築するためのツール。`,
+p:[
+["Service Consumptionドメインの特徴","テクノロジーを消費するビジネス側の視点を定義。CSDM4からの変更なし・ラベル変更なし","主要オブジェクト：Business Service・Business Service Offering"],
+["Service Classificationの役割","Business ServiceをはじめとするService系テーブルに設定する分類属性","フィルタリング・レポーティングのメカニズムで使用"],
+["ビジネスサービスの設計原則","テクノロジー詳細ではなくビジネスの観点で定義する","内部・外部・両方の分類を設定。ビジネスサイドのステークホルダー参加が必須"],
+["Offeringの機能","SLA・OLAの管理が可能","Subscriber（加入者：グループ・部門等）の識別も可能"],
+],
+q:[
+{t:"基礎",q:"Service ConsumptionドメインはCSDM4と比較してどのような変更があるか？",o:["主要オブジェクトが全て改名された","新規オブジェクトが5つ追加された","CSDM4からの変更なし・ラベル変更なし","Business ServiceがService Instanceに統合された"],a:2,e:"Service ConsumptionドメインはCSDM4からの変更なし・ラベル変更なし。CSDM5での主な変更はService DeliveryドメインやIdeation & Strategy（新規追加）に集中している。"},
+{t:"基礎",q:"Business ServiceのService Classificationに設定する値として正しいものはどれか？",o:["Application Service","Technology Service","Business Service","Managed Service"],a:2,e:"Business ServiceにはService Classification属性に「Business Service」の値を設定する。このService Classification属性はフィルタリング・レポーティングで使用される。"},
+{t:"引っ掛け",q:"Service Consumptionドメインでビジネスサービスを定義する際、最も重要な点として正しいものはどれか？",o:["DiscoveryデータをそのままBusiness Serviceとして使用する","ITの専門家だけで定義を完結させる","テクノロジー詳細ではなくビジネスの観点で定義し、ビジネスサイドのステークホルダーを巻き込む","全てのBusiness ServiceをExternalに分類する"],a:2,e:"ビジネスサービスはテクノロジー詳細ではなくビジネスの観点で定義する必要がある。ITの専門家だけでは困難であり、ビジネスサイドのステークホルダーを巻き込むことが重要。"},
+{t:"試験対策",q:"Service Consumptionドメインを主に管理するツール・製品として正しいものはどれか？",o:["Discovery・Service Mapping","Service Builder・Service Portfolio Management","CMDB Health Dashboard・Data Manager","CI Class Manager・IRE"],a:1,e:"Service ConsumptionドメインはService Builder（ビジネスサービス・オファリングの構築ツール）とService Portfolio Managementが主に管理する製品。"},
+]});
+// Course 11 Lesson 8
+L.push({c:"Course 11",l:"11-8",t:"ポートフォリオ管理・廃止アイテム・移行と次のステップ",
+s:`【ポートフォリオ管理】
+4つのポートフォリオカテゴリ：
+①Technology Management Services（共有ITサービス）
+②Business Services（ビジネスサービス）
+③Service Instances（サービスインスタンス）
+④外部販売製品（Product Lines）
+
+【廃止アイテム（Deprecation）】
+・「used for」属性（環境識別用）→「environment」に置き換え
+・hardware status・sub status・install status → Lifecycle Stage/Statusに移行予定
+・基底Serviceクラスへの直接CI作成 → 拡張テーブル（Business Service・Technical Service等）を使用
+・cmdb_rel_group / cmdb_rel_group_type → Teams機能に置き換え
+・Software Package / Software Installテーブル → SAM Foundationsに置き換え（SAMライセンス不要でインストール推奨）
+
+【実装アプローチ（3種類）】
+①Outcome Centric：特定の成果に必要なデータ要件からアプローチ（大規模組織で有効）
+②Domain Centric：特定のドメイン・製品エリアに集中してアプローチ
+③Stepwise：旧来のCrawl・Walk・Run・Flyアプローチ（大規模組織では成果が見えにくい）
+
+【CSDM移行の原則】
+・CSDM5への移行でやり直し不要
+・CSDMは繰り返し進化（iterate）するモデル
+・テーブルは残存。ラベル変更のみが主な変化`,
+p:[
+["4つのポートフォリオカテゴリ","Technology Management Services・Business Services・Service Instances・外部販売製品（Product Lines）","組織の異なるコンシューマーペルソナに対応した4区分"],
+["廃止：used for属性","「used for」属性が「environment」属性に置き換え","used forは全CIに存在しなかったため、environmentに統一"],
+["廃止：cmdb_rel_group","cmdb_rel_group / cmdb_rel_group_typeをTeams機能に置き換え","Teamsはサポート・変更・管理・脆弱性・開発グループ等を一元管理するCI関連リスト"],
+["廃止：Software Package/Install","Software Package・Software InstallテーブルをSAM Foundationsに置き換え","SAM Foundationsはライセンス不要でインストール推奨"],
+["Outcome Centricアプローチ","特定の成果（アウトカム）から必要なデータ要件を逆算してアプローチ","大規模組織で特に有効。具体的な価値実現につながりやすい"],
+["CSDM移行の原則","CSDM5への移行でやり直し不要。CSDMは繰り返し進化（iterate）するモデル","テーブルは維持。ラベル変更のみが主な変化"],
+],
+q:[
+{t:"基礎",q:"CSDMが定義するポートフォリオの4カテゴリに含まれないものはどれか？",o:["Technology Management Services（共有ITサービス）","Business Services（ビジネスサービス）","Service Instances（サービスインスタンス）","Application Portfolios（アプリケーションポートフォリオ）"],a:3,e:"4つのポートフォリオカテゴリはTechnology Management Services・Business Services・Service Instances・外部販売製品（Product Lines）。Application Portfoliosは4カテゴリには含まれない。"},
+{t:"基礎",q:"CSDM5で廃止方向の「used for」属性の置き換えとして正しいものはどれか？",o:["lifecycle_stage","environment","service_type","deployment_type"],a:1,e:"「used for」属性（CI環境の識別用）はCSDM5で「environment」属性に置き換えられた。used forは全CIに存在しなかったため、environmentに統一された。"},
+{t:"基礎",q:"cmdb_rel_group / cmdb_rel_group_typeの置き換えとして導入された機能はどれか？",o:["Dynamic CI Group","Teams機能","Service Builder","CMDB Group"],a:1,e:"cmdb_rel_group / cmdb_rel_group_typeはTeams機能に置き換えられた。Teamsはサポート・変更・管理・脆弱性・開発グループ等をCI関連リストとして一元管理する。"},
+{t:"基礎",q:"Software Package / Software InstallテーブルをリプレイスするSAM Foundationsに関して正しいものはどれか？",o:["SAMライセンスが必須","SAM Foundationsのインストールにはライセンスは不要で、全顧客にインストールを推奨","Enterprise版のServiceNowのみで使用可能","Software Package/Installテーブルと並行使用が必須"],a:1,e:"SAM Foundationsのインストールにはライセンスは不要で（SAMチームのライセンス不要）、全顧客にインストールを推奨している。"},
+{t:"引っ掛け",q:"CSDM5への移行に関して正しいものはどれか？",o:["CSDM5移行には全設定のやり直しが必要","CSDM3やCSDM4の実装をそのまま活用でき、CSDMは繰り返し進化するモデル。テーブルは維持されラベル変更が主な変化","全てのRelationshipタイプを再設定する必要がある","CSDM5ではService Deliveryドメインのテーブルが全て新テーブルに置き換えられた"],a:1,e:"CSDM5への移行でやり直しは不要。CSDMは繰り返し進化（iterate）するモデルであり、CSDM3やCSDM4の実装はそのまま活用できる。テーブルは維持されており、主な変化はラベル変更。"},
+{t:"試験対策",q:"3つの実装アプローチのうち大規模組織で直接的な成果が見えにくいとされるアプローチはどれか？",o:["Outcome Centric（アウトカム中心）","Domain Centric（ドメイン中心）","Stepwise（段階的：Crawl・Walk・Run・Fly）","Product Centric（製品中心）"],a:2,e:"Stepwise（段階的：Crawl・Walk・Run・Fly）アプローチは大規模組織では直接的な成果が見えにくい傾向がある。ServiceNowはOutcome CentricアプローチとDomain Centricアプローチを推奨している。"},
+{t:"意地悪",q:"Teams機能がリプレイスする旧テーブルの組み合わせとして正しいものはどれか？",o:["cmdb_ci_team / cmdb_team_type","cmdb_rel_group / cmdb_rel_group_type","sys_user_group / sys_user_grmember","cmdb_group / cmdb_group_member"],a:1,e:"Teams機能はcmdb_rel_group / cmdb_rel_group_typeをリプレイスする。Teamsはサポート・変更・管理・脆弱性・開発グループ等をCI関連リストとして一元管理する新機能。"},
+]});
+
+
+// ─── Course 12: CSDM 5 Fundamentals Training（PPTXスライドより） ──────────────
+// Course 12 Lesson 1
+L.push({c:"Course 12",l:"12-1",t:"エグゼクティブ概要・北極星・CSDMとは何か",
+s:`CSDMの歴史的背景：ITSM・ITBM・ITOMなど複数製品が存在し「サービスとは何か」の定義が120種類以上あった問題を解決するために誕生。
+
+CSDMとは：
+・製品をまたいだデータモデリングのガイダンス（SKUや製品ではない）
+・CMDBを含む全製品に適用されるプラットフォーム全体のデータモデルアプローチ
+・全製品・パートナーによって実装される
+・アーキテクチャとエンジニアリングを含む複数のステークホルダーが主導
+・ServiceNow外部でも受け入れられている
+・マルチプロダクトアウトカムに必須
+
+CSDMでないもの：販売されるSKU・製品・ITSM等のプロセス実装ガイド・レポートセット・過去実装の自動修正手段
+
+CSDM Evolution（バージョン履歴）：
+・v1（London/NY）：Application Service center、サービスタイプ集約
+・v2（Paris）：Design/Build/Sell、Business Service→Service改名
+・v3（Rome）：Foundationドメイン追加、Lifecycle stage/status、Multisource CMDB
+・v4（Rome後）：Buildドメイン追加、Teams、CMDB Data Manager
+・CSDM5（Yokohama+）：Ideation & Strategyドメイン追加、SBOM、DevOpsデータモデル、Service Instances
+
+北極星：Digital Value Network（デジタルバリューネットワーク）
+
+ビジネス価値データ（信頼できるデータが生む効果）：
+・失敗変更26%削減
+・重大インシデント解決時間27%短縮
+・重大脆弱性期間28%削減
+・優先度高インシデント46%削減
+・リクエスト処理時間20%短縮
+・問題解決インシデント485%増加
+・サービスオンボーディング速度20-40%向上
+・新サービス導入10-15%高速化
+・アプリコスト削減10-20%
+・運用コスト削減15-25%`,
+p:[
+["CSDMが生まれた背景","ITSM・ITBM・ITOMで「サービス」の定義が120種類以上あり統一されていなかった問題を解決するために誕生","CSDMはSKUや製品ではなく、全製品に適用されるデータモデリングのガイダンス"],
+["CSDMの定義","製品をまたいだデータモデリングのガイダンス。全製品・パートナーが実装し、ServiceNow外部でも受け入れられている","マルチプロダクトアウトカムに必須。アーキテクチャとエンジニアリングを含む複数ステークホルダーが主導"],
+["CSDMでないもの","SKU・製品・ITSM等のプロセス実装ガイド・レポートセット・過去実装の自動修正手段","CSDMは特定製品の実装ガイドではない"],
+["CSDM5の北極星","Digital Value Network（デジタルバリューネットワーク）","CSDM5+が目指す方向性"],
+["CSDM5の新要素","Ideation & Strategyドメイン追加・SBOM・DevOpsデータモデル・Service Instances","Yokohama+リリースで提供"],
+["失敗変更削減率","信頼できるデータにより失敗変更が26%削減される","KPI・価値実現評価・価値計算機から収集されたデータ"],
+["重大インシデント解決時間","重大インシデントの解決時間が27%短縮される","信頼できるデータがインパクト分析を支援するため"],
+["サービスオンボーディング速度","サービス・アプリケーションのオンボーディングが20〜40%高速化","信頼できるデータが運用効率を向上させる"],
+["テクニカルデット例","Business Applicationが正しいテーブルを使用していない・カスタムライフサイクル・ベースServiceクラス上のサービス・Dynamic CI Group未活用・Teamsを使っていない","テクニカルデットはメンテナンスコスト増加・デプロイサイクル長期化・ROI低下につながる"],
+],
+q:[
+{t:"基礎",q:"CSDMが誕生した背景として正しいものはどれか？",o:["ITSM製品のUIを統一するため","ITBM・ITSM・ITOMなど複数製品で「サービス」の定義が120種類以上あった問題を解決するため","CMDBのデータを自動クレンジングするため","ServiceNow製品のライセンス管理を統一するため"],a:1,e:"CSDMはITSM・ITBM・ITOMなど複数製品で「サービス」の定義が120種類以上あった問題を解決するために誕生した。「サービスとは何か」を統一するための共通データモデルガイダンス。"},
+{t:"基礎",q:"CSDMの説明として正しいものはどれか？",o:["ServiceNowが販売する専用SKU・製品","全製品・パートナーが実装するプラットフォーム全体のデータモデリングガイダンス","ITSM実装のためのプロセス実装ガイド","過去実装を自動修正するツール"],a:1,e:"CSDMはSKUや製品ではなく、全製品・パートナーが実装するプラットフォーム全体のデータモデリングガイダンス。ITSM等のプロセス実装ガイドや過去実装の自動修正手段でもない。"},
+{t:"基礎",q:"CSDM5（Yokohama+）で新たに追加された要素として含まれないものはどれか？",o:["Ideation & Strategyドメイン","SBOM","DevOpsデータモデル","Foundationドメイン"],a:3,e:"FoundationドメインはCSDM v3（Rome）で追加された。CSDM5（Yokohama+）での新要素はIdeation & Strategyドメイン・SBOM・DevOpsデータモデル・Service Instances。"},
+{t:"基礎",q:"信頼できるデータが生む効果として、失敗変更の削減率はどれか？",o:["20%削減","26%削減","46%削減","485%向上"],a:1,e:"信頼できるデータにより失敗変更が26%削減される（KPI・価値実現評価・価値計算機から収集されたデータによる）。"},
+{t:"基礎",q:"CSDM5の「北極星（North Star）」として正しいものはどれか？",o:["Digital Service Management","Digital Value Network","AI-Powered CMDB","Common Data Foundation"],a:1,e:"CSDM5の北極星はDigital Value Network（デジタルバリューネットワーク）。CSDM5+が目指す方向性を表す。"},
+{t:"引っ掛け",q:"CSDMに関して誤っている説明はどれか？",o:["全製品・パートナーによって実装される","ServiceNow外部でも受け入れられている","ITSM・SPM・APM等の製品のプロセス実装ガイドである","マルチプロダクトアウトカムに必須である"],a:2,e:"CSDMはITSM・SPM・APM等の製品のプロセス実装ガイドではない。スライドに「CSDMでないもの」として明示されている。CSDMはデータモデリングのガイダンスであり、特定製品の実装ガイドではない。"},
+{t:"引っ掛け",q:"FoundationドメインがCSDMで追加されたのはどのバージョンか？",o:["CSDM v2","CSDM v3","CSDM v4","CSDM 5"],a:1,e:"FoundationドメインはCSDM v3（Rome）で追加された。CSDM v4ではBuild & Integrationドメイン・Teams・CMDB Data Managerが追加された。"},
+{t:"試験対策",q:"3 Pillar approachの「Govern（ガバン）」の説明として正しいものはどれか？",o:["データを継続的に取り込み、マージ・更新・削除する","分析ガイダンスの確立・インシデント/変更管理の運用支援・レポート・計画への活用","ガバナンスチームとロールの確立・ヘルスメトリクスの改善・ライフサイクルプロセスの確立","物理CIとクラウドリソースの自動化"],a:1,e:"3 Pillar approachのGovern（ガバン）は「分析ガイダンスの確立・インシデント/変更管理の運用支援・レポートとメトリクスへの活用・計画への活用・消費製品・ロール・ペルソナ・プロセスの支援」を指す。Ingestがデータ取り込み、InsightがガバナンスチームとロールのICO確立を担当。"},
+{t:"意地悪",q:"テクニカルデットの例として原文（スライド）に含まれているものはどれか？",o:["Business Applicationが正しいテーブルを使用していない","IRE（識別・調整エンジン）の設定誤り","CMDB Health Dashboardのジョブが未実行","Discovery MID Serverの設定不備"],a:0,e:"スライド21に記載のテクニカルデット例は「Business Applicationが正しいテーブルを使用していない・カスタム/不整合なライフサイクル・ベースServiceクラス上のサービス・動的CIグループの未活用・不十分なEOLライフサイクルプロセス・不適切なFoundationデータ（ロケーション等）・Teamsを使っていない」など。IRE設定誤りやDiscovery設定不備は含まれていない。"},
+]});
+// Course 12 Lesson 2
+L.push({c:"Course 12",l:"12-2",t:"用語と初期段階の考慮事項（スライド詳細）",
+s:`Applicationの3種類（スライド24詳細）：
+
+Application（cmdb_ci_appl）：
+・Operational CI
+・Incident、Problem、Change（IPC）で使用
+・発見可能な特定ホスト上のコードのインストール（コンパイル済みコードのユニークなデプロイメント）
+・例：Database Instances、Java、WebSphere、Tomcat
+・特定のポートで通信するプログラム・モジュール・グループ
+
+Business Application（cmdb_ci_business_app）：
+・Operational CIではない
+・IPC（Incident、Problem、Change）では使用しない
+・バージョン非依存
+・ビジネスのインベントリ（ポートフォリオ）
+・全インスタンスの論理的表現
+・メタデータを含む
+・階層可能（プラットフォーム等）
+
+Application Service（cmdb_ci_service_auto）：
+・Operational CI
+・IPC（Incident、Problem、Change）で使用
+・Business Applicationのユニークなインスタンス
+・環境別（Dev、Test、Prod）に作成可能
+・リージョン別に作成可能
+・作成方法：手動マッピング・Service Mapping（Entry Point）・タグ・Dynamic Query
+・階層可能（マイクロサービス等）
+
+Business Service（cmdb_ci_service）：
+・Operational CI
+・IPC（Incident、Problem、Change）でインパクト管理に使用
+・変更承認にも使用
+・階層なし（1レベル）
+・内部・外部・両方向けに公開
+・コンシューマー・販売フォーカス
+
+Technology Management Service（cmdb_ci_service_technical）：
+・Operational CI
+・IPC（Incident、Problem、Change）でインパクト管理に使用
+・階層なし（1レベル）
+・プロバイダーフォーカス（ビジネスが消費・販売するために提供されるテクノロジー）`,
+p:[
+["Application（cmdb_ci_appl）の特徴","Operational CI。IPC使用可。特定ホスト上のコードのインストール（特定ポートで通信）","例：Database Instances・Java・WebSphere・Tomcat"],
+["Business Application（cmdb_ci_business_app）の特徴","Operational CIではない。IPC使用不可。バージョン非依存。ビジネスポートフォリオ（インベントリ）","全インスタンスの論理的表現。メタデータを含む。階層可能（プラットフォーム等）"],
+["Application Serviceの作成方法","手動マッピング・Service Mapping（Entry Point）・タグ・Dynamic Query","環境別（Dev/Test/Prod）・リージョン別に作成可能"],
+["Business Service（cmdb_ci_service）の特徴","Operational CI。IPC（インパクト）・変更承認で使用。階層なし（1レベル）","内部・外部・両方向けに公開。コンシューマー・販売フォーカス"],
+["Technology Management Service（cmdb_ci_service_technical）の特徴","Operational CI。IPC（インパクト）で使用。階層なし（1レベル）","プロバイダーフォーカス。ビジネスが消費・販売するためのテクノロジーを提供"],
+["Application ServiceのUI状況","Application ServiceはApplication Service Wizardから引き続き作成","Service Instanceの新UIはAustralia+タイムライン（翌年）を予定"],
+],
+q:[
+{t:"基礎",q:"Application（cmdb_ci_appl）の具体例として正しいものはどれか？",o:["SalesforceやSAPなどのビジネスアプリポートフォリオ","Database Instances・Java・WebSphere・Tomcatなどの特定ホスト上のインストール済みコード","dev/QA/prodの環境別にデプロイされたサービスインスタンス","ビジネスが顧客・従業員向けに提供するサービス"],a:1,e:"Application（cmdb_ci_appl）の具体例はDatabase Instances・Java・WebSphere・Tomcatなどの特定ホスト上のインストール済みコード。特定のポートで通信するコンパイル済みコードのユニークなデプロイメント。"},
+{t:"基礎",q:"Application Service（cmdb_ci_service_auto）の作成方法として含まれないものはどれか？",o:["手動マッピング","Service Mapping（Entry Point）","タグ","CI Class Managerでの自動生成"],a:3,e:"Application Serviceの作成方法は手動マッピング・Service Mapping（Entry Point）・タグ・Dynamic Queryの4種類。CI Class Managerでの自動生成は作成方法に含まれない。"},
+{t:"基礎",q:"Business Service（cmdb_ci_service）の特徴として正しいものはどれか？",o:["階層構造を持つ（複数レベル）","IPCでは使用しない","変更承認にも使用する","プロバイダーフォーカスのサービス"],a:2,e:"Business Service（cmdb_ci_service）は変更承認にも使用する。また階層なし（1レベル）・Operational CI・IPC（インパクト）で使用・コンシューマー・販売フォーカスが特徴。"},
+{t:"基礎",q:"Technology Management Service（cmdb_ci_service_technical）のフォーカスとして正しいものはどれか？",o:["コンシューマーフォーカス（顧客向けサービス）","プロバイダーフォーカス（ビジネスが消費・販売するために提供されるテクノロジー）","エグゼクティブフォーカス（経営層向けKPI）","ディベロッパーフォーカス（開発チーム向け）"],a:1,e:"Technology Management Service（cmdb_ci_service_technical）はプロバイダーフォーカス。ビジネスが消費・販売するために提供されるテクノロジーを識別する。Business Serviceがコンシューマー・販売フォーカスであるのと対照的。"},
+{t:"引っ掛け",q:"Application Service（cmdb_ci_service_auto）に関してCSDM5の現在の状況として正しいものはどれか？",o:["全てのService InstanceタイプのUIが既に実装済み","Application ServiceはApplication Service Wizardから引き続き作成。新UIはAustralia+タイムラインで予定","Application ServiceはCSDM5で廃止されService Instanceに完全移行済み","Application Service WizardはCSDM5で削除された"],a:1,e:"CSDM5時点でApplication ServiceはApplication Service Wizardから引き続き作成される。Service Instance向けの新UIはAustralia+タイムライン（翌年）を予定している。"},
+{t:"試験対策",q:"CSDMドメインの説明（スライド28）において、Service Deliveryドメインの説明として正しいものはどれか？",o:["アイデアや概念と組織の戦略的取り組み","製品の設計と計画（operational CIではない）","デプロイされたサービスインスタンスと関連する発見可能なコンポーネント。サービスインスタンスを提供・サポートするサービス","ビジネスのサービスポートフォリオ（Service Deliveryドメインの要素を販売・消費）"],a:2,e:"Service Deliveryドメインは「デプロイされたサービスインスタンスと、それに関連する発見可能なコンポーネント。それらのサービスインスタンスを提供・サポートするサービス」（スライド28）。"},
+]});
+// Course 12 Lesson 3
+L.push({c:"Course 12",l:"12-3",t:"Foundationドメイン（スライド詳細）",
+s:`Foundation Domainの定義（スライド35 CSDM5 Paper引用）：
+「他のCSDMドメインのオブジェクトから、またはオブジェクトへ参照される基本データを含むテーブル群。Foundationドメインで識別されるテーブルはCMDBリレーションシップでは使用されない。代わりに、これらは重要な参照データである。」
+
+Foundation Domainの配置理由：
+・他の全ドメインから参照される参照データ（referential data）
+・CMDB リレーションシップでは使用しない
+・ほとんどのServiceNow製品実装前に必要となることが多い
+・マスターデータ管理（MDM）のコンテキスト
+
+Value Stream（新規オブジェクト）：
+・Foundation Domainに配置
+・Detailed Model（詳細モデル）として提供
+
+Lifecycle（ライフサイクル）アプローチ（CSDM4で導入）：
+・問題：ITAM・CMDBにわたって9つ以上の状態/ステータス属性が存在。値間の相互作用が少ない。ServiceNowクライアントの50%以上がこれらのチョイスリストをカスタマイズ。ライフサイクルプロセスの一貫性がない。
+・解決策：
+  - Lifecycle Stage（ライフサイクルステージ）：ライフサイクルプロセスのステージ
+  - Life Cycle Status（ライフサイクルステータス）：ライフサイクルステージ内のステータス
+  - Lifecycle：ライフサイクル全体の位置
+・Physical vs Logical（有形物 vs 無形物）：異なる値セット
+・編集不可（can NOT edit）
+・移行を急ぐ必要なし（No Rush to Migrate）
+
+Foundation Domainの関連製品：
+・ライフサイクル管理：Lifecycle Sync・SBOMプラグイン・DevOps（SBOM）・Vulnerability Response（SBOM）
+・ほぼ全製品がこのデータを使用
+・ワークプレイス管理はロケーションを個別テーブルに拡張`,
+p:[
+["Foundation Domainの公式定義","他のCSDMドメインのオブジェクトから・またはオブジェクトへ参照される基本データを含むテーブル群。CMDBリレーションシップでは使用しない","CSDM5ペーパーより引用。重要な参照データ（critical referential data）"],
+["Lifecycle導入の背景","ITAM・CMDBにわたって9つ以上の状態/ステータス属性が存在し、ServiceNowクライアントの50%以上がチョイスリストをカスタマイズしていた","ライフサイクルプロセスの一貫性がなかったため、CSDM4でLifecycle Stage/Statusを導入"],
+["Lifecycle Stageの3要素","Lifecycle Stage（ライフサイクルプロセスのステージ）・Life Cycle Status（ステージ内のステータス）・Lifecycle（全体の位置）","Physical vs Logical（有形物 vs 無形物）で異なる値セット。編集不可。"],
+["Lifecycle移行の優先度","No Rush to Migrate（移行を急ぐ必要なし）","ライフサイクルステージとステータスは新しい実装で推奨されるが、既存の9つのステータスは引き続き存在"],
+["Foundation Domainの関連製品","ライフサイクル管理：Lifecycle Sync・SBOMプラグイン・DevOps（SBOM）・Vulnerability Response（SBOM）","ほぼ全製品がFoundationデータを使用"],
+],
+q:[
+{t:"基礎",q:"CSDM5ペーパーのFoundation Domainの定義として正しいものはどれか？",o:["CMDBのCIリレーションシップで使用される主要テーブル群","他のCSDMドメインのオブジェクトから・またはオブジェクトへ参照される基本データを含むテーブル群。CMDBリレーションシップでは使用しない","Service Deliveryドメインで使用される発見可能なCIの集合","全ドメインで使用されるServiceNow製品の一覧"],a:1,e:"CSDM5ペーパーによると、Foundation Domainは「他のCSDMドメインのオブジェクトから・またはオブジェクトへ参照される基本データを含むテーブル群。CMDBリレーションシップでは使用しない。重要な参照データ」として定義される。"},
+{t:"基礎",q:"Lifecycle Stage / Stage StatusがCSDM4で導入された背景として正しいものはどれか？",o:["ServiceNow製品のUIを刷新するため","ITAM・CMDBにわたって9つ以上の状態/ステータス属性が存在し、クライアントの50%以上がカスタマイズしていたため一貫性がなかった","Discoveryの検出精度を向上させるため","IRE（識別・調整エンジン）のパフォーマンス改善のため"],a:1,e:"Lifecycle Stage / Stage StatusはITAM・CMDBにわたって9つ以上の状態/ステータス属性が存在し、ServiceNowクライアントの50%以上がチョイスリストをカスタマイズしていた問題を解決するためCSDM4で導入された。"},
+{t:"基礎",q:"Lifecycle Stage / Stage Statusの「can NOT edit（編集不可）」の意味として正しいものはどれか？",o:["ServiceNow管理者はLifecycle Stageを追加・変更できない","Lifecycle StageはCMDB管理画面から非表示になっている","Lifecycle Stageの値はServiceNow Discoveryによって自動設定される","Lifecycle StageはCSV形式でのみエクスポート可能"],a:0,e:"Lifecycle Stage / Stage Statusの値はServiceNow管理者が追加・変更することができない（編集不可）。これはライフサイクルプロセスの一貫性を保つための仕様。"},
+{t:"引っ掛け",q:"Foundation Domainへの移行について正しいものはどれか？",o:["CSDM5へのアップグレード時に即座に全ステータスをLifecycle Stage/Statusに移行しなければならない","No Rush to Migrate（移行を急ぐ必要なし）。既存の9つのステータスは引き続き存在する","Foundation DomainはYokohamaリリースで自動移行される","Foundation Domainのみは移行が不要で廃止される"],a:1,e:"スライド37に「No Rush to Migrate（移行を急ぐ必要なし）」と明記されている。既存の9つの状態/ステータスは引き続き存在し、新しいLifecycle Stage/Statusへの移行を急ぐ必要はない。"},
+{t:"試験対策",q:"Foundation Domainのデータ管理に関連する製品・機能の組み合わせとして正しいものはどれか？",o:["Discovery・Service Mapping・IntegrationHub ETL","Lifecycle Sync・SBOMプラグイン・DevOps（SBOM）・Vulnerability Response（SBOM）","ITSM・GRC・Customer Service Management","CMDB Health Dashboard・Data Manager・Query Builder"],a:1,e:"Foundation Domainのライフサイクル管理に関連する製品・機能はLifecycle Sync・SBOMプラグイン・DevOps（SBOM）・Vulnerability Response（SBOM）。ほぼ全製品がFoundationデータを使用する。"},
+]});
+// Course 12 Lesson 4
+L.push({c:"Course 12",l:"12-4",t:"Ideation & Strategy・Design & Planning・Build & Integrateドメイン（スライド詳細）",
+s:`Ideation & Strategy Domain（スライド44）：
+・Strategic Plan：Mission（何をしているか・なぜするか）・Vision（将来の目標）・Value（行動を導く原則）を設定
+・Goals（ゴール）：組織が達成したい広範なアウトカム。ビジネスユニット固有または戦略的優先事項に沿ったもの。定性的ステートメント。ポートフォリオに関連付けてより良い投資決定を支援。
+・関連製品（管理）：Strategic Portfolio Management・Enterprise Architecture / APM
+・関連製品（データ利用）：Digital Portfolio Management
+
+Design & Planning Domain（スライド47）：
+・Business Capability：組織がビジネスモデルを実行・ミッションを果たすために必要な高レベルのケイパビリティ
+・Business Application：ビジネス機能を提供するために設定された全ソフトウェアとインフラの表現（タイトルのカタログ等）。ビジネスアプリケーションは全インスタンスの論理的表現。
+・Information Object：ガバナンスとコンプライアンス目的のためのデータタイプのスコーピングをサポート。概念的/論理的階層でのデータタイプを表示するCI。
+・関連製品（管理）：Strategic Portfolio Management・Enterprise Architecture / APM
+・関連製品（データ利用）：Digital Portfolio Management・Integrated Risk Management
+
+Build & Integrate Domain（スライド50）：
+・AI Digital Assets（AI System Digital Asset）：AI・GenAIサービスのソフトウェア/アプリケーションコンポーネントを表す。ビルド・統合・AIガバナンスのために、デプロイ可能なソフトウェアソース・バイナリ・コンポーネントを表す（ServiceNow製・サードパーティ製・カスタム製のいずれも対象）。
+・関連製品（管理）：DevOps・Digital Product Release
+・関連製品（データ利用）：Digital Portfolio Management・SecOps・GRC・EA（APM）・Asset Management`,
+p:[
+["Strategic Planの3要素","Mission（何をしているか・なぜするか）・Vision（将来の目標）・Value（行動を導く原則）","Strategic Planはミッション・ビジョン・バリューステートメントを設定する場所"],
+["Goalsの役割","組織が達成したい広範なアウトカム。ポートフォリオに関連付けて投資決定を支援する定性的ステートメント","ビジネスユニット固有または戦略的優先事項に沿ったゴールを設定"],
+["Business Capabilityの定義","組織がビジネスモデルを実行・ミッションを果たすために必要な高レベルのケイパビリティ","Design & PlanningドメインのOperational CIではない"],
+["Information Objectの役割","ガバナンスとコンプライアンス目的のためのデータタイプのスコーピングをサポート","概念的/論理的階層でのデータタイプを表示するCI（cmdb_ci_information_object）"],
+["AI Digital Assetsの定義","AI・GenAIサービスのソフトウェア/アプリケーションコンポーネントを表す","ビルド・統合・AIガバナンスのためのデプロイ可能なソフトウェアソース・バイナリ・コンポーネント（ServiceNow製・サードパーティ・カスタム製のいずれも対象）"],
+["Design & Planningの関連製品","管理：Strategic Portfolio Management・Enterprise Architecture / APM","データ利用：Digital Portfolio Management・Integrated Risk Management"],
+["Build & Integrateの関連製品","管理：DevOps・Digital Product Release","データ利用：Digital Portfolio Management・SecOps・GRC・EA（APM）・Asset Management"],
+],
+q:[
+{t:"基礎",q:"Ideation & Strategy DomainのStrategic Planで設定する3要素として正しいものはどれか？",o:["Goal・Milestone・Deliverable","Mission・Vision・Value","Budget・Timeline・Resource","Risk・Assumption・Constraint"],a:1,e:"Strategic PlanはMission（何をしているか・なぜするか）・Vision（将来の目標）・Value（行動を導く原則）を設定する場所。スライド44の定義による。"},
+{t:"基礎",q:"Design & Planning DomainのInformation Objectの用途として正しいものはどれか？",o:["物理サーバーのスペックを記録するCI","ガバナンスとコンプライアンス目的のためのデータタイプのスコーピングをサポートする概念的/論理的階層でのCI","Business Applicationのデプロイ済みインスタンスを識別するCI","テクノロジーの責任グループを識別するサービス"],a:1,e:"Information Objectはガバナンスとコンプライアンス目的のためのデータタイプのスコーピングをサポートする。概念的/論理的階層でのデータタイプを表示するCI。"},
+{t:"基礎",q:"Build & IntegrateドメインのAI Digital Assetsが表すものとして正しいものはどれか？",o:["デプロイ済みのAIサービスインスタンス（Operational CI）","AI・GenAIサービスのソフトウェア/アプリケーションコンポーネント（デプロイ可能なソフトウェアソース・バイナリ・コンポーネント）","AIが検出した物理サーバーの構成情報","AI Control TowerのKPI・メトリクスデータ"],a:1,e:"AI Digital Assets（AI System Digital Asset）はAI・GenAIサービスのソフトウェア/アプリケーションコンポーネントを表す。ビルド・統合・AIガバナンスのためのデプロイ可能なソフトウェアソース・バイナリ・コンポーネント（ServiceNow製・サードパーティ・カスタム製のいずれも対象）。"},
+{t:"試験対策",q:"Ideation & StrategyドメインとDesign & Planningドメインで共通して使用する製品として正しいものはどれか？",o:["Discovery・Service Mapping","Strategic Portfolio Management・Enterprise Architecture（APM）","ITSM・GRC","CMDB Health Dashboard・Data Manager"],a:1,e:"Ideation & StrategyとDesign & Planning両ドメインで共通して管理に使用する製品はStrategic Portfolio Management・Enterprise Architecture（APM）。両ドメインともDigital Portfolio Managementがデータ利用製品として関連する。"},
+{t:"引っ掛け",q:"GoalsについてCSDM5スライドで正しい説明はどれか？",o:["定量的なKPIメトリクスの集合","組織が達成したい広範なアウトカムの定性的ステートメント。ポートフォリオに関連付けて投資決定を支援する","Application Serviceの達成目標を記録するCI","Lifecycle StageとStage Statusの組み合わせを定義するオブジェクト"],a:1,e:"Goalsは「組織が達成したい広範なアウトカム。ビジネスユニット固有または戦略的優先事項に沿ったもの。定性的ステートメント。ポートフォリオに関連付けてより良い投資決定を支援する」（スライド44）。定量的KPIではなく定性的ステートメント。"},
+]});
+// Course 12 Lesson 5
+L.push({c:"Course 12",l:"12-5",t:"Service Delivery・Service ConsumptionドメインとAI関連CI（スライド詳細）",
+s:`Service Delivery Domain（スライド53-55）：
+
+Service Instanceに関するUI注意事項：
+「Service Instanceの新UIは存在しない。Application ServiceはApplication Service Wizardから引き続き作成。全サービス向けの新UIはAustralia+タイムライン（翌年）を予定。」
+
+Service Delivery Network（サービスデリバリーネットワーク）：
+・発見可能なコンポーネントとの関係性による技術ワークフロー（Tech Workflows）
+
+AI Function（スライド55定義）：
+「パブリッククラウドプラットフォームにデプロイされたAI SaaSアプリケーション。スケーラブルでオンデマンドの機械学習・データ処理・AIドリブンタスクのサービスを提供。オンプレミスインフラ管理不要の柔軟なソリューション。」
+
+AI Application（スライド55定義）：
+「Linux・Windows・Dockerコンテナ・Kubernetesクラスター等のさまざまなプラットフォームで動作するAIソフトウェアアプリケーション。機械学習モデル・データ分析・インテリジェントサービス・AI対応アプリケーションなど多様なAIワークロードをサポート。」
+
+API（スライド55）：
+「APIデータモデルはAPIデータ管理を支援するためCMDB内で提供。API Insightsの一部として、APIの詳細表示・比較・データギャップの特定/解決・サービスリレーションシップの管理を含むAPIの集中管理が可能。」
+
+Service Deliveryの関連製品：
+・管理：ITOM Visibility・Service Graph Connectors・IH-ETL・Asset Management（HAM・SAM）
+・データ利用：ITSM・Digital Portfolio Management・SecOps・GRC・EA（APM）・ITOM Health・CSM
+
+Service Consumption Domain（スライド58-59）：
+・Service Builder・Service Portfolio Managementで管理
+・ITSM・Digital Portfolio Management・GRC・EA（APM）・CSM・BCM・Catalogが利用`,
+p:[
+["AI Functionの定義","パブリッククラウドプラットフォームにデプロイされたAI SaaSアプリケーション","オンデマンドの機械学習・データ処理・AIドリブンタスクのサービス。オンプレミスインフラ管理不要"],
+["AI Applicationの定義","Linux・Windows・Dockerコンテナ・Kubernetesクラスター等で動作するAIソフトウェアアプリケーション","機械学習モデル・データ分析・インテリジェントサービス・AI対応アプリを含む多様なAIワークロードをサポート"],
+["APIのCMDB管理","APIデータモデルはAPIデータ管理を支援するためCMDB内で提供","API Insightsの一部：API詳細表示・比較・データギャップ特定/解決・サービスリレーションシップ管理"],
+["Service DeliveryのUI状況","Service Instanceの新UIは現時点では存在しない","Application ServiceはApplication Service Wizardから引き続き作成。新UIはAustralia+タイムラインを予定"],
+["Service Deliveryの管理製品","ITOM Visibility・Service Graph Connectors・IH-ETL・Asset Management（HAM・SAM）","データ利用：ITSM・DPM・SecOps・GRC・EA（APM）・ITOM Health・CSM"],
+["Service ConsumptionのBCM連携","Business Continuity Management（BCM）がService Consumptionデータを利用する","Service ConsumptionドメインはCatalogとも連携"],
+],
+q:[
+{t:"基礎",q:"AI Function（スライド55の定義）として正しいものはどれか？",o:["Linux・Windows・Docker・Kubernetesクラスターで動作するAIソフトウェアアプリケーション","パブリッククラウドプラットフォームにデプロイされたAI SaaSアプリケーション。スケーラブルでオンデマンドのMLサービスを提供","Build & IntegrateドメインのAI Digital Assetの別名","オンプレミスデータセンター内のAIサーバーの構成情報"],a:1,e:"AI Function（スライド55）はパブリッククラウドプラットフォームにデプロイされたAI SaaSアプリケーション。スケーラブルでオンデマンドの機械学習・データ処理・AIドリブンタスクのサービスを提供。オンプレミスインフラ管理が不要な柔軟なソリューション。"},
+{t:"基礎",q:"AI Application（スライド55の定義）として正しいものはどれか？",o:["パブリッククラウドプラットフォームにデプロイされたAI SaaSアプリケーション","Linux・Windows・Dockerコンテナ・Kubernetesクラスター等で動作するAIソフトウェアアプリケーション","AI System Digital Asset（デプロイ可能なAIのソフトウェアソース）","ServiceNow AI Control Towerで管理されるAIエージェント"],a:1,e:"AI Application（スライド55）はLinux・Windows・Dockerコンテナ・Kubernetesクラスター等のさまざまなプラットフォームで動作するAIソフトウェアアプリケーション。機械学習モデル・データ分析・インテリジェントサービスなど多様なAIワークロードをサポート。"},
+{t:"基礎",q:"Service Delivery DomainでAPIデータを管理する際の説明として正しいものはどれか？",o:["APIデータはService Consumptionドメインでのみ管理","APIデータモデルはAPIデータ管理支援のためCMDB内で提供。API InsightsでAPI詳細・比較・データギャップ解決・サービスリレーションシップ管理が可能","APIはCMDB外の独立したテーブルで管理される","APIはBuild & Integrateドメインでのみ管理される"],a:1,e:"APIデータモデルはAPIデータ管理を支援するためCMDB内で提供される。API Insightsの一部として、APIの詳細表示・比較・データギャップの特定/解決・サービスリレーションシップの管理を含むAPIの集中管理が可能。"},
+{t:"引っ掛け",q:"Service ConsumptionドメインのデータをBCM（Business Continuity Management）が利用することについて正しいものはどれか？",o:["BCMはService Deliveryドメインのデータのみを使用する","BCMはService Consumptionドメインのデータを利用する製品の一つとしてスライドに記載されている","BCMはFoundationドメインのデータのみを使用する","BCMとService ConsumptionドメインはCSDM5では関連しない"],a:1,e:"スライド59によると、Service Consumptionドメインのデータを利用する製品にBCM（Business Continuity Management）が含まれている。ITSM・DPM・GRC・EA（APM）・CSM・BCM・Catalogが含まれる。"},
+{t:"試験対策",q:"Service DeliveryドメインとService ConsumptionドメインのデータをITSM（Incident・Problem・Change）で活用する際の流れとして最も適切なものはどれか？",o:["Incident作成時はBusiness ApplicationからCIを選択し、Business Serviceは選択しない","Incident作成時はService Delivery（Application ServiceやApplication等のCIを選択）のデータを使用し、インパクトのあるBusiness ServiceはService Consumptionのデータを使用する","Incident作成時はService ConsumptionドメインのBusiness ServiceのみをCIとして選択する","ITSMはCSDMのどのドメインのデータも使用しない"],a:1,e:"Incident等のITSM処理では、Service DeliveryドメインのApplication ServiceやApplicationからCIを選択し、そのインパクトとしてService ConsumptionドメインのBusiness Serviceが関連付けられる。スライド41の例（SN Yokohama Prod → Business Service Onboarding）がこの流れを示している。"},
+]});
+// Course 12 Lesson 6
+L.push({c:"Course 12",l:"12-6",t:"ポートフォリオ管理・廃止アイテム・実装アプローチ（スライド詳細）",
+s:`Current Portfolios（スライド61）：
+・Enterprise / Service（DPM）
+・Personal（DPM）
+・Application（EA）
+・Project（SPM）
+・Technology（EA）
+
+SPM Lenses（ポートフォリオを使用するレンズ機能）：
+Value Stream・Product・Organization・Goals・Project Portfolio・Project Program・Strategic Investments
+
+4 Main Digital Product Portfolios（スライド62）：
+①Provided Externally（外部提供）：顧客向け製品・サービス → Business Service、Sold Product、Product Lines
+②Provided Internally（内部提供）：従業員・パートナー向けエンタープライズサービス → Technology Management Service
+③Manufacture & Delivery（製造・デリバリー）：ビルドチーム向けツールチェーン → Service Instance
+④Foundational（基盤）：ポートフォリオマネージャー向け基盤サービス
+
+廃止アイテム（スライド64）：
+・Use_for属性 → environmentに置き換え
+・Hardware status & substatus
+・Install Status
+・Base Service classの使用 → Business・Technical拡張クラスを使用（Service Builderを参照）
+・TEAMs：cmdb_rel_group・cmdb_rel_group_type参照の置き換え
+・SW Package table vs. SW Install table
+
+3つの実装アプローチ（スライド66-67）：
+①Outcome Centric：
+  メリット：アウトカムへの速い価値創出・特定インサイトへの集中・優先度高いリソース確保が容易
+  デメリット：他のアウトカム・ユースケースを考慮しない可能性・アウトカム外のチームが協力しない可能性・「データの孤島」が生じる可能性
+
+②Domain Centric：
+  メリット：1つのドメインに集中・製品・ポートフォリオ・チームの能力に合わせやすい・共通ペルソナで作業
+  デメリット：クロスドメインの価値を提供しない可能性・他ドメイン依存先との関与が困難な場合も
+
+③Step Wise（Crawl, Walk, Run, Fly）：
+  メリット：最初にFoundationを完成・EAと運用チームを早期に関与・計画と運用の接続を早期に確立
+  デメリット：早期の価値実現が困難・「何の意味があるの？」という価値提案が困難・後からサービスを確立・「CSDM Bingo」に陥るリスク
+
+CSDM移行の原則（スライド73）：
+・各バージョンは前のバージョンに積み重ねる
+・可能な限りアップグレードパスを提供
+・主な変更：Technology Management Service名称変更・Application ServiceのベースクラスがService Instanceに変更
+・曖昧さと詳細は「共通」なものへ対応
+・製品ロードマップの変更は毎四半期調整
+・「Seamless upgrade path, mostly（概ねシームレスなアップグレードパス）」`,
+p:[
+["現在のポートフォリオ種類","Enterprise/Service（DPM）・Personal（DPM）・Application（EA）・Project（SPM）・Technology（EA）","SPM Lenses：Value Stream・Product・Organization・Goals・Project Portfolio・Project Program・Strategic Investments"],
+["4つのデジタル製品ポートフォリオ","外部提供・内部提供・製造&デリバリー・基盤の4種類","外部提供→Business Service/Product Lines、内部提供→Technology Management Service、製造→Service Instance"],
+["Outcome Centricのデメリット","他のアウトカム・ユースケースを考慮しない可能性・アウトカム外チームが協力しない可能性・データの孤島リスク","速い価値創出が最大のメリット"],
+["Step Wiseのデメリット","早期の価値実現が困難・価値提案が困難・後からサービスを確立・CSDM Bingoリスク","Foundationを最初に完成させるメリットはある"],
+["CSDM5での主な変更","Technology Management Service名称変更・Application ServiceのベースクラスがService Instanceに変更","各バージョンは前のバージョンに積み重ねる。アップグレードパスを提供"],
+["廃止：Base Service class","Base Service classへの直接使用が廃止。Business・Technical拡張クラスを使用","Service Builderを使用することを推奨"],
+],
+q:[
+{t:"基礎",q:"SPM（Strategic Portfolio Management）のLenses機能に含まれるものとして正しいものはどれか？",o:["Value Stream・Product・Organization・Goals・Project Portfolio・Project Program・Strategic Investments","Business Capability・Business Application・Information Object・STLC Component","Discovery・Service Mapping・IH-ETL・Asset Management","ITSM・GRC・CSM・BCM・Catalog"],a:0,e:"SPM LensesはValue Stream・Product・Organization・Goals・Project Portfolio・Project Program・Strategic Investments。スライド61に記載。"},
+{t:"基礎",q:"Outcome Centric実装アプローチのデメリットとして正しいものはどれか？",o:["Foundationの完成が後回しになる・EAチームの関与が遅れる","他のアウトカム・ユースケースを考慮しない可能性・データの孤島（islands of data）が生じる可能性","共通ペルソナで作業できない・クロスドメインの価値を提供しない","早期の価値実現が困難・「CSDM Bingo」に陥るリスク"],a:1,e:"Outcome Centricのデメリットは「他のアウトカム・ユースケースを考慮しない可能性・アウトカム外のチームが協力しない可能性・データの孤島（islands of data）が生じる可能性」（スライド67）。"},
+{t:"基礎",q:"Step Wise（Crawl, Walk, Run, Fly）アプローチのメリットとして正しいものはどれか？",o:["アウトカムへの速い価値創出","最初にFoundationを完成・EAと運用チームを早期に関与・計画と運用の接続を早期に確立","1つのドメインに集中・共通ペルソナで作業","データの孤島リスクなし"],a:1,e:"Step Wiseのメリットは「最初にFoundationを完成・EAと運用チームを早期に関与・計画と運用の接続を早期に確立」（スライド67）。速い価値創出はOutcome Centricのメリット。"},
+{t:"引っ掛け",q:"CSDM5への移行でスライド73に記載された主な変更点として正しいものはどれか？",o:["全ての既存テーブルが新テーブルに置き換えられた","Technology Management Service名称変更・Application ServiceのベースクラスがService Instanceに変更の2点が主な変更","Foundationドメインが廃止された","IRE（識別・調整エンジン）が新エンジンに全面置き換えられた"],a:1,e:"スライド73によると、CSDM移行での主な変更は「Technology Management Service名称変更・Application ServiceのベースクラスがService Instanceに変更」の2点。全テーブルの置き換えではなく、概ねシームレスなアップグレードパスが提供される。"},
+{t:"試験対策",q:"「CSDM Bingo」リスクが最も高い実装アプローチはどれか？",o:["Outcome Centric","Domain Centric","Step Wise（Crawl, Walk, Run, Fly）","全てのアプローチで同等のリスク"],a:2,e:"「CSDM Bingo」リスクはStep Wise（Crawl, Walk, Run, Fly）アプローチのデメリットとしてスライド67に記載されている。この言葉はCSDMの各ドメインを順に実装していくだけで実際のビジネス価値が見えにくいことを指す。"},
+{t:"意地悪",q:"4つのデジタル製品ポートフォリオにおいて「Manufacture & Delivery（製造・デリバリー）」の主なCSDMオブジェクトはどれか？",o:["Business Service / Product Lines","Technology Management Service","Service Instance","Business Capability / Business Application"],a:2,e:"スライド62の4 Main Digital Product Portfoliosによると、「Manufacture & Delivery（製造・デリバリー）」はビルドチーム向けのツールチェーン・デリバリー自動化に対応し、主なCSDMオブジェクトはService Instance。外部提供→Business Service/Product Lines、内部提供→Technology Management Service。"},
+]});
+// Course 12 Lesson 7
+L.push({c:"Course 12",l:"12-7",t:"3 Pillar・Service Graph・技術的負債・実践事例（スライド詳細）",
+s:`3 Pillar approach（スライド17）：
+①Ingest（取り込み）：
+・データを継続的に取り込み、マージ・更新・削除
+・物理CIとクラウドリソース/構造の自動化
+・複数ソースを1つの信頼できるモデルにマージ
+・発見可能なものと発見不可能なものを接続
+・管理されたオーナーシップを確保
+
+②Govern（ガバン）：
+・分析ガイダンスの確立
+・Incident・変更管理の運用支援
+・レポートとメトリクスへの活用
+・計画への活用
+・消費製品・ロール・ペルソナ・プロセスのサポート
+
+③Insight（洞察）：
+・ガバナンスチームとロール
+・ヘルスメトリクスの改善を確保
+・ライフサイクルプロセスの確立
+・構造と定義を管理・伝達
+・使用とカスタマイズ/拡張ニーズのサポート
+・CSDMへのアライン
+
+Service Graph Overview（スライド19）：
+・Connected：全機能を接続しデジタル製品をモダンITスタックの全レイヤーで管理
+・Integrated：計画・アーキテクチャ・DevOps・従来型・クラウドを1つのCSDMフレームワークでガイド
+・Comprehensive：従来のCMDBより広範なスコープと能力
+
+Service GraphのFull Lifecycle Management：
+・Digital Products and Services：データサービス・設定状態・アプリケーションリレーションシップ
+・CSDM Guidance
+・Projects・People・Process・Core Data
+・Infrastructure・Configuration・Applications・Relationships（CMDB & beyond）
+
+Service Graph Connectors（スライド20）：
+・ServiceNowがテスト・サポートしたIREの使用
+・CSDMアライン
+・Multisource & reconciliation対応
+・取得方法：Service Graph Connector Central・Store.Servicenow.comを閲覧・Service Graph Connector Centralをダウンロード
+
+コンテキストの多層性（スライド18）：
+AIドリブンアウトカムには多層的なコンテキストが必要
+
+Product & Serviceの違い（スライド22）：
+・Product：顧客に価値を提供する財（もの）またはサービス（インタラクション）
+・Serviceは製品そのものである場合、または製品をサポートするために存在する場合がある`,
+p:[
+["3 Pillarの順序と意味","Ingest（取り込み）→Govern（ガバン）→Insight（洞察）の3本柱","データ基盤の成功に必要な3つの柱。CSDMとCMDB Foundation管理の基本フレームワーク"],
+["Ingestの要素","継続的なデータ取り込み・マージ・更新・削除。物理CI・クラウドの自動化。複数ソースの統合。発見可能と発見不可能の接続。管理オーナーシップの確保","データを正確に維持するための継続的なプロセス"],
+["Governの要素","分析ガイダンス確立・Incident/変更管理支援・レポートとメトリクス活用・計画への活用・消費製品/ロール/ペルソナ/プロセスのサポート","単なる技術管理ではなく、ビジネスプロセス全体を支援"],
+["Insightの要素","ガバナンスチームとロール・ヘルスメトリクス改善・ライフサイクルプロセス確立・構造と定義の管理・伝達・CSDMへのアライン","データを意思決定と改善に活用するための組織的プロセス"],
+["Service Graphの3特性","Connected（全機能接続）・Integrated（1つのCSDMフレームワーク）・Comprehensive（従来CMDBより広範）","Service GraphはCSDMガイダンスに基づくフルライフサイクル管理"],
+["Service Graph Connectorの入手方法","Service Graph Connector Central・Store.Servicenow.com・Service Graph Connector Centralをダウンロード","ServiceNowがテスト・サポートし、CSDMアライン・Multisource & reconciliation対応"],
+],
+q:[
+{t:"基礎",q:"3 Pillar approachの「Ingest（取り込み）」の要素として含まれないものはどれか？",o:["データを継続的に取り込み、マージ・更新・削除","発見可能なものと発見不可能なものを接続","ガバナンスチームとロールの確立","管理されたオーナーシップを確保"],a:2,e:"「ガバナンスチームとロールの確立」はInsight（洞察）の要素。Ingest（取り込み）の要素は「継続的なデータ取り込み・マージ・更新・削除・物理CI/クラウドの自動化・複数ソースの統合・発見可能/不可能の接続・管理オーナーシップの確保」。"},
+{t:"基礎",q:"Service Graph Connectorの特徴として正しいものはどれか？",o:["ServiceNowがテスト・サポートしたIREの使用・CSDMアライン・Multisource & reconciliation対応","ServiceNowが認定していないサードパーティ製コネクター","CMDBのCIを直接削除するためのコネクター","Discovery MID Serverの代替として使用するコネクター"],a:0,e:"Service Graph ConnectorはServiceNowがテスト・サポートしたIREの使用・CSDMアライン・Multisource & reconciliation対応が特徴（スライド20）。"},
+{t:"基礎",q:"Service Graphの「Comprehensive」の説明として正しいものはどれか？",o:["全機能を接続しデジタル製品をモダンITスタックの全レイヤーで管理","計画・アーキテクチャ・DevOps・クラウドを1つのCSDMフレームワークでガイド","従来のCMDBより広範なスコープと能力","AIによる自動設定管理"],a:2,e:"Service Graphの「Comprehensive」は「従来のCMDBより広範なスコープと能力」（スライド19）。ConnectedとIntegratedはそれぞれ別の特性を表す。"},
+{t:"試験対策",q:"3 Pillar approachの「Govern（ガバン）」の役割として最も適切なものはどれか？",o:["物理CIとクラウドリソースの自動取り込み","分析ガイダンスの確立・Incident/変更管理支援・レポートとメトリクス活用・計画への活用","ガバナンスチームとロールの確立・ヘルスメトリクスの改善・CSDMへのアライン","Service Graph Connectorの設定と管理"],a:1,e:"Govern（ガバン）は「分析ガイダンスの確立・Incident/変更管理の運用支援・レポートとメトリクスへの活用・計画への活用・消費製品/ロール/ペルソナ/プロセスのサポート」（スライド17）。物理CIの自動取り込みはIngest、ヘルスメトリクス改善はInsight。"},
+{t:"引っ掛け",q:"Service Graph Connectorを入手する方法として正しいものはどれか？",o:["ServiceNow Developer Portalからダウンロード","Service Graph Connector Central・Store.Servicenow.com・Service Graph Connector Centralのダウンロード","CMDB Health DashboardのMarketplace機能から取得","ServiceNow Technical Support経由で申請"],a:1,e:"Service Graph Connectorの入手方法はService Graph Connector Central・Store.Servicenow.comを閲覧・Service Graph Connector Centralをダウンロード（スライド20）。Developer Portalではない。"},
+]});
+
+
+// ─── Course 13: CIS-DF 試験対策問題（公式問題集・15問） ──────────────────────
+L.push({c:"Course 13",l:"13-1",t:"CSDM公式試験問題（15問）",
+s:`CIS-DF試験に実際に出題された・または出題傾向のある15問。公式問題集から翻訳。
+
+主なトピック：
+・CSDMのライフサイクル管理フィールド（Lifecycle Stage / Stage Status）
+・CSDMアライメントによるインシデント・変更要求のAssignment Group自動入力
+・CSDM未準拠の結果（テクニカルデット・将来製品との非互換性）
+・各ドメインに属するオブジェクト・機能
+・Service Builder・Digital Portfolio Management・CSDM Data Foundations Dashboard等の機能
+・Enterprise Architectが関与するドメイン（Design & Planning）
+・Customer Service ManagementはService Deliveryドメイン`,
+p:[
+["Q1：ライフサイクル管理フィールド","Life Cycle Stage と Stage Status が推奨フィールド","Install Status・Hardware Status・Operational Statusは廃止・非推奨方向"],
+["Q2：Assignment Group自動入力ルール","インシデント：選択したCIのSupport Groupが自動入力 / 変更要求：選択したCIのChange Groupが自動入力","Approval Groupは変更要求のAssignment Groupには自動入力されない"],
+["Q3：CSDM未準拠の結果","テクニカルデット増加 / 将来のServiceNow製品との非互換性","データ損失やStore App導入不能は直接の影響ではない"],
+["Q4：Business Application・Information Object・Capabilityのドメイン","Design & Planning ドメイン","Build & Integration・Service Delivery・Service Consumptionではない"],
+["Q5：Customer Service Management（CSM）のドメイン","Service Delivery ドメイン","Design & Planning・Ideation & Strategy・Build & Integrationではない"],
+["Q6：成功するデータ基盤の3本柱","Govern・Insight・Ingest の3つ","Correctness・Completeness・ComplianceはCMDB Healthメトリクスであり3本柱ではない"],
+["Q7：Application Service/Service InstanceとTechnology Management Offering・Business Service Offering・Business Applicationの関連付け","Service Builder を使用","CI Class Manager・CMDB Workspace・IntegrationHub ETLではない"],
+["Q8：Managed by GroupをCIグループ・クラスに同期設定できる場所","Technology Management Services と Technology Management Offerings の2箇所","CI Class Manager・Business Service Offerings・Business Servicesではない"],
+["Q9：デプロイ済みアプリケーションスタックとその依存関係の論理的表現","Application Service [cmdb_ci_service_auto]","Business Application・Application（cmdb_ci_appl）・Technology Management Serviceではない"],
+["Q10：インシデント・変更要求のCIとして選択できるもの（2つ）","Application Service と Dynamic CI Group","Installed Software・Business Applicationは直接選択しない（Operational CIではない）"],
+["Q11：Business Service・Technology Management Service・Offering類の効率的な作成ツール","Service Builder","Service Mapping・Application Service Wizard・CMDB Workspace・CI Class Managerではない"],
+["Q12：ポートフォリオ・サービス・製品をライフサイクル全体で統合管理するワークスペース","Digital Portfolio Management","Service Builder・CMDB Workspace・Service Operations Workspace・CI Class Managerではない"],
+["Q13：CSDMの実装状況をServiceNow推奨プラクティスに基づき評価・改善する可視化・レポートツール","CSDM Data Foundations Dashboard","Service Builder・CI Class Manager・Application Service Wizard・CMDB Health Dashboardではない"],
+["Q14：デプロイ済みサービスインスタンスとその発見可能なコンポーネントを表すドメイン","Service Delivery ドメイン","Design & Planning・Build & Integration・Ideation & Strategy・Service Consumptionではない"],
+["Q15：Enterprise Architectが関与するドメイン","Design & Planning ドメイン","Build & Integration・Service Consumption・Ideation & Strategy・Service Deliveryではない"],
+],
+q:[
+{t:"試験対策",q:"CSDMがCIのライフサイクル管理に推奨するフィールドはどれか？",o:["Life Cycle StageとStage Status","Install Status","Operational Status","Hardware Status"],a:0,e:"CSDMはCIのライフサイクル管理に「Life Cycle Stage（ライフサイクルステージ）とStage Status（ステージステータス）」を推奨する。Install Status・Operational Status・Hardware Statusは廃止・非推奨方向のフィールド。"},
+{t:"試験対策",q:"CSDMに準拠することで、新規インシデントおよび変更要求レコードのAssignment Groupフィールドが自動入力される。新規インシデントまたは変更要求を作成する際に正しいものはどれか？（2つ選択：正しい組み合わせを1つ選べ）",o:["選択したCIのApproval Groupがインシデントフォームのアサイングループに自動入力される / 選択したCIのManaged by Groupが変更要求フォームのアサイングループに自動入力される","選択したCIのSupport Groupがインシデントフォームのアサイングループに自動入力される / 選択したCIのChange Groupが変更要求フォームのアサイングループに自動入力される","選択したCIのChange Groupがインシデントフォームのアサイングループに自動入力される / 選択したCIのApproval Groupが変更要求フォームのアサイングループに自動入力される","選択したCIのManaged by Groupがインシデントフォームのアサイングループに自動入力される / 選択したCIのSupport Groupが変更要求フォームのアサイングループに自動入力される"],a:1,e:"正解は「Support Group→インシデントのAssignment Group自動入力」と「Change Group→変更要求のAssignment Group自動入力」の組み合わせ。Approval Groupは変更要求の承認者に使用されるがAssignment Groupへの自動入力には使用されない。"},
+{t:"試験対策",q:"CSDMに準拠しない場合に起こりうる結果はどれか？（2つ選択：正しい組み合わせを1つ選べ）",o:["データ損失の可能性 / ServiceNow Storeアプリケーションのインストール不能","テクニカルデットの増加 / 将来のServiceNow製品との非互換性","ServiceNow Storeアプリケーションのインストール不能 / テクニカルデットの増加","データ損失の可能性 / 将来のServiceNow製品との非互換性"],a:1,e:"CSDM未準拠の結果は「テクニカルデットの増加（Increased technical debt）」と「将来のServiceNow製品との非互換性（Incompatibility with future ServiceNow products）」。データ損失やStore Appのインストール不能は直接の影響として挙げられていない。"},
+{t:"試験対策",q:"Business Application・Information Object・Capabilityが属するCSDMドメインはどれか？",o:["Build & Integration","Design & Planning","Service Delivery","Service Consumption"],a:1,e:"Business Application・Information Object（情報オブジェクト）・Business Capability（ビジネスケイパビリティ）はDesign & Planningドメインに属する。"},
+{t:"試験対策",q:"Customer Service Management（CSM）が属するCSDMドメインはどれか？",o:["Design & Planning","Service Consumption","Ideation & Strategy","Service Delivery"],a:3,e:"Customer Service Management（CSM）はService Deliveryドメインに属する。スライド56でService Deliveryの「データ利用製品」としてCSMが記載されている。"},
+{t:"試験対策",q:"成功するデータ基盤を実現するための3本柱（3 Pillars）はどれか？（3つ選択：正しい組み合わせを1つ選べ）",o:["Correctness・Completeness・Compliance","Govern・Insight・Ingest","Govern・Completeness・Ingest","Insight・Correctness・Ingest"],a:1,e:"成功するデータ基盤の3本柱は「Govern（ガバン）・Insight（洞察）・Ingest（取り込み）」。Correctness・Completeness・ComplianceはCMDB Healthダッシュボードのメトリクス（3C）であり、3本柱とは別物。"},
+{t:"試験対策",q:"Application Service（サービスインスタンス）をTechnology Management Offering・Business Service Offering・Business Applicationと関連付けるために使用できる機能はどれか？",o:["CI Class Manager","Application Service Wizard","CMDB Workspace","Service Builder"],a:3,e:"Service Builderは、Application Service/Service InstanceとTechnology Management Offering・Business Service Offering・Business Applicationを関連付けるために使用する機能。スライド59でService ConsumptionドメインのデータをService Builderで管理することが記載されている。"},
+{t:"試験対策",q:"Managed by GroupをCIの基盤グループまたはクラスに設定・同期できる場所はどれか？（2つ選択：正しい組み合わせを1つ選べ）",o:["CI Class Manager / Business Service Offerings","Technology Management Services / Technology Management Offerings","Business Service Offerings / Business Services","CI Class Manager / Technology Management Services"],a:1,e:"Managed by GroupはTechnology Management ServicesとTechnology Management Offeringsの2箇所から設定・同期できる。CI Class Manager・Business Service Offerings・Business Servicesからは設定できない。"},
+{t:"試験対策",q:"デプロイ済みアプリケーションスタックとその依存関係の論理的表現であるサービスインスタンスタイプはどれか？",o:["Application Service [cmdb_ci_service_auto]","Business Application [cmdb_ci_business_app]","Application [cmdb_ci_appl]","Technology Management Service [cmdb_ci_service_technical]"],a:0,e:"Application Service [cmdb_ci_service_auto]は「デプロイ済みアプリケーションスタックとその依存関係の論理的表現であるサービスインスタンスタイプ」（スライド24）。Business Applicationはポートフォリオ管理用、Application（cmdb_ci_appl）はDiscoveryが検出したインストール済みコード、Technology Management ServiceはCIを管理するグループを識別するサービス。"},
+{t:"試験対策",q:"インシデントまたは変更要求のレコードでCIとして選択できるものはどれか？（2つ選択：正しい組み合わせを1つ選べ）",o:["Dynamic CI Group / Installed Software","Application Service / Dynamic CI Group","Business Application / Application Service","Installed Software / Business Application"],a:1,e:"Incident・Change RequstのCI選択で使用できるOperational CIはApplication Service（デプロイ済みインスタンス）とDynamic CI Group（プログラム的にグループ化されたCI）。Business ApplicationはOperational CIではないため直接選択しない。Installed SoftwareはCMDB外のオブジェクト。"},
+{t:"試験対策",q:"Business Service・Technology Management Service・Business Service Offering・Technology Management Offeringをフォームやリストよりも効率的な方法で作成できるツールはどれか？",o:["Service Mapping","Application Service Wizard","CMDB Workspace","Service Builder"],a:3,e:"Service BuilderはBusiness Service・Technology Management Service・Business Service Offering・Technology Management Offeringをよりストリームライン（効率的）な方法で作成できるツール。Application Service WizardはApplication Service専用。"},
+{t:"試験対策",q:"ポートフォリオ・サービス・オファリング・製品をライフサイクル全体にわたって統合的に表示・管理できる統一ワークスペースはどれか？",o:["Service Builder","CMDB Workspace","Service Operations Workspace","Digital Portfolio Management"],a:3,e:"Digital Portfolio Management（DPM）は「オーナーがポートフォリオ・サービス・オファリング・製品をライフサイクル全体にわたって総合的に閲覧・管理できる統一ワークスペース」。Service Builder・CMDB Workspace・Service Operations WorkspaceはDPMとは異なる機能。"},
+{t:"試験対策",q:"ServiceNow推奨のグッドプラクティスに基づいてCSDMの実装状況を評価・改善するための組み込みの可視化・レポートツールはどれか？",o:["CSDM Data Foundations Dashboard","Service Builder","CI Class Manager","CMDB Health Dashboard"],a:0,e:"CSDM Data Foundations DashboardはCSDMの実装状況をServiceNow推奨グッドプラクティスに基づいて評価・改善するための組み込みの可視化・レポートツール。CMDB Health DashboardはCMDBのCI健全性（Completeness・Compliance・Correctness）を管理するダッシュボードで別物。"},
+{t:"試験対策",q:"デプロイ済みサービスインスタンスと、その関連する発見可能なコンポーネントを表すCSDMドメインはどれか？",o:["Service Delivery","Design & Planning","Build & Integration","Ideation & Strategy"],a:0,e:"Service Deliveryドメインは「デプロイされたサービスインスタンスと関連する発見可能なコンポーネント。サービスインスタンスを提供・サポートするサービス」を表す（スライド28）。"},
+{t:"試験対策",q:"Enterprise Architect（エンタープライズアーキテクト）が関与するCSDMドメインはどれか？",o:["Build & Integration","Service Consumption","Ideation & Strategy","Design & Planning"],a:3,e:"Enterprise ArchitectはDesign & Planningドメインに関与する（スライド29・30）。Business Capability・Business Application・Information Objectなどの設計・計画段階のオブジェクトをEnterprise Architectが担当する。"},
+]});
+
 </script>
 </body>
 </html>
