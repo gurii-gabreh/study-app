@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CMDB Study App</title>
+<title>Study App</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
 :root{
@@ -165,13 +165,54 @@ textarea.tinput{min-height:180px;}
 /* Random mode button */
 .btn-rand-on{background:var(--purple);border-color:var(--purple);color:#fff !important;font-weight:600;}
 .btn-rand-on:hover{opacity:.85;}
+
+/* ── ホーム画面 ───────────────────────────────────── */
+.home-screen{display:flex;flex-direction:column;align-items:center;padding:40px 20px;min-height:calc(100vh - 56px);background:var(--bg);}
+.home-title{font-size:28px;font-weight:700;color:var(--fg);margin-bottom:8px;}
+.home-subtitle{font-size:14px;color:var(--muted);margin-bottom:40px;}
+.category-cards{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;max-width:900px;width:100%;}
+.category-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px 32px;cursor:pointer;transition:transform .15s,box-shadow .15s;min-width:280px;max-width:380px;flex:1;}
+.category-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.category-card-icon{font-size:36px;margin-bottom:12px;}
+.category-card-name{font-size:20px;font-weight:700;color:var(--fg);margin-bottom:8px;}
+.category-card-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+.category-card-stats{font-size:12px;color:var(--green);font-weight:600;}
+
+/* ── ヘッダー改修 ─────────────────────────────────── */
+.hdr{display:flex;align-items:center;gap:12px;padding:0 16px;height:56px;background:var(--hdr);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;flex-wrap:wrap;}
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.hdr-center{flex:1;display:flex;justify-content:center;}
+.home-btn{background:var(--card);border:1px solid var(--border);color:var(--fg);border-radius:var(--r);padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;transition:background .15s;}
+.home-btn:hover{background:var(--border);}
+.category-select{background:var(--card);border:1px solid var(--border);color:var(--fg);border-radius:var(--r);padding:6px 12px;font-size:13px;cursor:pointer;min-width:200px;}
+.category-select:focus{outline:none;border-color:var(--blue);}
+
+/* ── GAS連携ボタン ────────────────────────────────── */
+.gas-btn{background:var(--card);border:1px solid var(--border);color:var(--green);border-radius:var(--r);padding:5px 10px;cursor:pointer;font-size:12px;white-space:nowrap;}
+.gas-btn:hover{background:var(--border);}
+.gas-status{font-size:11px;padding:3px 8px;border-radius:var(--r);display:inline-block;}
+.gas-ok{background:#1a3a1a;color:var(--green);}
+.gas-err{background:#3a1a1a;color:var(--red);}
+.gas-ing{background:#1a2a3a;color:var(--blue);}
+
+/* ── GAS設定モーダル ──────────────────────────────── */
+.gas-setting{padding:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin:8px 0;}
+.gas-setting label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px;}
+.gas-setting input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--fg);border-radius:4px;padding:6px 8px;font-size:12px;}
 </style>
 </head>
 <body>
 
 <div class="hdr">
-  <div class="logo">📚 CMDB Study</div>
-  <div class="hdr-tabs">
+  <div class="hdr-left">
+    <button class="home-btn" onclick="goHome()" title="ホームへ">🏠 ホーム</button>
+    <div class="logo">📚 Study App</div>
+  </div>
+  <div class="hdr-center" id="hdr-category-area" style="display:none;">
+    <select class="category-select" id="category-select" onchange="onCategoryChange(this.value)">
+    </select>
+  </div>
+  <div class="hdr-tabs" id="hdr-tabs" style="display:none;">
     <button class="hdr-tab on" onclick="setMode('summary')">📄 要約</button>
     <button class="hdr-tab" onclick="setMode('quiz')">❓ 問題</button>
     <button class="hdr-tab" onclick="setMode('review')">🔴 復習</button>
@@ -180,13 +221,21 @@ textarea.tinput{min-height:180px;}
       <span class="datasrc-indicator"></span>データソース更新
     </button>
     <button class="datasrc-open-btn" id="datasrc-open-btn" onclick="openDataSourceNewTab()" title="all_lessons_data.htmlを新しいタブで開く">📂 データを開く</button>
-    <button class="gist-btn" id="gist-save-btn" onclick="gistSave()" title="メモをGitHub Gistに保存">☁️ メモ保存</button>
-    <button class="gist-btn" id="gist-load-btn" onclick="gistLoad()" title="GitHub GistからメモをロードS">☁️ メモ読込</button>
-    <span class="gist-status gist-ing" id="gist-status" style="display:none;"></span>
+    <button class="gas-btn" id="gas-setting-btn" onclick="openGasSettings()" title="GAS Web App URLを設定">⚙️ GAS設定</button>
+    <button class="gas-btn" id="gas-migrate-btn" onclick="migrateMemosToSheet()" title="既存メモをスプレッドシートに移行">📤 メモ移行</button>
+    <span class="gas-status" id="gas-status" style="display:none;"></span>
   </div>
 </div>
 
-<div class="layout">
+<!-- ホーム画面 -->
+<div id="home-screen" class="home-screen">
+  <div class="home-title">📚 Study App</div>
+  <div class="home-subtitle">カテゴリを選択して学習を開始してください</div>
+  <div class="category-cards" id="category-cards"></div>
+</div>
+
+<!-- 学習画面 -->
+<div class="layout" id="study-layout" style="display:none;">
   <div class="side" id="sidebar"></div>
   <div class="content" id="content"></div>
 </div>
@@ -243,6 +292,17 @@ textarea.tinput{min-height:180px;}
 <script>
 // ── State ──────────────────────────────────────────────
 const STORE_KEY = 'cmdb_study_v2';
+// ── カテゴリ定義 ─────────────────────────────────────
+const CATEGORIES = {
+  'ServiceNow CIS-DF': {
+    icon: '🔧',
+    desc: 'ServiceNow認定試験 CIS-DF（Discovery & CMDB Foundations）の試験対策問題集です。
+CMDB基礎・Discovery・CSDM・IRE・CMDB Health等を幅広くカバーしています。',
+    color: '#4a90d9',
+  }
+  // 今後追加：基本情報処理技術者試験 など
+};
+
 let state = {
   lessons: [],       // [{id, course, lesson, title, summary, points:[], quiz:[]}]
   mode: 'summary',
@@ -253,6 +313,8 @@ let state = {
   comments: {},      // 'lessonId_qi' -> comment text
   randomMode: false, // 選択肢ランダム表示モード
   shuffleMap: {},    // qkey_qi -> shuffled option indices
+  currentCategory: null, // 現在選択中のカテゴリ
+  gasUrl: '',        // GAS Web App URL
   dataSourceUrl: '', // URL of all_lessons_data.html
   gistToken: '',    // GitHub Personal Access Token
   gistId: ''        // Gist ID（初回保存後に自動設定）
@@ -265,6 +327,8 @@ function save() {
   for (const k in state.errors) s.errors[k] = [...state.errors[k]];
   s.randomMode = state.randomMode;
   s.shuffleMap = state.shuffleMap;
+  s.currentCategory = state.currentCategory;
+  s.gasUrl = state.gasUrl;
   localStorage.setItem(STORE_KEY, JSON.stringify(s));
 }
 
@@ -284,6 +348,8 @@ function load() {
     state.gistId = s.gistId || '';
     state.randomMode = s.randomMode || false;
     state.shuffleMap = s.shuffleMap || {};
+    state.currentCategory = s.currentCategory || null;
+    state.gasUrl = s.gasUrl || '';
     // コメントキーのマイグレーション（旧形式→新形式）
     if (s.comments) {
       const migratedComments = {};
@@ -310,8 +376,32 @@ function setMode(m) {
   document.querySelectorAll('.hdr-tab').forEach((b,i) => {
     b.classList.toggle('on', ['summary','quiz','review','history'][i] === m);
   });
-  renderSidebar();
-  renderContent();
+  // カテゴリを全レッスンに付与（既存データ対応）
+  state.lessons.forEach(l => {
+    if (!l.category) l.category = 'ServiceNow CIS-DF';
+  });
+
+  // 初期表示：カテゴリが選択済みなら学習画面、未選択ならホーム
+  if (state.currentCategory) {
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('study-layout').style.display = 'flex';
+    document.getElementById('hdr-category-area').style.display = 'flex';
+    document.getElementById('hdr-tabs').style.display = 'flex';
+    updateCategorySelect(state.currentCategory);
+    renderSidebar();
+    renderContent();
+  } else {
+    document.getElementById('home-screen').style.display = 'flex';
+    document.getElementById('study-layout').style.display = 'none';
+    document.getElementById('hdr-category-area').style.display = 'none';
+    document.getElementById('hdr-tabs').style.display = 'none';
+    renderHomeScreen();
+  }
+
+  // スプレッドシートからメモを読み込み
+  if (state.gasUrl) {
+    loadMemosFromSheet();
+  }
 }
 
 function setActiveLesson(id) {
@@ -322,6 +412,8 @@ function setActiveLesson(id) {
 
 // ── Sidebar ────────────────────────────────────────────
 function renderSidebar() {
+  // カテゴリでフィルタ
+  const lessons = state.currentCategory ? getLessonsForCategory(state.currentCategory) : state.lessons;
   const el = document.getElementById('sidebar');
   const mode = state.mode;
   let html = '';
@@ -575,14 +667,14 @@ function renderQuiz(el, lesson, isReview) {
       if (isMulti) {
         const correctLabels = q.multi.map(i => String.fromCharCode(65+i)+':'+q.opts[i]).join('・');
         reason = wasOk
-          ? `<span class="exp-label">${label}</span>正解の組み合わせを選択できました！<br><br>【正解の理由】${annotatedExp}`
-          : `<span class="exp-label">${label}</span>正解は「${correctLabels}」です。<br><br>【正解の理由】${annotatedExp}`;
+          ? `<span class="exp-label">${label}</span>正解の組み合わせを選択できました！`
+          : `<span class="exp-label">${label}</span>正解は「${correctLabels}」です。`;
       } else {
         const annotatedOptCorrect = addJpAnnotations(escHtml(q.opts[q.ans]));
         const annotatedOptWrong = (!wasOk && qs.wrongs[qi] != null) ? addJpAnnotations(escHtml(q.opts[qs.wrongs[qi]])) : '';
         reason = wasOk
-          ? `<span class="exp-label">${label}</span>この選択肢が正解の理由：${annotatedExp}`
-          : `<span class="exp-label">${label}</span>正解は「${String.fromCharCode(65+q.ans)}：${annotatedOptCorrect}」です。<br><br>【なぜ不正解か】あなたは「${String.fromCharCode(65+qs.wrongs[qi])}：${annotatedOptWrong}」を選びましたが、これは誤りです。<br><br>【正解の理由】${annotatedExp}`;
+          ? `<span class="exp-label">${label}</span>正解です！`
+          : `<span class="exp-label">${label}</span>正解は「${String.fromCharCode(65+q.ans)}：${annotatedOptCorrect}」です。`;
       }
       html += `<div class="exp ${expCls}">${reason}</div>`;
       // コメント欄（回答後のみ表示）
@@ -684,6 +776,80 @@ function autoResizeMemo(el) {
   el.style.height = el.scrollHeight + 'px';
 }
 
+// ── ホーム画面 ─────────────────────────────────────────
+function goHome() {
+  state.currentCategory = null;
+  save();
+  document.getElementById('home-screen').style.display = 'flex';
+  document.getElementById('study-layout').style.display = 'none';
+  document.getElementById('hdr-category-area').style.display = 'none';
+  document.getElementById('hdr-tabs').style.display = 'none';
+  renderHomeScreen();
+}
+
+function renderHomeScreen() {
+  const container = document.getElementById('category-cards');
+  if (!container) return;
+  
+  // レッスン・問題数を集計
+  const stats = {};
+  state.lessons.forEach(l => {
+    const cat = l.category || 'ServiceNow CIS-DF';
+    if (!stats[cat]) stats[cat] = { lessons: 0, questions: 0 };
+    stats[cat].lessons++;
+    stats[cat].questions += (l.quiz || []).length;
+  });
+
+  let html = '';
+  Object.keys(CATEGORIES).forEach(catName => {
+    const cat = CATEGORIES[catName];
+    const s = stats[catName] || { lessons: 0, questions: 0 };
+    html += `
+      <div class="category-card" onclick="selectCategory('${catName}')" style="border-top:4px solid ${cat.color}">
+        <div class="category-card-icon">${cat.icon}</div>
+        <div class="category-card-name">${catName}</div>
+        <div class="category-card-desc">${cat.desc.replace(/\n/g,'<br>')}</div>
+        <div class="category-card-stats">📚 ${s.lessons}レッスン ／ ❓ ${s.questions}問</div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function selectCategory(catName) {
+  state.currentCategory = catName;
+  save();
+  // ホーム非表示・学習画面表示
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('study-layout').style.display = 'flex';
+  document.getElementById('hdr-category-area').style.display = 'flex';
+  document.getElementById('hdr-tabs').style.display = 'flex';
+  // カテゴリセレクト更新
+  updateCategorySelect(catName);
+  // サイドバー・コンテンツ更新
+  renderSidebar();
+  renderContent();
+}
+
+function updateCategorySelect(currentCat) {
+  const sel = document.getElementById('category-select');
+  if (!sel) return;
+  let html = '';
+  Object.keys(CATEGORIES).forEach(name => {
+    const selected = name === currentCat ? 'selected' : '';
+    html += `<option value="${name}" ${selected}>${CATEGORIES[name].icon} ${name}</option>`;
+  });
+  sel.innerHTML = html;
+}
+
+function onCategoryChange(catName) {
+  selectCategory(catName);
+}
+
+// ── カテゴリでレッスンをフィルタ ───────────────────────
+function getLessonsForCategory(catName) {
+  return state.lessons.filter(l => (l.category || 'ServiceNow CIS-DF') === catName);
+}
+
 // ── ランダムモード切替 ─────────────────────────────────
 function toggleRandom() {
   state.randomMode = !state.randomMode;
@@ -751,21 +917,44 @@ function saveHistory(lid, qkey) {
   const total = qs.scores.length;
   const errArr = [];
   qs.scores.forEach((s,i) => { if (s===0) errArr.push(i); });
+
+  // 日時生成
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  // localStorageの履歴に追加
   state.history.unshift({
     lessonId: lid,
+    category: lesson.category || 'ServiceNow CIS-DF',
     course: lesson.course,
     lesson: lesson.lesson,
     title: lesson.title,
-    correct, total,
-    date: new Date().toLocaleString('ja-JP'),
+    correct,
+    total,
+    date: dateStr,
     wrongs: errArr
   });
-  if (state.history.length > 200) state.history = state.history.slice(0,200);
   save();
-  showToast('履歴に保存しました');
+
+  // スプレッドシートに送信
+  const records = [];
+  qs.scores.forEach((score, qi) => {
+    records.push({
+      date: dateStr,
+      category: lesson.category || 'ServiceNow CIS-DF',
+      course: lesson.course,
+      lesson: lesson.lesson,
+      qno: `Q${qi+1}`,
+      result: score === 1 ? '正解' : '不正解'
+    });
+  });
+  sendToSheet('saveHistory', { records });
+
+  renderContent();
+  showToast('📊 履歴を保存しました');
 }
 
-// ── History ────────────────────────────────────────────
+
 function renderHistory(el) {
   if (state.history.length === 0) {
     el.innerHTML = `<div class="welcome"><div style="font-size:48px;">📊</div><h2>履歴がありません</h2><p>問題モードで回答後「履歴保存」ボタンを押すと記録されます。</p></div>`;
@@ -863,12 +1052,16 @@ function importLesson() {
   }
 
   const newLesson = {id, course, lesson, title, summary, points, quiz};
+  if (!newLesson.category) newLesson.category = 'ServiceNow CIS-DF';
   state.lessons.push(newLesson);
   state.activeLesson = id;
   save();
   closeModal();
-  renderSidebar();
-  renderContent();
+  renderHomeScreen();
+  if (state.currentCategory) {
+    renderSidebar();
+    renderContent();
+  }
   showToast(`「${title}」をインポートしました（問題:${quiz.length}問）`);
 }
 
@@ -879,8 +1072,11 @@ function deleteLesson(id) {
   delete state.quizState[id];
   delete state.errors[id];
   save();
-  renderSidebar();
-  renderContent();
+  renderHomeScreen();
+  if (state.currentCategory) {
+    renderSidebar();
+    renderContent();
+  }
 }
 
 // ── 英語キーワードに日本語補足を付与 ──────────────────────
@@ -944,6 +1140,24 @@ function saveCommentFixed(course, lesson, qi, text) {
   const key = course + '_' + lesson + '_' + qi;
   state.comments[key] = text;
   save();
+
+  // スプレッドシートに送信（デバウンス）
+  clearTimeout(window._memoTimer);
+  window._memoTimer = setTimeout(() => {
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    // カテゴリを取得
+    const lesson_obj = state.lessons.find(l => l.course === course && l.lesson === lesson);
+    const category = lesson_obj ? (lesson_obj.category || 'ServiceNow CIS-DF') : 'ServiceNow CIS-DF';
+    sendToSheet('saveMemo', {
+      category,
+      course,
+      lesson,
+      qno: `Q${parseInt(qi)+1}`,
+      text,
+      date: dateStr
+    });
+  }, 1500);
 }
 
 function getComment(lid, qi) {
@@ -1019,11 +1233,15 @@ window.addEventListener('message', (event) => {
       points: d.points || [],
       quiz: normalizeQuiz(d.quiz)
     };
+    if (!newLesson.category) newLesson.category = 'ServiceNow CIS-DF';
     state.lessons.push(newLesson);
     state.activeLesson = id;
     save();
-    renderSidebar();
-    renderContent();
+    renderHomeScreen();
+    if (state.currentCategory) {
+      renderSidebar();
+      renderContent();
+    }
     showToast(`✅ 「${d.title}」をインポートしました（問題:${newLesson.quiz.length}問）`);
 
     // 送信元に完了を通知
@@ -1048,9 +1266,14 @@ window.addEventListener('message', (event) => {
         summary: d.summary || '', points: d.points || [], quiz: normalizeQuiz(d.quiz) });
       count++;
     });
+    // カテゴリ付与
+    state.lessons.forEach(l => { if (!l.category) l.category = 'ServiceNow CIS-DF'; });
     save();
-    renderSidebar();
-    renderContent();
+    renderHomeScreen();
+    if (state.currentCategory) {
+      renderSidebar();
+      renderContent();
+    }
     showToast(`✅ ${count}レッスンをデータソースから更新しました`);
     // ボタンの色を更新
     const ind = document.querySelector('.datasrc-indicator');
@@ -1064,6 +1287,113 @@ let dataSourceWindow = null;
 
 // ── GitHub Gist メモ保存・読込 ──────────────────────────
 const GIST_FILENAME = 'cmdb_study_memo.json';
+
+// ── GAS（スプレッドシート）連携 ─────────────────────────
+function gasSetStatus(msg, type) {
+  const el = document.getElementById('gas-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'gas-status gas-' + type;
+  el.style.display = msg ? 'inline-block' : 'none';
+  if (type === 'ok' || type === 'err') {
+    setTimeout(() => { el.style.display = 'none'; }, 3000);
+  }
+}
+
+async function sendToSheet(action, data) {
+  if (!state.gasUrl) {
+    // GAS URLが未設定の場合はローカルのみ
+    return;
+  }
+  try {
+    const res = await fetch(state.gasUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...data })
+    });
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message);
+  } catch (err) {
+    console.warn('GAS送信エラー:', err);
+  }
+}
+
+async function loadMemosFromSheet() {
+  if (!state.gasUrl) return;
+  try {
+    gasSetStatus('メモ読込中...', 'ing');
+    const res = await fetch(state.gasUrl + '?action=getMemos');
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message);
+    // スプレッドシートのメモをlocalStorageに反映
+    const memos = json.memos || {};
+    if (!state.comments) state.comments = {};
+    Object.keys(memos).forEach(key => {
+      // key: category_course_lesson_qno → course_lesson_qi
+      const parts = key.split('_');
+      // parts[0]=category, parts[1]=course (例:Course 1→"Course 1"), parts[2]=lesson, parts[3]=qno
+      if (parts.length >= 4) {
+        const qno = parts[parts.length - 1]; // Q1, Q2...
+        const qi = String(parseInt(qno.replace('Q','')) - 1);
+        const lesson = parts[parts.length - 2];
+        const course = parts.slice(1, parts.length - 2).join('_');
+        const localKey = course.replace(/\s/g,'') + '_' + lesson + '_' + qi;
+        state.comments[localKey] = memos[key].text;
+      }
+    });
+    save();
+    gasSetStatus('✅ メモ読込完了', 'ok');
+  } catch (err) {
+    gasSetStatus('❌ 読込失敗', 'err');
+    console.error(err);
+  }
+}
+
+async function migrateMemosToSheet() {
+  if (!state.gasUrl) {
+    const url = prompt('GAS Web App URLを入力してください:');
+    if (!url) return;
+    state.gasUrl = url;
+    save();
+  }
+  if (!confirm('既存のメモをスプレッドシートに移行します。よろしいですか？')) return;
+  try {
+    gasSetStatus('移行中...', 'ing');
+    const comments = state.comments || {};
+    const memos = [];
+    Object.keys(comments).forEach(key => {
+      const text = comments[key];
+      if (!text || !text.trim()) return;
+      // key形式: Course1_1-1_0 (course_lesson_qi)
+      const parts = key.split('_');
+      if (parts.length < 3) return;
+      const qi = parts[parts.length - 1];
+      const lesson = parts[parts.length - 2];
+      const courseRaw = parts.slice(0, parts.length - 2).join('_');
+      // courseRaw例: "Course1" → "Course 1"
+      const course = courseRaw.replace(/Course(\d+)/, 'Course $1');
+      // カテゴリを特定
+      const lesson_obj = state.lessons.find(l => l.course === course && l.lesson === lesson);
+      const category = lesson_obj ? (lesson_obj.category || 'ServiceNow CIS-DF') : 'ServiceNow CIS-DF';
+      memos.push({ category, course, lesson, qno: `Q${parseInt(qi)+1}`, text });
+    });
+    await sendToSheet('migrateMemos', { memos });
+    gasSetStatus(`✅ ${memos.length}件移行完了`, 'ok');
+    showToast(`📤 ${memos.length}件のメモをスプレッドシートに移行しました`);
+  } catch (err) {
+    gasSetStatus('❌ 移行失敗', 'err');
+    console.error(err);
+  }
+}
+
+function openGasSettings() {
+  const url = prompt('GAS Web App URLを入力してください:
+（script.google.comでデプロイ後に表示されるURL）', state.gasUrl || '');
+  if (url !== null) {
+    state.gasUrl = url;
+    save();
+    showToast('✅ GAS URLを保存しました');
+  }
+}
 
 function gistSetStatus(msg, type) {
   const el = document.getElementById('gist-status');
