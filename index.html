@@ -385,22 +385,13 @@ function setMode(m) {
     if (!l.category) l.category = 'ServiceNow CIS-DF';
   });
 
-  // 初期表示：カテゴリが選択済みなら学習画面、未選択ならホーム
-  if (state.currentCategory) {
-    document.getElementById('home-screen').style.display = 'none';
-    document.getElementById('study-layout').style.display = 'flex';
-    document.getElementById('hdr-category-area').style.display = 'flex';
-    document.getElementById('hdr-tabs').style.display = 'flex';
-    updateCategorySelect(state.currentCategory);
-    renderSidebar();
-    renderContent();
-  } else {
-    document.getElementById('home-screen').style.display = 'flex';
-    document.getElementById('study-layout').style.display = 'none';
-    document.getElementById('hdr-category-area').style.display = 'none';
-    document.getElementById('hdr-tabs').style.display = 'none';
-    renderHomeScreen();
-  }
+  // 初期表示：常にホーム画面から開始
+  // （GASからデータ読込完了後にカテゴリカードを更新）
+  document.getElementById('home-screen').style.display = 'flex';
+  document.getElementById('study-layout').style.display = 'none';
+  document.getElementById('hdr-category-area').style.display = 'none';
+  document.getElementById('hdr-tabs').style.display = 'none';
+  renderHomeScreen();
 
   // スプレッドシートから問題データとメモを読み込み
   if (state.gasUrl) {
@@ -1718,15 +1709,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ── Init ───────────────────────────────────────────────
 load();
 
-// load()でlocalStorageが空の場合（初回アクセス）も
-// ホーム画面を確実に表示する
-if (!state.currentCategory) {
-  document.getElementById('home-screen').style.display = 'flex';
-  document.getElementById('study-layout').style.display = 'none';
-  document.getElementById('hdr-category-area').style.display = 'none';
-  document.getElementById('hdr-tabs').style.display = 'none';
-  renderHomeScreen();
-}
+// 起動時は必ずホーム画面を表示する
 
 // Fix modal tab init
 document.querySelectorAll('#mtab-summary,#mtab-points,#mtab-quiz').forEach(el => el.style.display='none');
