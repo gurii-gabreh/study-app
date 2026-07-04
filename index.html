@@ -228,7 +228,7 @@ textarea.tinput{min-height:180px;}
 </div>
 
 <!-- ホーム画面 -->
-<div id="home-screen" class="home-screen">
+<div id="home-screen" class="home-screen" style="display:none;">
   <div class="home-title">📚 Study App</div>
   <div class="home-subtitle">カテゴリを選択して学習を開始してください</div>
   <div class="category-cards" id="category-cards"></div>
@@ -314,7 +314,7 @@ let state = {
   randomMode: false, // 選択肢ランダム表示モード
   shuffleMap: {},    // qkey_qi -> shuffled option indices
   currentCategory: null, // 現在選択中のカテゴリ
-  gasUrl: '',        // GAS Web App URL
+  gasUrl: 'https://script.google.com/macros/s/AKfycbyUdZ4tFzqJVkoL4GMm0BWEettzYBgGAqWAMo1myz1jCQjwgjZAeTKyLNxcG0zaFaE/exec', // GAS Web App URL
   dataSourceUrl: '', // URL of all_lessons_data.html
   gistToken: '',    // GitHub Personal Access Token
   gistId: ''        // Gist ID（初回保存後に自動設定）
@@ -349,7 +349,7 @@ function load() {
     state.randomMode = s.randomMode || false;
     state.shuffleMap = s.shuffleMap || {};
     state.currentCategory = s.currentCategory || null;
-    state.gasUrl = s.gasUrl || '';
+    state.gasUrl = s.gasUrl || 'https://script.google.com/macros/s/AKfycbyUdZ4tFzqJVkoL4GMm0BWEettzYBgGAqWAMo1myz1jCQjwgjZAeTKyLNxcG0zaFaE/exec';
     // コメントキーのマイグレーション（旧形式→新形式）
     if (s.comments) {
       const migratedComments = {};
@@ -1607,8 +1607,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Init ───────────────────────────────────────────────
 load();
-renderSidebar();
-renderContent();
 
 // Fix modal tab init
 document.querySelectorAll('#mtab-summary,#mtab-points,#mtab-quiz').forEach(el => el.style.display='none');
