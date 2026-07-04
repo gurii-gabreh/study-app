@@ -296,8 +296,7 @@ const STORE_KEY = 'cmdb_study_v2';
 const CATEGORIES = {
   'ServiceNow CIS-DF': {
     icon: '🔧',
-    desc: 'ServiceNow認定試験 CIS-DF（Discovery & CMDB Foundations）の試験対策問題集です。
-CMDB基礎・Discovery・CSDM・IRE・CMDB Health等を幅広くカバーしています。',
+    desc: 'ServiceNow認定試験 CIS-DF（Discovery & CMDB Foundations）の試験対策問題集です。\nCMDB基礎・Discovery・CSDM・IRE・CMDB Health等を幅広くカバーしています。',
     color: '#4a90d9',
   }
   // 今後追加：基本情報処理技術者試験 など
@@ -1385,8 +1384,7 @@ async function migrateMemosToSheet() {
 }
 
 function openGasSettings() {
-  const url = prompt('GAS Web App URLを入力してください:
-（script.google.comでデプロイ後に表示されるURL）', state.gasUrl || '');
+  const url = prompt('GAS Web App URLを入力してください\n（script.google.comでデプロイ後に表示されるURL）', state.gasUrl || '');
   if (url !== null) {
     state.gasUrl = url;
     save();
