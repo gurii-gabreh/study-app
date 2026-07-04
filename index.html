@@ -313,7 +313,7 @@ let state = {
   randomMode: false, // 選択肢ランダム表示モード
   shuffleMap: {},    // qkey_qi -> shuffled option indices
   currentCategory: null, // 現在選択中のカテゴリ
-  gasUrl: 'https://script.google.com/macros/s/AKfycbyUdZ4tFzqJVkoL4GMm0BWEettzYBgGAqWAMo1myz1jCQjwgjZAeTKyLNxcG0zaFaE/exec', // GAS Web App URL
+  gasUrl: 'https://script.google.com/macros/s/AKfycbzCDIeYInkEycagsvOfI1q0D67ic6MMMyZhKf4xvSWAY7T8JszZbPsI273YFibuspc/exec', // GAS Web App URL
   dataSourceUrl: '', // URL of all_lessons_data.html
   gistToken: '',    // GitHub Personal Access Token
   gistId: ''        // Gist ID（初回保存後に自動設定）
@@ -347,7 +347,7 @@ function load() {
     state.randomMode = s.randomMode || false;
     state.shuffleMap = s.shuffleMap || {};
     state.currentCategory = s.currentCategory || null;
-    state.gasUrl = s.gasUrl || 'https://script.google.com/macros/s/AKfycbyUdZ4tFzqJVkoL4GMm0BWEettzYBgGAqWAMo1myz1jCQjwgjZAeTKyLNxcG0zaFaE/exec';
+    state.gasUrl = s.gasUrl || 'https://script.google.com/macros/s/AKfycbzCDIeYInkEycagsvOfI1q0D67ic6MMMyZhKf4xvSWAY7T8JszZbPsI273YFibuspc/exec';
     // コメントキーのマイグレーション（旧形式→新形式）
     if (s.comments) {
       const migratedComments = {};
