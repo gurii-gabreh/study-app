@@ -334,9 +334,8 @@ function save() {
 
 function load() {
   const raw = localStorage.getItem(STORE_KEY);
-  if (!raw) return;
   try {
-    const s = JSON.parse(raw);
+    const s = raw ? JSON.parse(raw) : {};
     state.lessons = s.lessons || [];
     state.history = s.history || [];
     state.quizState = s.quizState || {};
@@ -1607,6 +1606,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Init ───────────────────────────────────────────────
 load();
+
+// load()でlocalStorageが空の場合（初回アクセス）も
+// ホーム画面を確実に表示する
+if (!state.currentCategory) {
+  document.getElementById('home-screen').style.display = 'flex';
+  document.getElementById('study-layout').style.display = 'none';
+  document.getElementById('hdr-category-area').style.display = 'none';
+  document.getElementById('hdr-tabs').style.display = 'none';
+  renderHomeScreen();
+}
 
 // Fix modal tab init
 document.querySelectorAll('#mtab-summary,#mtab-points,#mtab-quiz').forEach(el => el.style.display='none');
