@@ -396,9 +396,9 @@ function setMode(m) {
     renderHomeScreen();
   }
 
-  // スプレッドシートからメモを読み込み
+  // スプレッドシートから問題データとメモを読み込み
   if (state.gasUrl) {
-    loadMemosFromSheet();
+    loadLessonsFromSheet();
   }
 }
 
@@ -1287,6 +1287,113 @@ let dataSourceWindow = null;
 const GIST_FILENAME = 'cmdb_study_memo.json';
 
 // ── GAS（スプレッドシート）連携 ─────────────────────────
+// ── スプレッドシートから問題データ読込 ─────────────────
+async function loadLessonsFromSheet() {
+  if (!state.gasUrl) return;
+  try {
+    showLoadingOverlay('📚 問題データを読み込み中...');
+    const res = await fetch(state.gasUrl + '?action=getLessons');
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message);
+
+    const lessons = json.lessons || [];
+    if (lessons.length === 0) {
+      // データが0件の場合は移行を実行
+      hideLoadingOverlay();
+      await migrateDataFromHtml();
+      return;
+    }
+
+    // IDを付与して state.lessons に反映
+    state.lessons = lessons.map(l => ({
+      ...l,
+      id: l.id || (l.course.replace(/\s/g,'') + '_' + l.lesson.replace(/\./g,'')),
+      category: l.category || 'ServiceNow CIS-DF'
+    }));
+
+    // errors の初期化（新規レッスンのみ）
+    state.lessons.forEach(l => {
+      if (!state.errors[l.id]) state.errors[l.id] = new Set();
+    });
+
+    save();
+    hideLoadingOverlay();
+
+    // ホーム画面更新
+    renderHomeScreen();
+    if (state.currentCategory) {
+      renderSidebar();
+      renderContent();
+    }
+
+    // メモも読込
+    loadMemosFromSheet();
+
+  } catch (err) {
+    hideLoadingOverlay();
+    console.error('問題データ読込エラー:', err);
+    showToast('⚠️ 問題データの読込に失敗しました。キャッシュデータを使用します。');
+    // キャッシュが残っていればそのまま使用
+    if (state.lessons.length > 0) {
+      renderHomeScreen();
+      if (state.currentCategory) {
+        renderSidebar();
+        renderContent();
+      }
+    }
+  }
+}
+
+// ── all_lessons_data.htmlからスプレッドシートに移行 ─────
+async function migrateDataFromHtml() {
+  try {
+    showLoadingOverlay('📤 データを移行中...(初回のみ・数分かかる場合があります)');
+    const res = await fetch(state.gasUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'migrateFromHtml' })
+    });
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message);
+
+    hideLoadingOverlay();
+    showToast(`✅ データ移行完了！${json.lessons}レッスン・${json.questions}問をスプレッドシートに保存しました`);
+
+    // 移行完了後に問題データを読込
+    await loadLessonsFromSheet();
+
+  } catch (err) {
+    hideLoadingOverlay();
+    showToast('❌ データ移行に失敗しました: ' + err.message);
+    console.error(err);
+  }
+}
+
+// ── ローディングオーバーレイ ──────────────────────────
+function showLoadingOverlay(msg) {
+  let overlay = document.getElementById('loading-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'loading-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;';
+    overlay.innerHTML = '<div id="loading-msg" style="color:#e6edf3;font-size:16px;"></div><div style="width:48px;height:48px;border:3px solid #30363d;border-top-color:#58a6ff;border-radius:50%;animation:spin 1s linear infinite;"></div>';
+    document.body.appendChild(overlay);
+    // スピナーアニメーション
+    if (!document.getElementById('spin-style')) {
+      const style = document.createElement('style');
+      style.id = 'spin-style';
+      style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(style);
+    }
+  }
+  document.getElementById('loading-msg').textContent = msg;
+  overlay.style.display = 'flex';
+}
+
+function hideLoadingOverlay() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
 function gasSetStatus(msg, type) {
   const el = document.getElementById('gas-status');
   if (!el) return;
