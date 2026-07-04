@@ -371,7 +371,23 @@ function load() {
       const ind = document.querySelector('.datasrc-indicator');
       if (ind) ind.style.background = '#3fb950';
     }
+    // カテゴリを全レッスンに付与（既存データ対応）
+    state.lessons.forEach(l => {
+      if (!l.category) l.category = 'ServiceNow CIS-DF';
+    });
   } catch(e) { console.warn(e); }
+
+  // 常にホーム画面から開始
+  document.getElementById('home-screen').style.display = 'flex';
+  document.getElementById('study-layout').style.display = 'none';
+  document.getElementById('hdr-category-area').style.display = 'none';
+  document.getElementById('hdr-tabs').style.display = 'none';
+  renderHomeScreen();
+
+  // GASから問題データ・メモを読み込み
+  if (state.gasUrl) {
+    loadLessonsFromSheet();
+  }
 }
 
 // ── Mode ───────────────────────────────────────────────
@@ -380,23 +396,8 @@ function setMode(m) {
   document.querySelectorAll('.hdr-tab').forEach((b,i) => {
     b.classList.toggle('on', ['summary','quiz','review','history'][i] === m);
   });
-  // カテゴリを全レッスンに付与（既存データ対応）
-  state.lessons.forEach(l => {
-    if (!l.category) l.category = 'ServiceNow CIS-DF';
-  });
-
-  // 初期表示：常にホーム画面から開始
-  // （GASからデータ読込完了後にカテゴリカードを更新）
-  document.getElementById('home-screen').style.display = 'flex';
-  document.getElementById('study-layout').style.display = 'none';
-  document.getElementById('hdr-category-area').style.display = 'none';
-  document.getElementById('hdr-tabs').style.display = 'none';
-  renderHomeScreen();
-
-  // スプレッドシートから問題データとメモを読み込み
-  if (state.gasUrl) {
-    loadLessonsFromSheet();
-  }
+  renderSidebar();
+  renderContent();
 }
 
 function setActiveLesson(id) {
