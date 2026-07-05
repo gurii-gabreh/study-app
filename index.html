@@ -593,7 +593,7 @@ function renderQuiz(el, lesson, isReview) {
       ${!isReview && errCount > 0 ? `<span class="err-chip">🔴 ${errCount}問ミス</span>` : ''}
       <button class="btn" onclick="resetQuiz('${qkey}',${isReview})">🔄 リセット</button>
       <button class="btn${randOn?' btn-rand-on':''}" onclick="toggleRandom()" title="選択肢の順番をランダムに表示">🔀 ランダム${randOn?' ON':' OFF'}</button>
-      ${qs.done ? `<button class="btn btn-y" onclick="saveHistory('${lid}','${qkey}')">💾 履歴保存</button>` : ''}
+      ${answered > 0 ? `<button class="btn btn-y" onclick="saveHistory('${lid}','${qkey}')">💾 履歴保存</button>` : ''}
     </div>
   `;
 
