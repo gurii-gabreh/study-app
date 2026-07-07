@@ -229,6 +229,7 @@ textarea.tinput{min-height:180px;}
     <button class="datasrc-open-btn" id="datasrc-open-btn" onclick="openDataSourceNewTab()" title="all_lessons_data.htmlを新しいタブで開く">📂 データを開く</button>
     <button class="gas-btn" id="gas-setting-btn" onclick="openGasSettings()" title="GAS Web App URLを設定">⚙️ GAS設定</button>
     <button class="gas-btn" id="gas-migrate-btn" onclick="migrateMemosToSheet()" title="既存メモをスプレッドシートに移行">📤 メモ移行</button>
+    <button class="gas-btn" id="img-setting-btn" onclick="openImageSettings()" title="Google Drive画像取込設定">📷 画像取込設定</button>
     <span class="gas-status" id="gas-status" style="display:none;"></span>
   </div>
 </div>
@@ -244,6 +245,66 @@ textarea.tinput{min-height:180px;}
 <div class="layout" id="study-layout" style="display:none;">
   <div class="side" id="sidebar"></div>
   <div class="content" id="content"></div>
+</div>
+
+<!-- 画像取込設定モーダル -->
+<div class="overlay" id="img-modal" style="display:none;">
+  <div class="modal" style="max-width:560px;">
+    <h3>📷 Google Drive 画像取込設定</h3>
+
+    <div class="ig">
+      <div class="il">ルートフォルダID（GoogleドライブのフォルダURLの末尾ID）</div>
+      <input class="tinput" id="img-root-folder" placeholder="例: 1aBcDeFgHiJkLmNoPqRsTuV" style="min-height:unset;height:36px;">
+      <button class="btn" style="margin-top:6px;" onclick="loadSubFolders()">🔄 サブフォルダを取得</button>
+    </div>
+
+    <div class="ig" style="margin-top:10px;">
+      <div class="il">処理対象サブフォルダ（フォルダ取得後に選択）</div>
+      <select class="tinput" id="img-target-folder" style="min-height:unset;height:36px;">
+        <option value="">-- フォルダを選択 --</option>
+      </select>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+      <div class="ig">
+        <div class="il">1回の処理数（サブフォルダ数）</div>
+        <input class="tinput" id="img-process-count" type="number" min="1" max="10" value="1" style="min-height:unset;height:36px;">
+      </div>
+      <div class="ig">
+        <div class="il">定時処理時刻（JST）</div>
+        <input class="tinput" id="img-schedule-time" type="time" value="23:00" style="min-height:unset;height:36px;">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px;">
+      <div class="ig">
+        <div class="il">カテゴリ（空白可）</div>
+        <input class="tinput" id="img-category" placeholder="ServiceNow CIS-DF" style="min-height:unset;height:36px;">
+      </div>
+      <div class="ig">
+        <div class="il">コース（空白可）</div>
+        <input class="tinput" id="img-course" placeholder="Course 15" style="min-height:unset;height:36px;">
+      </div>
+      <div class="ig">
+        <div class="il">レッスン番号（空白可）</div>
+        <input class="tinput" id="img-lesson" placeholder="15-1" style="min-height:unset;height:36px;">
+      </div>
+    </div>
+
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:10px;margin-top:12px;font-size:11px;color:#8b949e;line-height:1.7;">
+      ⚙️ <strong>Gemini APIキーの設定方法</strong><br>
+      GASのスクリプトエディタ → 「プロジェクトの設定」→「スクリプトプロパティ」<br>
+      プロパティ名: <code style="color:#58a6ff;">GEMINI_API_KEY</code> / 値: Gemini APIキー
+    </div>
+
+    <div id="img-status" style="display:none;font-size:12px;padding:8px;border-radius:6px;margin-top:8px;"></div>
+
+    <div class="mact" style="margin-top:12px;">
+      <button class="btn" onclick="closeImageSettings()">キャンセル</button>
+      <button class="btn btn-p" onclick="runImageProcessNow()">▶️ 今すぐ処理実行</button>
+      <button class="btn btn-p" onclick="saveImageSettings()">💾 設定を保存</button>
+    </div>
+  </div>
 </div>
 
 <!-- Import Modal -->
@@ -1485,6 +1546,116 @@ async function migrateMemosToSheet() {
   } catch (err) {
     gasSetStatus('❌ 移行失敗', 'err');
     console.error(err);
+  }
+}
+
+// ── 画像取込設定 ─────────────────────────────────────
+function openImageSettings() {
+  // 現在の設定を取得してフォームに反映
+  fetch(state.gasUrl + '?action=getImageSettings')
+    .then(r => r.json())
+    .then(json => {
+      if (json.status !== 'ok') return;
+      const s = json.settings;
+      document.getElementById('img-root-folder').value  = s.rootFolderId  || '';
+      document.getElementById('img-process-count').value = s.processCount || 1;
+      document.getElementById('img-category').value     = s.category      || '';
+      document.getElementById('img-course').value       = s.course        || '';
+      document.getElementById('img-lesson').value       = s.lessonNo      || '';
+      // 時刻設定
+      const h = String(s.scheduleHour || 23).padStart(2,'0');
+      const m = String(s.scheduleMin  || 0).padStart(2,'0');
+      document.getElementById('img-schedule-time').value = h + ':' + m;
+      // フォルダ選択を復元
+      if (s.rootFolderId) loadSubFolders(s.targetFolder);
+    })
+    .catch(() => {});
+  document.getElementById('img-modal').style.display = 'flex';
+}
+
+function closeImageSettings() {
+  document.getElementById('img-modal').style.display = 'none';
+}
+
+function setImgStatus(msg, type) {
+  const el = document.getElementById('img-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+  el.style.background = type === 'ok' ? '#0d2c1a' : type === 'err' ? '#2c1416' : '#1a2a3a';
+  el.style.color = type === 'ok' ? '#3fb950' : type === 'err' ? '#f85149' : '#58a6ff';
+  el.style.border = '1px solid ' + (type === 'ok' ? '#2ea043' : type === 'err' ? '#da3633' : '#1f6feb');
+}
+
+async function loadSubFolders(selectValue) {
+  const rootId = document.getElementById('img-root-folder').value.trim();
+  if (!rootId) { setImgStatus('ルートフォルダIDを入力してください', 'err'); return; }
+  setImgStatus('フォルダ取得中...', 'ing');
+  try {
+    const res = await fetch(state.gasUrl + '?action=getSubFolders&rootFolderId=' + encodeURIComponent(rootId));
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message);
+    const sel = document.getElementById('img-target-folder');
+    sel.innerHTML = '<option value="">-- フォルダを選択 --</option>';
+    (json.folders || []).forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.name;
+      opt.textContent = f.name;
+      if (selectValue && f.name === selectValue) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    setImgStatus('✅ ' + (json.folders || []).length + '件のフォルダを取得しました', 'ok');
+  } catch (err) {
+    setImgStatus('❌ ' + err.message, 'err');
+  }
+}
+
+async function saveImageSettings() {
+  const timeVal = document.getElementById('img-schedule-time').value || '23:00';
+  const [h, m] = timeVal.split(':').map(Number);
+  const settings = {
+    rootFolderId: document.getElementById('img-root-folder').value.trim(),
+    targetFolder: document.getElementById('img-target-folder').value,
+    processCount: parseInt(document.getElementById('img-process-count').value) || 1,
+    scheduleHour: h || 23,
+    scheduleMin:  m || 0,
+    category:     document.getElementById('img-category').value.trim(),
+    course:       document.getElementById('img-course').value.trim(),
+    lessonNo:     document.getElementById('img-lesson').value.trim(),
+  };
+  setImgStatus('保存中...', 'ing');
+  try {
+    const res = await fetch(state.gasUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'saveImageSettings', settings, updateTrigger: true })
+    });
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message);
+    setImgStatus('✅ 設定を保存しました（定時処理トリガーを更新しました）', 'ok');
+    showToast('📷 画像取込設定を保存しました');
+  } catch (err) {
+    setImgStatus('❌ ' + err.message, 'err');
+  }
+}
+
+async function runImageProcessNow() {
+  if (!confirm('今すぐ画像処理を実行しますか？\n（処理に数分かかる場合があります）')) return;
+  // まず設定を保存
+  await saveImageSettings();
+  setImgStatus('処理中...（数分かかる場合があります）', 'ing');
+  try {
+    const res = await fetch(state.gasUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'runImageProcess' })
+    });
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message);
+    setImgStatus('✅ 処理が完了しました。スプレッドシートをご確認ください。', 'ok');
+    showToast('📷 画像処理が完了しました');
+    // 問題データを再読込
+    await loadLessonsFromSheet();
+  } catch (err) {
+    setImgStatus('❌ ' + err.message, 'err');
   }
 }
 
