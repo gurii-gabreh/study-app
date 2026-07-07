@@ -1363,11 +1363,12 @@ async function loadLessonsFromSheet() {
       return;
     }
 
-    // IDを付与して state.lessons に反映
+    // IDを付与してstate.lessonsに反映（normalizeQuizでフィールド名を統一）
     state.lessons = lessons.map(l => ({
       ...l,
       id: l.id || (l.course.replace(/\s/g,'') + '_' + l.lesson.replace(/\./g,'')),
-      category: l.category || 'ServiceNow CIS-DF'
+      category: l.category || 'ServiceNow CIS-DF',
+      quiz: normalizeQuiz(l.quiz || [])
     }));
 
     // errors の初期化（新規レッスンのみ）
