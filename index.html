@@ -276,19 +276,51 @@ textarea.tinput{min-height:180px;}
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px;">
-      <div class="ig">
-        <div class="il">カテゴリ（空白可）</div>
-        <input class="tinput" id="img-category" placeholder="ServiceNow CIS-DF" style="min-height:unset;height:36px;">
+    <div style="margin-top:12px;background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px;">
+      <div style="font-size:11px;color:#8b949e;margin-bottom:8px;font-weight:600;">📂 カテゴリ・コース・レッスン設定</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div class="ig">
+          <div class="il">カテゴリ</div>
+          <select class="tinput" id="img-category" onchange="onImgCategoryChange(this.value)" style="min-height:unset;height:36px;">
+            <option value="">-- 選択 --</option>
+          </select>
+        </div>
+        <div class="ig">
+          <div class="il">コース</div>
+          <select class="tinput" id="img-course" onchange="onImgCourseChange(this.value)" style="min-height:unset;height:36px;">
+            <option value="">-- 選択 --</option>
+          </select>
+        </div>
+        <div class="ig">
+          <div class="il">レッスン番号</div>
+          <select class="tinput" id="img-lesson" style="min-height:unset;height:36px;">
+            <option value="">-- 選択 --</option>
+          </select>
+        </div>
       </div>
-      <div class="ig">
-        <div class="il">コース（空白可）</div>
-        <input class="tinput" id="img-course" placeholder="Course 15" style="min-height:unset;height:36px;">
-      </div>
-      <div class="ig">
-        <div class="il">レッスン番号（空白可）</div>
-        <input class="tinput" id="img-lesson" placeholder="15-1" style="min-height:unset;height:36px;">
-      </div>
+      <details style="margin-top:8px;">
+        <summary style="font-size:11px;color:#58a6ff;cursor:pointer;user-select:none;">＋ 新規カテゴリ・コース・レッスンを追加</summary>
+        <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;align-items:end;">
+          <div class="ig">
+            <div class="il">カテゴリ名</div>
+            <input class="tinput" id="new-master-category" placeholder="例: 基本情報技術者" style="min-height:unset;height:32px;font-size:11px;">
+          </div>
+          <div class="ig">
+            <div class="il">コース名</div>
+            <input class="tinput" id="new-master-course" placeholder="例: 午前問題" style="min-height:unset;height:32px;font-size:11px;">
+          </div>
+          <div class="ig">
+            <div class="il">レッスン番号</div>
+            <input class="tinput" id="new-master-lesson" placeholder="例: 1-1" style="min-height:unset;height:32px;font-size:11px;">
+          </div>
+          <div class="ig">
+            <div class="il">タイトル（任意）</div>
+            <input class="tinput" id="new-master-title" placeholder="例: 基礎理論" style="min-height:unset;height:32px;font-size:11px;">
+          </div>
+        </div>
+        <button class="btn btn-p" style="margin-top:6px;width:100%;font-size:12px;" onclick="addMasterData()">＋ 追加してスプレッドシートに保存</button>
+        <div id="master-status" style="display:none;font-size:11px;margin-top:4px;padding:4px 8px;border-radius:4px;"></div>
+      </details>
     </div>
 
     <div style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:10px;margin-top:12px;font-size:11px;color:#8b949e;line-height:1.7;">
@@ -1551,6 +1583,127 @@ async function migrateMemosToSheet() {
 }
 
 // ── 画像取込設定 ─────────────────────────────────────
+// ── マスターデータ管理 ───────────────────────────────────
+let masterData = {}; // { カテゴリ: { コース: [{lesson, title}] } }
+
+async function loadMasterData(selectCategory, selectCourse, selectLesson) {
+  try {
+    const res = await fetch(state.gasUrl + '?action=getMaster');
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message);
+    masterData = json.master || {};
+
+    // カテゴリプルダウン更新
+    const catSel = document.getElementById('img-category');
+    const curCat = selectCategory || catSel.value;
+    catSel.innerHTML = '<option value="">-- 選択 --</option>';
+    Object.keys(masterData).forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat;
+      opt.textContent = cat;
+      if (cat === curCat) opt.selected = true;
+      catSel.appendChild(opt);
+    });
+
+    // カテゴリが選択済みならコースも更新
+    if (curCat) {
+      onImgCategoryChange(curCat, selectCourse, selectLesson);
+    }
+  } catch (err) {
+    console.warn('マスターデータ読込エラー:', err);
+  }
+}
+
+function onImgCategoryChange(cat, selectCourse, selectLesson) {
+  const courseSel = document.getElementById('img-course');
+  const lessonSel = document.getElementById('img-lesson');
+  courseSel.innerHTML = '<option value="">-- 選択 --</option>';
+  lessonSel.innerHTML = '<option value="">-- 選択 --</option>';
+
+  if (!cat || !masterData[cat]) return;
+
+  const courses = Object.keys(masterData[cat]);
+  courses.forEach(course => {
+    const opt = document.createElement('option');
+    opt.value = course;
+    opt.textContent = course;
+    if (course === selectCourse) opt.selected = true;
+    courseSel.appendChild(opt);
+  });
+
+  if (selectCourse) {
+    onImgCourseChange(selectCourse, selectLesson);
+  }
+}
+
+function onImgCourseChange(course, selectLesson) {
+  const cat = document.getElementById('img-category').value;
+  const lessonSel = document.getElementById('img-lesson');
+  lessonSel.innerHTML = '<option value="">-- 選択 --</option>';
+
+  if (!cat || !course || !masterData[cat] || !masterData[cat][course]) return;
+
+  masterData[cat][course].forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.lesson;
+    opt.textContent = item.lesson + (item.title ? ': ' + item.title : '');
+    if (item.lesson === selectLesson) opt.selected = true;
+    lessonSel.appendChild(opt);
+  });
+}
+
+async function addMasterData() {
+  const category = document.getElementById('new-master-category').value.trim();
+  const course   = document.getElementById('new-master-course').value.trim();
+  const lessonNo = document.getElementById('new-master-lesson').value.trim();
+  const title    = document.getElementById('new-master-title').value.trim();
+
+  if (!category) {
+    setMasterStatus('カテゴリ名は必須です', 'err');
+    return;
+  }
+
+  setMasterStatus('保存中...', 'ing');
+  try {
+    const res = await fetch(state.gasUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'addMaster', category, course, lessonNo, title })
+    });
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message);
+
+    setMasterStatus('✅ 追加しました', 'ok');
+    // フォームをクリア
+    document.getElementById('new-master-category').value = '';
+    document.getElementById('new-master-course').value = '';
+    document.getElementById('new-master-lesson').value = '';
+    document.getElementById('new-master-title').value = '';
+    // プルダウンを更新
+    await loadMasterData(category, course, lessonNo);
+
+    // アプリのCATEGORIESにも追加（ホーム画面に反映）
+    if (!CATEGORIES[category]) {
+      CATEGORIES[category] = {
+        icon: '📚',
+        desc: category + 'の試験対策問題集です。',
+        color: '#e67e22',
+      };
+      renderHomeScreen();
+    }
+  } catch (err) {
+    setMasterStatus('❌ ' + err.message, 'err');
+  }
+}
+
+function setMasterStatus(msg, type) {
+  const el = document.getElementById('master-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+  el.style.background = type === 'ok' ? '#0d2c1a' : type === 'err' ? '#2c1416' : '#1a2a3a';
+  el.style.color = type === 'ok' ? '#3fb950' : type === 'err' ? '#f85149' : '#58a6ff';
+}
+
 function openImageSettings() {
   // 現在の設定を取得してフォームに反映
   fetch(state.gasUrl + '?action=getImageSettings')
@@ -1558,19 +1711,21 @@ function openImageSettings() {
     .then(json => {
       if (json.status !== 'ok') return;
       const s = json.settings;
-      document.getElementById('img-root-folder').value  = s.rootFolderId  || '';
+      document.getElementById('img-root-folder').value   = s.rootFolderId || '';
       document.getElementById('img-process-count').value = s.processCount || 1;
-      document.getElementById('img-category').value     = s.category      || '';
-      document.getElementById('img-course').value       = s.course        || '';
-      document.getElementById('img-lesson').value       = s.lessonNo      || '';
       // 時刻設定
       const h = String(s.scheduleHour || 23).padStart(2,'0');
       const m = String(s.scheduleMin  || 0).padStart(2,'0');
       document.getElementById('img-schedule-time').value = h + ':' + m;
       // フォルダ選択を復元
       if (s.rootFolderId) loadSubFolders(s.targetFolder);
+      // マスターデータ読込（カテゴリ・コース・レッスンを復元）
+      loadMasterData(s.category || '', s.course || '', s.lessonNo || '');
     })
-    .catch(() => {});
+    .catch(() => {
+      // GAS未設定時もマスターデータを読込試行
+      loadMasterData('', '', '');
+    });
   document.getElementById('img-modal').style.display = 'flex';
 }
 
@@ -1620,9 +1775,9 @@ async function saveImageSettings() {
     processCount: parseInt(document.getElementById('img-process-count').value) || 1,
     scheduleHour: h || 23,
     scheduleMin:  m || 0,
-    category:     document.getElementById('img-category').value.trim(),
-    course:       document.getElementById('img-course').value.trim(),
-    lessonNo:     document.getElementById('img-lesson').value.trim(),
+    category:     document.getElementById('img-category').value,
+    course:       document.getElementById('img-course').value,
+    lessonNo:     document.getElementById('img-lesson').value,
   };
   setImgStatus('保存中...', 'ing');
   try {
