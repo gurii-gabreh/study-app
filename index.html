@@ -393,12 +393,7 @@ textarea.tinput{min-height:180px;}
 const STORE_KEY = 'cmdb_study_v2';
 // ── カテゴリ定義 ─────────────────────────────────────
 const CATEGORIES = {
-  'ServiceNow CIS-DF': {
-    icon: '🔧',
-    desc: 'ServiceNow認定試験 CIS-DF（Discovery & CMDB Foundations）の試験対策問題集です。\nCMDB基礎・Discovery・CSDM・IRE・CMDB Health等を幅広くカバーしています。',
-    color: '#4a90d9',
-  }
-  // 今後追加：基本情報処理技術者試験 など
+  'ServiceNow CIS-DF': { icon: '🔧', desc: '', color: '#4a90d9' }
 };
 
 let state = {
@@ -895,9 +890,7 @@ function renderHomeScreen() {
     const s = stats[catName] || { lessons: 0, questions: 0 };
     html += `
       <div class="category-card" onclick="selectCategory('${catName}')" style="border-top:4px solid ${cat.color}">
-        <div class="category-card-icon">${cat.icon}</div>
         <div class="category-card-name">${catName}</div>
-        <div class="category-card-desc">${cat.desc.replace(/\n/g,'<br>')}</div>
         <div class="category-card-stats">📚 ${s.lessons}レッスン ／ ❓ ${s.questions}問</div>
       </div>`;
   });
@@ -1410,6 +1403,14 @@ async function loadLessonsFromSheet() {
 
     save();
     hideLoadingOverlay();
+
+    // スプレッドシートから取得したカテゴリをCATEGORIESに自動追加
+    state.lessons.forEach(l => {
+      const cat = l.category || 'ServiceNow CIS-DF';
+      if (!CATEGORIES[cat]) {
+        CATEGORIES[cat] = { icon: '📚', desc: '', color: '#e67e22' };
+      }
+    });
 
     // ホーム画面更新
     renderHomeScreen();
