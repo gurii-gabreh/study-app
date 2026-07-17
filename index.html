@@ -367,6 +367,7 @@ textarea.tinput{min-height:180px;}
       <button class="mtab" onclick="switchMTab('summary')">要約データ</button>
       <button class="mtab" onclick="switchMTab('points')">ポイント表</button>
       <button class="mtab" onclick="switchMTab('quiz')">問題データ</button>
+      <button class="mtab" onclick="switchMTab('bulk')">📦 一括インポート</button>
     </div>
     <!-- info tab -->
     <div id="mtab-info">
@@ -398,6 +399,20 @@ textarea.tinput{min-height:180px;}
 正解列はA/B/C/Dのいずれかで指定
 スプレッドシートの「スプレッドシート用コピー」ボタンのデータをそのまま貼り付け可能
 先頭のレッスン列・コース列は自動的に無視されます</div>
+    </div>
+    <!-- bulk tab -->
+    <div id="mtab-bulk" style="display:none;">
+      <div class="ig">
+        <div class="il">スプレッドシートを直接貼り付け（カテゴリ〜複数選択の14列をそのままコピー＆ペースト）</div>
+        <textarea class="tinput" id="imp-bulk" style="min-height:260px;" placeholder="カテゴリ&#9;コース&#9;レッスン番号&#9;レッスンタイトル&#9;問番号&#9;問題タイプ&#9;問題文&#9;選択肢A&#9;選択肢B&#9;選択肢C&#9;選択肢D&#9;正解&#9;解説&#9;複数選択"></textarea>
+      </div>
+      <div class="hint-box">列の形式：カテゴリ[TAB]コース[TAB]レッスン番号[TAB]レッスンタイトル[TAB]問番号[TAB]問題タイプ[TAB]問題文[TAB]選択肢A[TAB]選択肢B[TAB]選択肢C[TAB]選択肢D[TAB]正解[TAB]解説[TAB]複数選択
+コース・レッスン番号・レッスンタイトル・問番号・問題タイプは空欄でも構いません（空欄の場合は既定値で取り込まれます）
+複数選択列に正解の記号（例：A,C）を入れると複数選択問題として取り込まれます。空欄なら単一選択（正解列を使用）
+ヘッダー行は自動的にスキップされます。同じカテゴリ・コース・レッスン番号の行は1つのレッスンにまとめられ、既存レッスンがあれば問題が追加されます</div>
+      <div class="mact" style="margin-top:8px;">
+        <button class="btn btn-p" style="width:100%;" onclick="importBulkQuizData()">📦 一括インポート実行</button>
+      </div>
     </div>
     <div class="mact">
       <button class="btn" onclick="closeModal()">キャンセル</button>
@@ -1451,14 +1466,13 @@ function closeModal() {
 }
 function switchMTab(t) {
   mTabCurrent = t;
-  ['info','summary','points','quiz'].forEach(s => {
-    const tab = document.querySelector(`.mtab:nth-child(${['info','summary','points','quiz'].indexOf(s)+1})`);
+  ['info','summary','points','quiz','bulk'].forEach(s => {
     const panel = document.getElementById('mtab-'+s);
     if (panel) panel.style.display = s===t ? 'flex' : 'none';
     if (panel) panel.style.flexDirection = 'column';
   });
   document.querySelectorAll('.mtab').forEach((b,i) => {
-    b.classList.toggle('on', ['info','summary','points','quiz'][i]===t);
+    b.classList.toggle('on', ['info','summary','points','quiz','bulk'][i]===t);
   });
 }
 
@@ -1522,6 +1536,91 @@ function importLesson() {
     renderContent();
   }
   showToast(`「${title}」をインポートしました（問題:${quiz.length}問）`);
+}
+
+// ── 一括インポート（スプレッドシート14列: カテゴリ/コース/レッスン番号/レッスンタイトル/問番号/問題タイプ/問題文/選択肢A-D/正解/解説/複数選択）──
+// コース・レッスン番号・レッスンタイトル・問番号・問題タイプは空欄可（既定値で取り込む）
+function parseBulkQuizRows(text) {
+  const lines = text.replace(/\r\n/g,'\n').split('\n');
+  const groups = {}; // category__course__lesson -> {category,course,lesson,title,quiz:[]}
+  const order = [];
+
+  lines.forEach((line, li) => {
+    if (!line.trim()) return;
+    const cols = line.split('\t');
+    if (li === 0 && (cols[0]||'').trim() === 'カテゴリ') return; // ヘッダー行をスキップ
+
+    const category = (cols[0]||'').trim() || (state.currentCategory || 'ServiceNow CIS-DF');
+    const course = (cols[1]||'').trim() || 'Course 1';
+    const lessonNo = (cols[2]||'').trim() || '1-1';
+    const title = (cols[3]||'').trim();
+    const type = (cols[5]||'').trim() || '基礎';
+    const q = (cols[6]||'').trim();
+    if (!q) return; // 問題文が無い行は取り込み対象外
+
+    const opts = [cols[7]||'', cols[8]||'', cols[9]||'', cols[10]||''];
+    const ansLetter = (cols[11]||'A').trim().toUpperCase();
+    const ans = Math.max(0, 'ABCD'.indexOf(ansLetter));
+    const exp = (cols[12]||'').trim();
+
+    let multi = null;
+    const multiRaw = (cols[13]||'').trim();
+    if (multiRaw) {
+      const letters = multiRaw.toUpperCase().split(/[^A-D]+/).filter(Boolean);
+      const idx = letters.map(l => 'ABCD'.indexOf(l)).filter(i => i >= 0).sort((a,b)=>a-b);
+      if (idx.length > 0) multi = idx;
+    }
+
+    const key = category + '__' + course + '__' + lessonNo;
+    if (!groups[key]) {
+      groups[key] = { category, course, lesson: lessonNo, title, quiz: [] };
+      order.push(key);
+    } else if (title && !groups[key].title) {
+      groups[key].title = title;
+    }
+    groups[key].quiz.push({ type, q, opts, ans, multi, exp });
+  });
+
+  return order.map(k => groups[k]);
+}
+
+function importBulkQuizData() {
+  const raw = document.getElementById('imp-bulk').value;
+  if (!raw.trim()) { showToast('データを貼り付けてください'); return; }
+
+  const groups = parseBulkQuizRows(raw);
+  if (groups.length === 0) { showToast('取り込める行が見つかりませんでした'); return; }
+
+  let newLessonCount = 0, updatedLessonCount = 0, qCount = 0;
+  groups.forEach(g => {
+    qCount += g.quiz.length;
+    const existing = state.lessons.find(l =>
+      (l.category || 'ServiceNow CIS-DF') === g.category && l.course === g.course && l.lesson === g.lesson);
+    if (existing) {
+      existing.quiz = (existing.quiz || []).concat(g.quiz);
+      if (!existing.title && g.title) existing.title = g.title;
+      updatedLessonCount++;
+    } else {
+      const id = g.course.replace(/\s/g,'') + '_' + g.lesson.replace(/\./g,'') + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+      state.lessons.push({
+        id, course: g.course, lesson: g.lesson,
+        title: g.title || `${g.course} ${g.lesson}`,
+        category: g.category, summary: '', points: [], quiz: g.quiz
+      });
+      if (!CATEGORIES[g.category]) CATEGORIES[g.category] = { icon: '📚', desc: '', color: '#e67e22' };
+      newLessonCount++;
+    }
+  });
+
+  save();
+  document.getElementById('imp-bulk').value = '';
+  closeModal();
+  renderHomeScreen();
+  if (state.currentCategory) {
+    renderSidebar();
+    renderContent();
+  }
+  showToast(`📦 一括インポート完了：新規${newLessonCount}レッスン／更新${updatedLessonCount}レッスン／問題${qCount}問`);
 }
 
 function deleteLesson(id) {
@@ -2418,7 +2517,7 @@ load();
 // 起動時は必ずホーム画面を表示する
 
 // Fix modal tab init
-document.querySelectorAll('#mtab-summary,#mtab-points,#mtab-quiz').forEach(el => el.style.display='none');
+document.querySelectorAll('#mtab-summary,#mtab-points,#mtab-quiz,#mtab-bulk').forEach(el => el.style.display='none');
 document.getElementById('mtab-info').style.display = 'flex';
 document.getElementById('mtab-info').style.flexDirection = 'column';
 </script>
