@@ -151,12 +151,28 @@ textarea.tinput{min-height:180px;}
 .exp-label{font-weight:700;margin-right:4px;}
 
 /* History */
-.hist-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
-.hist-lesson{font-size:11px;color:var(--text2);flex-shrink:0;}
-.hist-score{font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 8px;border-radius:4px;}
+.hist-score{font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 8px;border-radius:4px;white-space:nowrap;}
 .hist-score.ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
 .hist-score.ng{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
-.hist-date{font-size:10px;color:var(--text3);margin-left:auto;white-space:nowrap;}
+.hist-course-sec{margin-bottom:24px;}
+.hist-course-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.hist-course-name{font-size:14px;font-weight:700;color:var(--text);}
+.hist-count-tabs{display:flex;gap:4px;}
+.hist-count-btn{padding:3px 10px;border-radius:var(--r);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.hist-count-btn:hover{border-color:var(--border2);color:var(--text);}
+.hist-count-btn.on{background:var(--accent2);border-color:var(--accent);color:#fff;}
+.hist-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r);}
+.hist-table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap;}
+.hist-table th{text-align:center;padding:6px 10px;background:var(--bg3);border-bottom:1px solid var(--border);color:var(--text2);font-weight:500;font-size:11px;}
+.hist-table th:nth-child(1),.hist-table th:nth-child(2){text-align:left;}
+.hist-table td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text);text-align:center;}
+.hist-table tr:last-child td{border-bottom:none;}
+.hist-table tr:hover td{background:var(--bg3);}
+.hist-date-cell{font-size:10px;color:var(--text3);text-align:left;}
+.hist-lesson-cell{font-size:11px;color:var(--text2);text-align:left;}
+.maru{color:var(--green);font-weight:700;}
+.batsu{color:var(--red);font-weight:700;}
+.hist-na{color:var(--text3);}
 
 /* Err review */
 .err-section{background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--yellow);}
@@ -505,7 +521,7 @@ function renderSidebar() {
   if (mode === 'history') { el.innerHTML = ''; return; }
   if (mode === 'review') {
     html += `<div class="side-sec">復習リスト</div>`;
-    const errLessons = state.lessons.filter(l => (state.errors[l.id]?.size || 0) > 0);
+    const errLessons = lessons.filter(l => (state.errors[l.id]?.size || 0) > 0);
     if (errLessons.length === 0) {
       html += `<div style="padding:8px;font-size:12px;color:var(--text3);">間違えた問題はありません</div>`;
     } else {
@@ -525,7 +541,7 @@ function renderSidebar() {
 
   // Group by course
   const courses = {};
-  state.lessons.forEach(l => {
+  lessons.forEach(l => {
     if (!courses[l.course]) courses[l.course] = [];
     courses[l.course].push(l);
   });
@@ -1014,7 +1030,8 @@ function saveHistory(lid, qkey) {
     correct,
     total,
     date: dateStr,
-    wrongs: errArr
+    wrongs: errArr,
+    scores: qs.scores.slice() // 各問題の正解(1)/不正解(0)/未回答(null)を○×表示用に保持
   });
   save();
 
@@ -1037,23 +1054,76 @@ function saveHistory(lid, qkey) {
 }
 
 
+// コースごとの履歴表示件数（1 / 10 / 20 / 全件）。永続化不要のUI状態のためモジュール変数で保持
+const historyViewCount = {};
+
 function renderHistory(el) {
-  if (state.history.length === 0) {
+  // 現在選択中のカテゴリの履歴のみに絞り込む
+  const history = state.currentCategory
+    ? state.history.filter(h => (h.category || 'ServiceNow CIS-DF') === state.currentCategory)
+    : state.history;
+
+  if (history.length === 0) {
     el.innerHTML = `<div class="welcome"><div style="font-size:48px;">📊</div><h2>履歴がありません</h2><p>問題モードで回答後「履歴保存」ボタンを押すと記録されます。</p></div>`;
     return;
   }
-  let html = `<div class="sec-hdr"><span class="sec-title">📊 回答履歴</span><button class="btn btn-d" onclick="clearHistory()">🗑 全削除</button></div>`;
-  state.history.forEach((h,i) => {
-    const pct = Math.round(h.correct/h.total*100);
-    const cls = pct>=80?'ok':'ng';
-    html += `<div class="hist-item">
-      <span class="hist-lesson">${h.course} · ${h.lesson} ${h.title}</span>
-      <span class="hist-score ${cls}">${h.correct}/${h.total} (${pct}%)</span>
-      ${h.wrongs?.length>0?`<span style="font-size:10px;color:var(--red);">ミス:Q${h.wrongs.map(x=>x+1).join(',')}` :''}
-      <span class="hist-date">${h.date}</span>
-    </div>`;
+
+  // コースごとにグループ化（履歴は新しい順に並んでいるためグループ内も新しい順）
+  const groups = {};
+  history.forEach(h => {
+    if (!groups[h.course]) groups[h.course] = [];
+    groups[h.course].push(h);
   });
+
+  let html = `<div class="sec-hdr"><span class="sec-title">📊 回答履歴</span><button class="btn btn-d" onclick="clearHistory()">🗑 全削除</button></div>`;
+
+  Object.entries(groups).forEach(([course, entries]) => {
+    const viewCount = historyViewCount[course] || 10;
+    const shown = viewCount === 'all' ? entries : entries.slice(0, viewCount);
+    const maxQ = shown.reduce((m,h) => Math.max(m, h.total || 0), 0);
+    const courseJs = course.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+    html += `<div class="hist-course-sec">`;
+    html += `<div class="hist-course-hdr">
+      <span class="hist-course-name">${escHtml(course)}</span>
+      <span class="hist-count-tabs">
+        ${[1,10,20,'all'].map(c => `<button class="hist-count-btn${viewCount===c?' on':''}" onclick="setHistoryViewCount('${courseJs}',${c==='all'?"'all'":c})">${c==='all'?'全件':c+'回'}</button>`).join('')}
+      </span>
+    </div>`;
+
+    html += `<div class="hist-table-wrap"><table class="hist-table"><thead><tr>
+      <th>日時</th><th>レッスン</th><th>点数</th>`;
+    for (let qi=0; qi<maxQ; qi++) html += `<th>Q${qi+1}</th>`;
+    html += `</tr></thead><tbody>`;
+    shown.forEach(h => {
+      const pct = h.total ? Math.round(h.correct/h.total*100) : 0;
+      const cls = pct>=80?'ok':'ng';
+      html += `<tr><td class="hist-date-cell">${h.date}</td><td class="hist-lesson-cell">${escHtml(h.lesson)} ${escHtml(h.title||'')}</td><td><span class="hist-score ${cls}">${h.correct}/${h.total}</span></td>`;
+      for (let qi=0; qi<maxQ; qi++) {
+        if (qi >= h.total) { html += `<td></td>`; continue; }
+        let mark;
+        if (h.scores) {
+          // 新形式：正解(1)/不正解(0)/未回答(null)を判別
+          if (h.scores[qi] === 1) mark = `<span class="maru">○</span>`;
+          else if (h.scores[qi] === 0) mark = `<span class="batsu">✕</span>`;
+          else mark = `<span class="hist-na">-</span>`;
+        } else {
+          // 旧データ（scores未保存）：wrongsのみから判定
+          mark = h.wrongs && h.wrongs.includes(qi) ? `<span class="batsu">✕</span>` : `<span class="maru">○</span>`;
+        }
+        html += `<td>${mark}</td>`;
+      }
+      html += `</tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+  });
+
   el.innerHTML = html;
+}
+
+function setHistoryViewCount(course, count) {
+  historyViewCount[course] = count;
+  renderHistory(document.getElementById('content'));
 }
 
 function clearHistory() {
