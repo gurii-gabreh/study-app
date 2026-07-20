@@ -113,6 +113,7 @@ textarea.tinput{min-height:180px;}
 .qcard.answered-ok{border-color:var(--green-border);}
 .qcard.answered-ng{border-color:var(--red-border);}
 .qno{font-size:11px;color:var(--text3);margin-bottom:3px;font-family:'JetBrains Mono',monospace;}
+.qsrc{font-size:10px;color:var(--text3);font-weight:400;margin-left:8px;font-family:'Noto Sans JP',sans-serif;}
 .tbadge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;margin-bottom:6px;}
 .t基礎{background:#0d2c1a;color:#3fb950;border:1px solid #2ea043;}
 .t意地悪{background:#2c1416;color:#f85149;border:1px solid #da3633;}
@@ -151,12 +152,28 @@ textarea.tinput{min-height:180px;}
 .exp-label{font-weight:700;margin-right:4px;}
 
 /* History */
-.hist-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
-.hist-lesson{font-size:11px;color:var(--text2);flex-shrink:0;}
-.hist-score{font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 8px;border-radius:4px;}
+.hist-score{font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 8px;border-radius:4px;white-space:nowrap;}
 .hist-score.ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
 .hist-score.ng{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
-.hist-date{font-size:10px;color:var(--text3);margin-left:auto;white-space:nowrap;}
+.hist-course-sec{margin-bottom:24px;}
+.hist-course-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.hist-course-name{font-size:14px;font-weight:700;color:var(--text);}
+.hist-count-tabs{display:flex;gap:4px;}
+.hist-count-btn{padding:3px 10px;border-radius:var(--r);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.hist-count-btn:hover{border-color:var(--border2);color:var(--text);}
+.hist-count-btn.on{background:var(--accent2);border-color:var(--accent);color:#fff;}
+.hist-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r);}
+.hist-table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap;}
+.hist-table th{text-align:center;padding:6px 10px;background:var(--bg3);border-bottom:1px solid var(--border);color:var(--text2);font-weight:500;font-size:11px;}
+.hist-table th:nth-child(1),.hist-table th:nth-child(2){text-align:left;}
+.hist-table td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text);text-align:center;}
+.hist-table tr:last-child td{border-bottom:none;}
+.hist-table tr:hover td{background:var(--bg3);}
+.hist-date-cell{font-size:10px;color:var(--text3);text-align:left;}
+.hist-lesson-cell{font-size:11px;color:var(--text2);text-align:left;}
+.maru{color:var(--green);font-weight:700;}
+.batsu{color:var(--red);font-weight:700;}
+.hist-na{color:var(--text3);}
 
 /* Err review */
 .err-section{background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--yellow);}
@@ -222,6 +239,7 @@ textarea.tinput{min-height:180px;}
     <button class="hdr-tab on" onclick="setMode('summary')">📄 要約</button>
     <button class="hdr-tab" onclick="setMode('quiz')">❓ 問題</button>
     <button class="hdr-tab" onclick="setMode('review')">🔴 復習</button>
+    <button class="hdr-tab" onclick="setMode('weak')">🧠 苦手問題</button>
     <button class="hdr-tab" onclick="setMode('history')">📊 履歴</button>
     <button class="datasrc-btn" id="datasrc-btn" onclick="openDataSource()" title="all_lessons_data.htmlからデータを読み込みます">
       <span class="datasrc-indicator"></span>データソース更新
@@ -349,6 +367,7 @@ textarea.tinput{min-height:180px;}
       <button class="mtab" onclick="switchMTab('summary')">要約データ</button>
       <button class="mtab" onclick="switchMTab('points')">ポイント表</button>
       <button class="mtab" onclick="switchMTab('quiz')">問題データ</button>
+      <button class="mtab" onclick="switchMTab('bulk')">📦 一括インポート</button>
     </div>
     <!-- info tab -->
     <div id="mtab-info">
@@ -380,6 +399,20 @@ textarea.tinput{min-height:180px;}
 正解列はA/B/C/Dのいずれかで指定
 スプレッドシートの「スプレッドシート用コピー」ボタンのデータをそのまま貼り付け可能
 先頭のレッスン列・コース列は自動的に無視されます</div>
+    </div>
+    <!-- bulk tab -->
+    <div id="mtab-bulk" style="display:none;">
+      <div class="ig">
+        <div class="il">スプレッドシートを直接貼り付け（カテゴリ〜複数選択の14列をそのままコピー＆ペースト）</div>
+        <textarea class="tinput" id="imp-bulk" style="min-height:260px;" placeholder="カテゴリ&#9;コース&#9;レッスン番号&#9;レッスンタイトル&#9;問番号&#9;問題タイプ&#9;問題文&#9;選択肢A&#9;選択肢B&#9;選択肢C&#9;選択肢D&#9;正解&#9;解説&#9;複数選択"></textarea>
+      </div>
+      <div class="hint-box">列の形式：カテゴリ[TAB]コース[TAB]レッスン番号[TAB]レッスンタイトル[TAB]問番号[TAB]問題タイプ[TAB]問題文[TAB]選択肢A[TAB]選択肢B[TAB]選択肢C[TAB]選択肢D[TAB]正解[TAB]解説[TAB]複数選択
+コース・レッスン番号・レッスンタイトル・問番号・問題タイプは空欄でも構いません（空欄の場合は既定値で取り込まれます）
+複数選択列に正解の記号（例：A,C）を入れると複数選択問題として取り込まれます。空欄なら単一選択（正解列を使用）
+ヘッダー行は自動的にスキップされます。同じカテゴリ・コース・レッスン番号の行は1つのレッスンにまとめられ、既存レッスンがあれば問題が追加されます</div>
+      <div class="mact" style="margin-top:8px;">
+        <button class="btn btn-p" style="width:100%;" onclick="importBulkQuizData()">📦 一括インポート実行</button>
+      </div>
     </div>
     <div class="mact">
       <button class="btn" onclick="closeModal()">キャンセル</button>
@@ -482,7 +515,7 @@ function load() {
 function setMode(m) {
   state.mode = m;
   document.querySelectorAll('.hdr-tab').forEach((b,i) => {
-    b.classList.toggle('on', ['summary','quiz','review','history'][i] === m);
+    b.classList.toggle('on', ['summary','quiz','review','weak','history'][i] === m);
   });
   renderSidebar();
   renderContent();
@@ -502,10 +535,10 @@ function renderSidebar() {
   const mode = state.mode;
   let html = '';
 
-  if (mode === 'history') { el.innerHTML = ''; return; }
+  if (mode === 'history' || mode === 'weak') { el.innerHTML = ''; return; }
   if (mode === 'review') {
     html += `<div class="side-sec">復習リスト</div>`;
-    const errLessons = state.lessons.filter(l => (state.errors[l.id]?.size || 0) > 0);
+    const errLessons = lessons.filter(l => (state.errors[l.id]?.size || 0) > 0);
     if (errLessons.length === 0) {
       html += `<div style="padding:8px;font-size:12px;color:var(--text3);">間違えた問題はありません</div>`;
     } else {
@@ -525,7 +558,7 @@ function renderSidebar() {
 
   // Group by course
   const courses = {};
-  state.lessons.forEach(l => {
+  lessons.forEach(l => {
     if (!courses[l.course]) courses[l.course] = [];
     courses[l.course].push(l);
   });
@@ -560,6 +593,7 @@ function renderContent() {
   const mode = state.mode;
 
   if (mode === 'history') { renderHistory(el); return; }
+  if (mode === 'weak') { renderWeakQuiz(el); return; }
 
   if (!state.activeLesson) {
     el.innerHTML = `<div class="welcome">
@@ -932,6 +966,237 @@ function getLessonsForCategory(catName) {
   return state.lessons.filter(l => (l.category || 'ServiceNow CIS-DF') === catName);
 }
 
+// ── 苦手問題コース（現在のカテゴリで一度でも間違えた問題を横断集計）──
+const weakQuizCache = {}; // qkey -> 出題スナップショット（セッション中は固定）
+
+function getWeakQuestions() {
+  const cat = state.currentCategory;
+  const catLessons = cat ? getLessonsForCategory(cat) : state.lessons;
+  const list = [];
+  catLessons.forEach(l => {
+    const errSet = state.errors[l.id];
+    if (!errSet || errSet.size === 0) return;
+    const allQ = l.quiz || [];
+    [...errSet].sort((a,b)=>a-b).forEach(qi => {
+      if (qi < allQ.length) {
+        list.push({ ...allQ[qi], lessonId: l.id, srcQi: qi, course: l.course, lesson: l.lesson, title: l.title });
+      }
+    });
+  });
+  return list;
+}
+
+function weakKey() {
+  return 'weak_' + (state.currentCategory || 'all');
+}
+
+function renderWeakQuiz(el) {
+  const qkey = weakKey();
+  if (!weakQuizCache[qkey]) weakQuizCache[qkey] = getWeakQuestions();
+  const questions = weakQuizCache[qkey];
+
+  if (questions.length === 0) {
+    delete weakQuizCache[qkey];
+    el.innerHTML = `<div class="welcome">
+      <div style="font-size:48px;">🎉</div>
+      <h2>苦手問題はありません</h2>
+      <p>問題モードで間違えるとここに集まります。<br>${state.currentCategory ? escHtml(state.currentCategory) + '内の' : ''}全レッスンを横断して出題されます。</p>
+    </div>`;
+    return;
+  }
+
+  if (!state.quizState[qkey] || state.quizState[qkey].total !== questions.length) {
+    state.quizState[qkey] = {
+      scores: new Array(questions.length).fill(null),
+      wrongs: new Array(questions.length).fill(null),
+      done: false,
+      total: questions.length
+    };
+  }
+  const qs = state.quizState[qkey];
+  const correct = qs.scores.filter(x=>x===1).length;
+  const answered = qs.scores.filter(x=>x!==null).length;
+
+  let html = `
+    <div class="sec-hdr">
+      <span class="sec-title">🧠 苦手問題コース（${escHtml(state.currentCategory||'全カテゴリ')}） — 全${questions.length}問</span>
+    </div>
+    <div class="quiz-bar">
+      <span class="score-chip">${correct} / ${answered}</span>
+      <button class="btn" onclick="resetWeakQuiz('${qkey}')">🔄 リセット（出題し直し）</button>
+    </div>
+    <div class="err-section">🧠 これまでに間違えたことのある問題を、コース・レッスン横断で ${questions.length} 問出題しています。正解すると苦手問題から外れます。</div>
+  `;
+
+  questions.forEach((q, qi) => {
+    const done = qs.scores[qi] !== null;
+    const wasOk = qs.scores[qi] === 1;
+    const isMulti = Array.isArray(q.multi) && q.multi.length > 0;
+    html += `<div class="qcard${done?(wasOk?' answered-ok':' answered-ng'):''}" id="qc_${qkey}_${qi}">
+      <div class="qno">Q${qi+1}<span class="qsrc">${escHtml(q.course)} ・ ${escHtml(q.lesson)} ${escHtml(q.title||'')}</span></div>
+      <span class="tbadge t${q.type}">${q.type}</span>
+      <div class="qtext">${escHtml(q.q)}</div>`;
+
+    if (isMulti) {
+      html += `<div class="multi-hint">💡 ${q.multi.length}つ選択してください</div>`;
+      q.opts.forEach((o, oi) => {
+        let cls = '';
+        if (done) {
+          if (q.multi.includes(oi)) cls = ' ok';
+          else if (qs.wrongs[qi] && qs.wrongs[qi].includes(oi)) cls = ' ng';
+        }
+        const multiKey = qkey + '_' + qi;
+        const alreadySel = (!done && multiSelections[multiKey] && multiSelections[multiKey].has(oi)) ? ' sel-multi' : '';
+        html += `<button class="opt${cls}${alreadySel}" ${done?'disabled':''} id="mopt_${qkey}_${qi}_${oi}" onclick="toggleWeakMulti('${qkey}',${qi},${oi})">${String.fromCharCode(65+oi)}. ${escHtml(o)}</button>`;
+      });
+      if (!done) {
+        const multiKey2 = qkey + '_' + qi;
+        const curSelCount = (multiSelections[multiKey2] && multiSelections[multiKey2].size) || 0;
+        const subDisabled = curSelCount !== q.multi.length ? 'disabled' : '';
+        html += `<button class="multi-submit" id="msub_${qkey}_${qi}" onclick="submitWeakMulti('${qkey}',${qi})" ${subDisabled}>回答する（${curSelCount}/${q.multi.length}選択）</button>`;
+      }
+    } else {
+      q.opts.forEach((o, oi) => {
+        let cls = '';
+        if (done) {
+          if (oi === q.ans) cls = ' ok';
+          else if (oi === qs.wrongs[qi] && !wasOk) cls = ' ng';
+        }
+        html += `<button class="opt${cls}"${done?' disabled':''} onclick="answerWeakQ('${qkey}',${qi},${oi})">${String.fromCharCode(65+oi)}. ${escHtml(o)}</button>`;
+      });
+    }
+
+    if (done) {
+      const expCls = wasOk ? 'exp-ok' : 'exp-ng';
+      const label = wasOk ? '✅ 正解！' : '❌ 不正解';
+      let reason = '';
+      if (isMulti) {
+        const correctLabels = q.multi.map(i => String.fromCharCode(65+i)+':'+q.opts[i]).join('・');
+        reason = wasOk
+          ? `<span class="exp-label">${label}</span>正解の組み合わせを選択できました！`
+          : `<span class="exp-label">${label}</span>正解は「${correctLabels}」です。`;
+      } else {
+        const annotatedOptCorrect = addJpAnnotations(escHtml(q.opts[q.ans]));
+        reason = wasOk
+          ? `<span class="exp-label">${label}</span>正解です！`
+          : `<span class="exp-label">${label}</span>正解は「${String.fromCharCode(65+q.ans)}：${annotatedOptCorrect}」です。`;
+      }
+      html += `<div class="exp ${expCls}">${reason}</div>`;
+      const cKey = q.course.replace(/\s/g,'') + '_' + q.lesson + '_' + q.srcQi;
+      const savedComment = (state.comments||{})[cKey] || '';
+      html += `<div class="comment-box">
+        <div class="comment-label">📝 メモ・コメント（内容は自動保存されます）</div>
+        <textarea class="comment-ta" id="cmt_${qkey}_${qi}" placeholder="ここに気づきや疑問点を記録できます..."
+          oninput="autoResizeMemo(this);saveCommentFixed('${q.course.replace(/\s/g,'')}','${q.lesson}',${q.srcQi},this.value)">${escHtml(savedComment)}</textarea>
+      </div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  el.innerHTML = html;
+  setTimeout(() => {
+    document.querySelectorAll('.comment-ta').forEach(ta => {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    });
+  }, 0);
+}
+
+function answerWeakQ(qkey, qi, chosen) {
+  const questions = weakQuizCache[qkey];
+  if (!questions) return;
+  const q = questions[qi];
+  if (!q) return;
+  const qs = state.quizState[qkey];
+  const correct = chosen === q.ans;
+  qs.scores[qi] = correct ? 1 : 0;
+  qs.wrongs[qi] = chosen;
+
+  if (!correct) {
+    if (!state.errors[q.lessonId]) state.errors[q.lessonId] = new Set();
+    state.errors[q.lessonId].add(q.srcQi);
+  } else if (state.errors[q.lessonId]) {
+    state.errors[q.lessonId].delete(q.srcQi);
+    if (state.errors[q.lessonId].size === 0) delete state.errors[q.lessonId];
+  }
+
+  if (qs.scores.every(s=>s!==null)) qs.done = true;
+  save();
+  renderContent();
+  renderSidebar();
+  setTimeout(() => {
+    const card = document.getElementById(`qc_${qkey}_${qi}`);
+    if (card) card.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }, 100);
+}
+
+function toggleWeakMulti(qkey, qi, oi) {
+  const key = qkey + '_' + qi;
+  if (!multiSelections[key]) multiSelections[key] = new Set();
+  const sel = multiSelections[key];
+  const btn = document.getElementById('mopt_' + qkey + '_' + qi + '_' + oi);
+  if (sel.has(oi)) {
+    sel.delete(oi);
+    if (btn) btn.classList.remove('sel-multi');
+  } else {
+    sel.add(oi);
+    if (btn) btn.classList.add('sel-multi');
+  }
+  const questions = weakQuizCache[qkey];
+  const q = questions && questions[qi];
+  const subBtn = document.getElementById('msub_' + qkey + '_' + qi);
+  if (subBtn && q && q.multi) {
+    const ready = sel.size === q.multi.length;
+    subBtn.disabled = !ready;
+    subBtn.textContent = '回答する（' + sel.size + '/' + q.multi.length + '選択）';
+  }
+}
+
+function submitWeakMulti(qkey, qi) {
+  const questions = weakQuizCache[qkey];
+  if (!questions) return;
+  const q = questions[qi];
+  if (!q || !q.multi) return;
+
+  const key = qkey + '_' + qi;
+  const sel = multiSelections[key] || new Set();
+  const selectedArr = [...sel].sort();
+  const correctArr = [...q.multi].sort();
+  const correct = selectedArr.length === correctArr.length &&
+    selectedArr.every((v,i) => v === correctArr[i]);
+
+  const qs = state.quizState[qkey];
+  qs.scores[qi] = correct ? 1 : 0;
+  qs.wrongs[qi] = selectedArr;
+
+  if (!correct) {
+    if (!state.errors[q.lessonId]) state.errors[q.lessonId] = new Set();
+    state.errors[q.lessonId].add(q.srcQi);
+  } else if (state.errors[q.lessonId]) {
+    state.errors[q.lessonId].delete(q.srcQi);
+    if (state.errors[q.lessonId].size === 0) delete state.errors[q.lessonId];
+  }
+
+  if (qs.scores.every(s=>s!==null)) qs.done = true;
+  save();
+  renderContent();
+  renderSidebar();
+  setTimeout(() => {
+    const card = document.getElementById('qc_' + qkey + '_' + qi);
+    if (card) card.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }, 100);
+}
+
+function resetWeakQuiz(qkey) {
+  const shuffleKeys = Object.keys(state.shuffleMap).filter(k=>k.startsWith(qkey));
+  shuffleKeys.forEach(k=>delete state.shuffleMap[k]);
+  delete state.quizState[qkey];
+  delete weakQuizCache[qkey];
+  save();
+  renderContent();
+}
+
 // ── ランダムモード切替 ─────────────────────────────────
 function toggleRandom() {
   state.randomMode = !state.randomMode;
@@ -1014,7 +1279,8 @@ function saveHistory(lid, qkey) {
     correct,
     total,
     date: dateStr,
-    wrongs: errArr
+    wrongs: errArr,
+    scores: qs.scores.slice() // 各問題の正解(1)/不正解(0)/未回答(null)を○×表示用に保持
   });
   save();
 
@@ -1037,23 +1303,149 @@ function saveHistory(lid, qkey) {
 }
 
 
+// コースごとの履歴表示件数（1 / 10 / 20 / 全件）。永続化不要のUI状態のためモジュール変数で保持
+const historyViewCount = {};
+
 function renderHistory(el) {
-  if (state.history.length === 0) {
+  // 現在選択中のカテゴリの履歴のみに絞り込む
+  const history = state.currentCategory
+    ? state.history.filter(h => (h.category || 'ServiceNow CIS-DF') === state.currentCategory)
+    : state.history;
+
+  if (history.length === 0) {
     el.innerHTML = `<div class="welcome"><div style="font-size:48px;">📊</div><h2>履歴がありません</h2><p>問題モードで回答後「履歴保存」ボタンを押すと記録されます。</p></div>`;
     return;
   }
-  let html = `<div class="sec-hdr"><span class="sec-title">📊 回答履歴</span><button class="btn btn-d" onclick="clearHistory()">🗑 全削除</button></div>`;
-  state.history.forEach((h,i) => {
-    const pct = Math.round(h.correct/h.total*100);
-    const cls = pct>=80?'ok':'ng';
-    html += `<div class="hist-item">
-      <span class="hist-lesson">${h.course} · ${h.lesson} ${h.title}</span>
-      <span class="hist-score ${cls}">${h.correct}/${h.total} (${pct}%)</span>
-      ${h.wrongs?.length>0?`<span style="font-size:10px;color:var(--red);">ミス:Q${h.wrongs.map(x=>x+1).join(',')}` :''}
-      <span class="hist-date">${h.date}</span>
-    </div>`;
+
+  // コースごとにグループ化（履歴は新しい順に並んでいるためグループ内も新しい順）
+  const groups = {};
+  history.forEach(h => {
+    if (!groups[h.course]) groups[h.course] = [];
+    groups[h.course].push(h);
   });
+
+  let html = `<div class="sec-hdr"><span class="sec-title">📊 回答履歴</span><button class="btn" onclick="copyAnalysisText()">🤖 AI分析用にコピー</button><button class="btn btn-d" onclick="clearHistory()">🗑 全削除</button></div>`;
+
+  Object.entries(groups).forEach(([course, entries]) => {
+    const viewCount = historyViewCount[course] || 10;
+    const shown = viewCount === 'all' ? entries : entries.slice(0, viewCount);
+    const maxQ = shown.reduce((m,h) => Math.max(m, h.total || 0), 0);
+    const courseJs = course.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+    html += `<div class="hist-course-sec">`;
+    html += `<div class="hist-course-hdr">
+      <span class="hist-course-name">${escHtml(course)}</span>
+      <span class="hist-count-tabs">
+        ${[1,10,20,'all'].map(c => `<button class="hist-count-btn${viewCount===c?' on':''}" onclick="setHistoryViewCount('${courseJs}',${c==='all'?"'all'":c})">${c==='all'?'全件':c+'回'}</button>`).join('')}
+      </span>
+    </div>`;
+
+    html += `<div class="hist-table-wrap"><table class="hist-table"><thead><tr>
+      <th>日時</th><th>レッスン</th><th>点数</th>`;
+    for (let qi=0; qi<maxQ; qi++) html += `<th>Q${qi+1}</th>`;
+    html += `</tr></thead><tbody>`;
+    shown.forEach(h => {
+      const pct = h.total ? Math.round(h.correct/h.total*100) : 0;
+      const cls = pct>=80?'ok':'ng';
+      html += `<tr><td class="hist-date-cell">${h.date}</td><td class="hist-lesson-cell">${escHtml(h.lesson)} ${escHtml(h.title||'')}</td><td><span class="hist-score ${cls}">${h.correct}/${h.total}</span></td>`;
+      for (let qi=0; qi<maxQ; qi++) {
+        if (qi >= h.total) { html += `<td></td>`; continue; }
+        let mark;
+        if (h.scores) {
+          // 新形式：正解(1)/不正解(0)/未回答(null)を判別
+          if (h.scores[qi] === 1) mark = `<span class="maru">○</span>`;
+          else if (h.scores[qi] === 0) mark = `<span class="batsu">✕</span>`;
+          else mark = `<span class="hist-na">-</span>`;
+        } else {
+          // 旧データ（scores未保存）：wrongsのみから判定
+          mark = h.wrongs && h.wrongs.includes(qi) ? `<span class="batsu">✕</span>` : `<span class="maru">○</span>`;
+        }
+        html += `<td>${mark}</td>`;
+      }
+      html += `</tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+  });
+
   el.innerHTML = html;
+}
+
+function setHistoryViewCount(course, count) {
+  historyViewCount[course] = count;
+  renderHistory(document.getElementById('content'));
+}
+
+// ── AI分析用データ生成 ────────────────────────────────
+// 指定レッスン・問題番号について、履歴全体から間違えた回数／受験回数を集計
+function getQuestionStats(lessonId, qi) {
+  let attempts = 0, wrong = 0;
+  state.history.forEach(h => {
+    if (h.lessonId !== lessonId || qi >= (h.total || 0)) return;
+    attempts++;
+    if (h.scores) { if (h.scores[qi] === 0) wrong++; }
+    else if (h.wrongs && h.wrongs.includes(qi)) wrong++;
+  });
+  return { attempts, wrong };
+}
+
+function buildAnalysisText() {
+  const cat = state.currentCategory || '全カテゴリ';
+  const history = state.currentCategory
+    ? state.history.filter(h => (h.category || 'ServiceNow CIS-DF') === state.currentCategory)
+    : state.history;
+
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  const lines = [];
+  lines.push(`# ${cat} 学習分析データ（${dateStr}生成）`);
+  lines.push('');
+
+  // コース別成績サマリー
+  const courseGroups = {};
+  history.forEach(h => {
+    if (!courseGroups[h.course]) courseGroups[h.course] = [];
+    courseGroups[h.course].push(h);
+  });
+  lines.push('## コース別成績サマリー');
+  if (Object.keys(courseGroups).length === 0) {
+    lines.push('（テスト履歴がありません）');
+  } else {
+    Object.entries(courseGroups).forEach(([course, entries]) => {
+      const totalCorrect = entries.reduce((s,h)=>s+h.correct,0);
+      const totalQ = entries.reduce((s,h)=>s+h.total,0);
+      const avgPct = totalQ ? Math.round(totalCorrect/totalQ*100) : 0;
+      const recent = entries.slice(0,5).map(h=>`${h.correct}/${h.total}`).join('、');
+      lines.push(`- ${course}：受験${entries.length}回／平均正答率${avgPct}%／直近の結果: ${recent}`);
+    });
+  }
+  lines.push('');
+
+  // 苦手問題一覧（現時点で間違えたままの問題。カテゴリ内を横断）
+  const weak = getWeakQuestions();
+  lines.push(`## 現在の苦手問題一覧（${weak.length}問）`);
+  if (weak.length === 0) {
+    lines.push('（現在、苦手問題はありません）');
+  } else {
+    weak.forEach((q, i) => {
+      const stats = getQuestionStats(q.lessonId, q.srcQi);
+      const ansText = Array.isArray(q.multi) ? q.multi.map(idx=>q.opts[idx]).join('・') : q.opts[q.ans];
+      lines.push(`${i+1}. [${q.course} ${q.lesson}] (${q.type}) ${q.q}`);
+      lines.push(`   正解: ${ansText} ／ この問題の被受験${stats.attempts}回中${stats.wrong}回不正解`);
+    });
+  }
+  lines.push('');
+  lines.push('## お願い');
+  lines.push('上記は資格試験対策アプリの学習履歴データです。コース別の得意・不得意、繰り返し間違えている問題の傾向を分析したうえで、今後どの分野を重点的に学習すべきか、優先して復習すべき問題、次の学習の進め方を提案してください。');
+
+  return lines.join('\n');
+}
+
+function copyAnalysisText() {
+  const text = buildAnalysisText();
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('🤖 AI分析用データをコピーしました。AIチャットに貼り付けてご利用ください');
+  });
 }
 
 function clearHistory() {
@@ -1074,14 +1466,13 @@ function closeModal() {
 }
 function switchMTab(t) {
   mTabCurrent = t;
-  ['info','summary','points','quiz'].forEach(s => {
-    const tab = document.querySelector(`.mtab:nth-child(${['info','summary','points','quiz'].indexOf(s)+1})`);
+  ['info','summary','points','quiz','bulk'].forEach(s => {
     const panel = document.getElementById('mtab-'+s);
     if (panel) panel.style.display = s===t ? 'flex' : 'none';
     if (panel) panel.style.flexDirection = 'column';
   });
   document.querySelectorAll('.mtab').forEach((b,i) => {
-    b.classList.toggle('on', ['info','summary','points','quiz'][i]===t);
+    b.classList.toggle('on', ['info','summary','points','quiz','bulk'][i]===t);
   });
 }
 
@@ -1145,6 +1536,91 @@ function importLesson() {
     renderContent();
   }
   showToast(`「${title}」をインポートしました（問題:${quiz.length}問）`);
+}
+
+// ── 一括インポート（スプレッドシート14列: カテゴリ/コース/レッスン番号/レッスンタイトル/問番号/問題タイプ/問題文/選択肢A-D/正解/解説/複数選択）──
+// コース・レッスン番号・レッスンタイトル・問番号・問題タイプは空欄可（既定値で取り込む）
+function parseBulkQuizRows(text) {
+  const lines = text.replace(/\r\n/g,'\n').split('\n');
+  const groups = {}; // category__course__lesson -> {category,course,lesson,title,quiz:[]}
+  const order = [];
+
+  lines.forEach((line, li) => {
+    if (!line.trim()) return;
+    const cols = line.split('\t');
+    if (li === 0 && (cols[0]||'').trim() === 'カテゴリ') return; // ヘッダー行をスキップ
+
+    const category = (cols[0]||'').trim() || (state.currentCategory || 'ServiceNow CIS-DF');
+    const course = (cols[1]||'').trim() || 'Course 1';
+    const lessonNo = (cols[2]||'').trim() || '1-1';
+    const title = (cols[3]||'').trim();
+    const type = (cols[5]||'').trim() || '基礎';
+    const q = (cols[6]||'').trim();
+    if (!q) return; // 問題文が無い行は取り込み対象外
+
+    const opts = [cols[7]||'', cols[8]||'', cols[9]||'', cols[10]||''];
+    const ansLetter = (cols[11]||'A').trim().toUpperCase();
+    const ans = Math.max(0, 'ABCD'.indexOf(ansLetter));
+    const exp = (cols[12]||'').trim();
+
+    let multi = null;
+    const multiRaw = (cols[13]||'').trim();
+    if (multiRaw) {
+      const letters = multiRaw.toUpperCase().split(/[^A-D]+/).filter(Boolean);
+      const idx = letters.map(l => 'ABCD'.indexOf(l)).filter(i => i >= 0).sort((a,b)=>a-b);
+      if (idx.length > 0) multi = idx;
+    }
+
+    const key = category + '__' + course + '__' + lessonNo;
+    if (!groups[key]) {
+      groups[key] = { category, course, lesson: lessonNo, title, quiz: [] };
+      order.push(key);
+    } else if (title && !groups[key].title) {
+      groups[key].title = title;
+    }
+    groups[key].quiz.push({ type, q, opts, ans, multi, exp });
+  });
+
+  return order.map(k => groups[k]);
+}
+
+function importBulkQuizData() {
+  const raw = document.getElementById('imp-bulk').value;
+  if (!raw.trim()) { showToast('データを貼り付けてください'); return; }
+
+  const groups = parseBulkQuizRows(raw);
+  if (groups.length === 0) { showToast('取り込める行が見つかりませんでした'); return; }
+
+  let newLessonCount = 0, updatedLessonCount = 0, qCount = 0;
+  groups.forEach(g => {
+    qCount += g.quiz.length;
+    const existing = state.lessons.find(l =>
+      (l.category || 'ServiceNow CIS-DF') === g.category && l.course === g.course && l.lesson === g.lesson);
+    if (existing) {
+      existing.quiz = (existing.quiz || []).concat(g.quiz);
+      if (!existing.title && g.title) existing.title = g.title;
+      updatedLessonCount++;
+    } else {
+      const id = g.course.replace(/\s/g,'') + '_' + g.lesson.replace(/\./g,'') + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+      state.lessons.push({
+        id, course: g.course, lesson: g.lesson,
+        title: g.title || `${g.course} ${g.lesson}`,
+        category: g.category, summary: '', points: [], quiz: g.quiz
+      });
+      if (!CATEGORIES[g.category]) CATEGORIES[g.category] = { icon: '📚', desc: '', color: '#e67e22' };
+      newLessonCount++;
+    }
+  });
+
+  save();
+  document.getElementById('imp-bulk').value = '';
+  closeModal();
+  renderHomeScreen();
+  if (state.currentCategory) {
+    renderSidebar();
+    renderContent();
+  }
+  showToast(`📦 一括インポート完了：新規${newLessonCount}レッスン／更新${updatedLessonCount}レッスン／問題${qCount}問`);
 }
 
 function deleteLesson(id) {
@@ -2041,7 +2517,7 @@ load();
 // 起動時は必ずホーム画面を表示する
 
 // Fix modal tab init
-document.querySelectorAll('#mtab-summary,#mtab-points,#mtab-quiz').forEach(el => el.style.display='none');
+document.querySelectorAll('#mtab-summary,#mtab-points,#mtab-quiz,#mtab-bulk').forEach(el => el.style.display='none');
 document.getElementById('mtab-info').style.display = 'flex';
 document.getElementById('mtab-info').style.flexDirection = 'column';
 </script>
