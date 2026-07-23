@@ -1561,13 +1561,7 @@ function parseBulkQuizRows(text) {
     const ans = resolveAnswerIndex(cols[11], opts);
     const exp = (cols[12]||'').trim();
 
-    let multi = null;
-    const multiRaw = (cols[13]||'').trim();
-    if (multiRaw) {
-      const letters = multiRaw.toUpperCase().split(/[^A-D]+/).filter(Boolean);
-      const idx = letters.map(l => 'ABCD'.indexOf(l)).filter(i => i >= 0).sort((a,b)=>a-b);
-      if (idx.length > 0) multi = idx;
-    }
+    const multi = resolveMultiIndices(cols[13]);
 
     const key = category + '__' + course + '__' + lessonNo;
     if (!groups[key]) {
@@ -1747,6 +1741,8 @@ function resolveAnswerIndex(raw, opts) {
   const cleaned = (raw || '').trim().replace(/^['"’”]+|['"’”]+$/g, '').trim();
   const letterMatch = cleaned.match(/^([A-Da-d])[.\s、:：]*$/);
   if (letterMatch) return 'ABCD'.indexOf(letterMatch[1].toUpperCase());
+  const kanaMatch = cleaned.match(/^([アイウエ])[.\s、:：]*$/);
+  if (kanaMatch) return 'アイウエ'.indexOf(kanaMatch[1]);
   const numMatch = cleaned.match(/^([1-4])[.\s、:：]*$/);
   if (numMatch) return parseInt(numMatch[1], 10) - 1;
   if (opts) {
@@ -1755,7 +1751,23 @@ function resolveAnswerIndex(raw, opts) {
   }
   const anyLetter = cleaned.match(/[A-Da-d]/);
   if (anyLetter) return 'ABCD'.indexOf(anyLetter[0].toUpperCase());
+  const anyKana = cleaned.match(/[アイウエ]/);
+  if (anyKana) return 'アイウエ'.indexOf(anyKana[0]);
   return 0;
+}
+
+// ── 複数選択の正解列（例: "A,C" または "ア、ウ"）をインデックス配列に変換 ──
+function resolveMultiIndices(raw) {
+  const cleaned = (raw || '').trim();
+  if (!cleaned) return null;
+  const kanaChars = [...cleaned].filter(ch => 'アイウエ'.includes(ch));
+  if (kanaChars.length > 0) {
+    const idx = [...new Set(kanaChars.map(ch => 'アイウエ'.indexOf(ch)))].sort((a,b)=>a-b);
+    return idx.length > 0 ? idx : null;
+  }
+  const letters = cleaned.toUpperCase().split(/[^A-D]+/).filter(Boolean);
+  const idx = [...new Set(letters.map(l => 'ABCD'.indexOf(l)).filter(i => i >= 0))].sort((a,b)=>a-b);
+  return idx.length > 0 ? idx : null;
 }
 
 // ── Quiz field normalizer ────────────────────────────────
