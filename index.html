@@ -1517,8 +1517,7 @@ function importLesson() {
       // offset: type, offset+1: No, offset+2: question, offset+3..6: opts A-D, offset+7: ans, offset+8: exp
       const q = cols[offset+2] || '';
       const opts = [cols[offset+3]||'', cols[offset+4]||'', cols[offset+5]||'', cols[offset+6]||''];
-      const ansLetter = (cols[offset+7]||'A').trim().toUpperCase();
-      const ans = Math.max(0, 'ABCD'.indexOf(ansLetter));
+      const ans = resolveAnswerIndex(cols[offset+7], opts);
       const exp = cols[offset+8] || '';
       if (q) quiz.push({type, q, opts, ans, exp});
     });
@@ -1559,8 +1558,7 @@ function parseBulkQuizRows(text) {
     if (!q) return; // 問題文が無い行は取り込み対象外
 
     const opts = [cols[7]||'', cols[8]||'', cols[9]||'', cols[10]||''];
-    const ansLetter = (cols[11]||'A').trim().toUpperCase();
-    const ans = Math.max(0, 'ABCD'.indexOf(ansLetter));
+    const ans = resolveAnswerIndex(cols[11], opts);
     const exp = (cols[12]||'').trim();
 
     let multi = null;
@@ -1740,6 +1738,24 @@ function saveComment(lid, qi, text) {
   if (!state.comments) state.comments = {};
   state.comments[lid+'_'+qi] = text;
   save();
+}
+
+// ── 正解列の表記ゆれを吸収してA~Dのインデックスに変換 ──────
+// スプレッドシートのテキスト強制用の先頭アポストロフィ（'B など）・
+// 「B.」「B：」のような区切り文字・数字(1~4)・選択肢本文そのものにも対応
+function resolveAnswerIndex(raw, opts) {
+  const cleaned = (raw || '').trim().replace(/^['"’”]+|['"’”]+$/g, '').trim();
+  const letterMatch = cleaned.match(/^([A-Da-d])[.\s、:：]*$/);
+  if (letterMatch) return 'ABCD'.indexOf(letterMatch[1].toUpperCase());
+  const numMatch = cleaned.match(/^([1-4])[.\s、:：]*$/);
+  if (numMatch) return parseInt(numMatch[1], 10) - 1;
+  if (opts) {
+    const idx = opts.findIndex(o => (o||'').trim().replace(/^['"’”]+/, '') === cleaned);
+    if (idx >= 0) return idx;
+  }
+  const anyLetter = cleaned.match(/[A-Da-d]/);
+  if (anyLetter) return 'ABCD'.indexOf(anyLetter[0].toUpperCase());
+  return 0;
 }
 
 // ── Quiz field normalizer ────────────────────────────────
