@@ -120,6 +120,9 @@ textarea.tinput{min-height:180px;}
 .t引っ掛け{background:#271f0a;color:#d29922;border:1px solid #9e6a03;}
 .t試験対策{background:#1a1f3a;color:#58a6ff;border:1px solid #1f6feb;}
 .qtext{font-size:13px;color:var(--text);line-height:1.7;margin-bottom:10px;font-weight:500;}
+.qimg-link{display:block;margin-bottom:12px;}
+.qimg{max-width:100%;max-height:420px;border-radius:var(--r);border:1px solid var(--border);display:block;background:var(--bg3);}
+.qimg-link.qimg-error{display:none;}
 .opt{display:block;width:100%;text-align:left;padding:8px 12px;margin-bottom:5px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg3);color:var(--text);font-size:12px;cursor:pointer;transition:all .15s;line-height:1.5;font-family:'Noto Sans JP',sans-serif;}
 .opt:hover:not(:disabled){background:var(--bg4);border-color:var(--border2);}
 .opt.ok{background:var(--green-bg);border-color:var(--green-border);color:var(--green);}
@@ -403,11 +406,12 @@ textarea.tinput{min-height:180px;}
     <!-- bulk tab -->
     <div id="mtab-bulk" style="display:none;">
       <div class="ig">
-        <div class="il">スプレッドシートを直接貼り付け（カテゴリ〜複数選択の20列をそのままコピー＆ペースト・選択肢は最大10択A〜J対応）</div>
-        <textarea class="tinput" id="imp-bulk" style="min-height:260px;" placeholder="カテゴリ&#9;コース&#9;レッスン番号&#9;レッスンタイトル&#9;問番号&#9;問題タイプ&#9;問題文&#9;選択肢A&#9;選択肢B&#9;選択肢C&#9;選択肢D&#9;選択肢E&#9;選択肢F&#9;選択肢G&#9;選択肢H&#9;選択肢I&#9;選択肢J&#9;正解&#9;解説&#9;複数選択"></textarea>
+        <div class="il">スプレッドシートを直接貼り付け（カテゴリ〜複数選択の21列をそのままコピー＆ペースト・選択肢は最大10択A〜J、問題文には画像添付も対応）</div>
+        <textarea class="tinput" id="imp-bulk" style="min-height:260px;" placeholder="カテゴリ&#9;コース&#9;レッスン番号&#9;レッスンタイトル&#9;問番号&#9;問題タイプ&#9;問題文&#9;問題文画像&#9;選択肢A&#9;選択肢B&#9;選択肢C&#9;選択肢D&#9;選択肢E&#9;選択肢F&#9;選択肢G&#9;選択肢H&#9;選択肢I&#9;選択肢J&#9;正解&#9;解説&#9;複数選択"></textarea>
       </div>
-      <div class="hint-box">列の形式：カテゴリ[TAB]コース[TAB]レッスン番号[TAB]レッスンタイトル[TAB]問番号[TAB]問題タイプ[TAB]問題文[TAB]選択肢A〜J（最大10列）[TAB]正解[TAB]解説[TAB]複数選択
+      <div class="hint-box">列の形式：カテゴリ[TAB]コース[TAB]レッスン番号[TAB]レッスンタイトル[TAB]問番号[TAB]問題タイプ[TAB]問題文[TAB]問題文画像[TAB]選択肢A〜J（最大10列）[TAB]正解[TAB]解説[TAB]複数選択
 コース・レッスン番号・レッスンタイトル・問番号・問題タイプは空欄でも構いません（空欄の場合は既定値で取り込まれます）。選択肢は4択の場合、E〜J列は空欄のままでOKです
+問題文画像列には =IMAGE("画像URL") 数式、または画像の素のURLをそのまま入れられます（表・図などを画像として問題文の下に表示します）
 正解列はA〜J／ア〜コのどちらの表記でも認識します
 複数選択列に正解の記号（例：A,C またはア、ウ）を入れると複数選択問題として取り込まれます。空欄なら単一選択（正解列を使用）
 ヘッダー行は自動的にスキップされます。同じカテゴリ・コース・レッスン番号の行は1つのレッスンにまとめられ、既存レッスンがあれば問題が追加されます</div>
@@ -730,7 +734,8 @@ function renderQuiz(el, lesson, isReview) {
     html += `<div class="qcard${done?(wasOk?' answered-ok':' answered-ng'):''}" id="qc_${qkey}_${qi}">
       <div class="qno">${isReview ? `復習 Q${qi+1}` : `Q${qi+1}`}</div>
       <span class="tbadge t${q.type}">${q.type}</span>
-      <div class="qtext">${escHtml(q.q)}</div>`;
+      <div class="qtext">${escHtml(q.q)}</div>
+      ${renderQuestionImage(q.img)}`;
 
     const isMulti = Array.isArray(q.multi) && q.multi.length > 0;
     if (isMulti) {
@@ -1036,7 +1041,8 @@ function renderWeakQuiz(el) {
     html += `<div class="qcard${done?(wasOk?' answered-ok':' answered-ng'):''}" id="qc_${qkey}_${qi}">
       <div class="qno">Q${qi+1}<span class="qsrc">${escHtml(q.course)} ・ ${escHtml(q.lesson)} ${escHtml(q.title||'')}</span></div>
       <span class="tbadge t${q.type}">${q.type}</span>
-      <div class="qtext">${escHtml(q.q)}</div>`;
+      <div class="qtext">${escHtml(q.q)}</div>
+      ${renderQuestionImage(q.img)}`;
 
     if (isMulti) {
       html += `<div class="multi-hint">💡 ${q.multi.length}つ選択してください</div>`;
@@ -1558,14 +1564,17 @@ function parseBulkQuizRows(text) {
     const q = (cols[6]||'').trim();
     if (!q) return; // 問題文が無い行は取り込み対象外
 
+    // 問題文に添付する画像（表・図など）。=IMAGE("url")形式・素のURLどちらにも対応
+    const img = extractImageUrl(cols[7]);
+
     // 選択肢A〜J（最大10択、擬似言語の穴埋め問題などア〜コまである場合に対応）
-    const opts = [cols[7],cols[8],cols[9],cols[10],cols[11],cols[12],cols[13],cols[14],cols[15],cols[16]]
+    const opts = [cols[8],cols[9],cols[10],cols[11],cols[12],cols[13],cols[14],cols[15],cols[16],cols[17]]
       .map(o => (o||'').trim())
       .filter(o => o !== '');
-    const ans = resolveAnswerIndex(cols[17], opts);
-    const exp = (cols[18]||'').trim();
+    const ans = resolveAnswerIndex(cols[18], opts);
+    const exp = (cols[19]||'').trim();
 
-    const multi = resolveMultiIndices(cols[19]);
+    const multi = resolveMultiIndices(cols[20]);
 
     const key = category + '__' + course + '__' + lessonNo;
     if (!groups[key]) {
@@ -1574,7 +1583,7 @@ function parseBulkQuizRows(text) {
     } else if (title && !groups[key].title) {
       groups[key].title = title;
     }
-    groups[key].quiz.push({ type, q, opts, ans, multi, exp });
+    groups[key].quiz.push({ type, q, img, opts, ans, multi, exp });
   });
 
   return order.map(k => groups[k]);
@@ -1746,6 +1755,18 @@ function saveComment(lid, qi, text) {
 const ANSWER_LETTERS = 'ABCDEFGHIJ';
 const ANSWER_KANA = 'アイウエオカキクケコ';
 
+// ── 問題文画像列から画像URLを取り出す ──────────────────
+// スプレッドシートで =IMAGE("url") 数式のまま貼り付けられた場合と、素のURLが
+// 貼り付けられた場合の両方に対応する
+function extractImageUrl(raw) {
+  const cleaned = (raw || '').trim();
+  if (!cleaned) return '';
+  const formulaMatch = cleaned.match(/=?\s*IMAGE\(\s*"([^"]+)"/i);
+  if (formulaMatch) return formulaMatch[1];
+  if (/^https?:\/\//i.test(cleaned)) return cleaned;
+  return '';
+}
+
 function resolveAnswerIndex(raw, opts) {
   const cleaned = (raw || '').trim().replace(/^['"’”]+|['"’”]+$/g, '').trim();
   const letterMatch = cleaned.match(/^([A-Ja-j])[.\s、:：]*$/);
@@ -1785,6 +1806,7 @@ function normalizeQuiz(quiz) {
   return quiz.map(q => ({
     type: q.type || q.t || '基礎',
     q: q.q,
+    img: q.img || q.i || '',  // 問題文に添付する画像（表・図など）のURL
     opts: q.opts || q.o || [],
     ans: q.ans !== undefined ? q.ans : (q.a !== undefined ? q.a : 0),
     multi: q.multi || null,  // 複数選択の正解インデックス配列 例: [1,3]
@@ -1795,6 +1817,15 @@ function normalizeQuiz(quiz) {
 // ── Utils ──────────────────────────────────────────────
 function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── 問題文に添付された画像（表・図など）の描画 ──────────
+function renderQuestionImage(img) {
+  if (!img) return '';
+  const url = escHtml(img);
+  return `<a class="qimg-link" href="${url}" target="_blank" rel="noopener">
+    <img class="qimg" src="${url}" alt="問題の図・表" loading="lazy" onerror="this.closest('.qimg-link').classList.add('qimg-error')">
+  </a>`;
 }
 
 function showToast(msg) {
