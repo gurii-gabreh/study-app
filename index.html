@@ -779,7 +779,7 @@ function renderQuiz(el, lesson, isReview) {
           if (oi === q.ans) cls = ' ok';
           else if (oi === qs.wrongs[qi] && !wasOk) cls = ' ng';
         }
-        html += `<button class="opt${cls}"${done?' disabled':''} onclick="answerQ('${qkey}',${qi},${oi},${isReview},${JSON.stringify(isReview ? (errIndices||[]) : [])})">'${String.fromCharCode(65+dispIdx)}. ${escHtml(o)}</button>`;
+        html += `<button class="opt${cls}"${done?' disabled':''} onclick="answerQ('${qkey}',${qi},${oi},${isReview},${JSON.stringify(isReview ? (errIndices||[]) : [])})">${String.fromCharCode(65+dispIdx)}. ${escHtml(o)}</button>`;
       });
     }
 
@@ -1578,7 +1578,10 @@ function parseBulkQuizRows(text) {
   });
   const col = (cols, name) => {
     const i = colIndex[name];
-    return (i === undefined ? '' : (cols[i] || '')).trim();
+    const raw = (i === undefined ? '' : (cols[i] || '')).trim();
+    // スプレッドシート側で「文字列として強制」した際に付く先頭の ' は、
+    // コピー時に一緒に紛れ込み、URL判定や表示を壊すため、どの列でも除去しておく
+    return raw.replace(/^'(?!')/, '').trim();
   };
 
   lines.forEach((line, li) => {
@@ -1788,7 +1791,9 @@ const ANSWER_KANA = 'アイウエオカキクケコ';
 // スプレッドシートで =IMAGE("url") 数式のまま貼り付けられた場合と、素のURLが
 // 貼り付けられた場合の両方に対応する
 function extractImageUrl(raw) {
-  const cleaned = (raw || '').trim();
+  // 先頭の ' は、スプレッドシート側で「文字列として強制」した際に付く不可視のマーカーで
+  // コピー時に一緒に紛れ込むことがあるため、他の記号と合わせて除去してから判定する
+  const cleaned = (raw || '').trim().replace(/^['"’”]+/, '').trim();
   if (!cleaned) return '';
   const formulaMatch = cleaned.match(/=?\s*IMAGE\(\s*"([^"]+)"/i);
   if (formulaMatch) return formulaMatch[1];
