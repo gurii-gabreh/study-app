@@ -63,10 +63,6 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);width:100%;max-width:680px;padding:20px;display:flex;flex-direction:column;gap:14px;max-height:92vh;overflow-y:auto;}
 .modal h3{font-size:15px;color:var(--text);}
-.modal-desc{font-size:12px;color:var(--text2);line-height:1.7;}
-.modal-tabs{display:flex;gap:4px;}
-.mtab{padding:4px 12px;border-radius:var(--r);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;font-family:'Noto Sans JP',sans-serif;}
-.mtab.on{background:var(--bg3);color:var(--text);border-color:var(--border2);}
 .ig{display:flex;flex-direction:column;gap:5px;}
 .il{font-size:11px;color:var(--text2);}
 .tinput{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:12px;font-family:'JetBrains Mono',monospace;resize:vertical;transition:border-color .15s;}
@@ -209,18 +205,6 @@ textarea.tinput{min-height:180px;}
 .category-select{background:#21262d;border:1px solid #30363d;color:#e6edf3;border-radius:var(--r);padding:6px 12px;font-size:13px;cursor:pointer;min-width:200px;}
 .category-select:focus{outline:none;border-color:var(--blue);}
 
-/* ── GAS連携ボタン ────────────────────────────────── */
-.gas-btn{background:var(--card);border:1px solid var(--border);color:var(--green);border-radius:var(--r);padding:5px 10px;cursor:pointer;font-size:12px;white-space:nowrap;}
-.gas-btn:hover{background:var(--border);}
-.gas-status{font-size:11px;padding:3px 8px;border-radius:var(--r);display:inline-block;}
-.gas-ok{background:#1a3a1a;color:var(--green);}
-.gas-err{background:#3a1a1a;color:var(--red);}
-.gas-ing{background:#1a2a3a;color:var(--blue);}
-
-/* ── GAS設定モーダル ──────────────────────────────── */
-.gas-setting{padding:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin:8px 0;}
-.gas-setting label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px;}
-.gas-setting input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--fg);border-radius:4px;padding:6px 8px;font-size:12px;}
 </style>
 </head>
 <body>
@@ -244,10 +228,6 @@ textarea.tinput{min-height:180px;}
       <span class="datasrc-indicator"></span>データソース更新
     </button>
     <button class="datasrc-open-btn" id="datasrc-open-btn" onclick="openDataSourceNewTab()" title="all_lessons_data.htmlを新しいタブで開く">📂 データを開く</button>
-    <button class="gas-btn" id="gas-setting-btn" onclick="openGasSettings()" title="GAS Web App URLを設定">⚙️ GAS設定</button>
-    <button class="gas-btn" id="gas-migrate-btn" onclick="migrateMemosToSheet()" title="既存メモをスプレッドシートに移行">📤 メモ移行</button>
-    <button class="gas-btn" id="img-setting-btn" onclick="openImageSettings()" title="Google Drive画像取込設定">📷 画像取込設定</button>
-    <span class="gas-status" id="gas-status" style="display:none;"></span>
   </div>
 </div>
 
@@ -262,164 +242,6 @@ textarea.tinput{min-height:180px;}
 <div class="layout" id="study-layout" style="display:none;">
   <div class="side" id="sidebar"></div>
   <div class="content" id="content"></div>
-</div>
-
-<!-- 画像取込設定モーダル -->
-<div class="overlay" id="img-modal" style="display:none;">
-  <div class="modal" style="max-width:560px;">
-    <h3>📷 Google Drive 画像取込設定</h3>
-
-    <div class="ig">
-      <div class="il">ルートフォルダID（GoogleドライブのフォルダURLの末尾ID）</div>
-      <input class="tinput" id="img-root-folder" placeholder="例: 1aBcDeFgHiJkLmNoPqRsTuV" style="min-height:unset;height:36px;">
-      <button class="btn" style="margin-top:6px;" onclick="loadSubFolders()">🔄 サブフォルダを取得</button>
-    </div>
-
-    <div class="ig" style="margin-top:10px;">
-      <div class="il">処理対象サブフォルダ（フォルダ取得後に選択）</div>
-      <select class="tinput" id="img-target-folder" style="min-height:unset;height:36px;">
-        <option value="">-- フォルダを選択 --</option>
-      </select>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
-      <div class="ig">
-        <div class="il">1回の処理数（サブフォルダ数）</div>
-        <input class="tinput" id="img-process-count" type="number" min="1" max="10" value="1" style="min-height:unset;height:36px;">
-      </div>
-      <div class="ig">
-        <div class="il">定時処理時刻（JST）</div>
-        <input class="tinput" id="img-schedule-time" type="time" value="23:00" style="min-height:unset;height:36px;">
-      </div>
-    </div>
-
-    <div style="margin-top:12px;background:#161b22;border:1px solid #30363d;border-radius:6px;padding:12px;">
-      <div style="font-size:11px;color:#8b949e;margin-bottom:8px;font-weight:600;">📂 カテゴリ・コース・レッスン設定</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
-        <div class="ig">
-          <div class="il">カテゴリ</div>
-          <select class="tinput" id="img-category" onchange="onImgCategoryChange(this.value)" style="min-height:unset;height:36px;">
-            <option value="">-- 選択 --</option>
-          </select>
-        </div>
-        <div class="ig">
-          <div class="il">コース</div>
-          <select class="tinput" id="img-course" onchange="onImgCourseChange(this.value)" style="min-height:unset;height:36px;">
-            <option value="">-- 選択 --</option>
-          </select>
-        </div>
-        <div class="ig">
-          <div class="il">レッスン番号</div>
-          <select class="tinput" id="img-lesson" style="min-height:unset;height:36px;">
-            <option value="">-- 選択 --</option>
-          </select>
-        </div>
-      </div>
-      <details style="margin-top:8px;">
-        <summary style="font-size:11px;color:#58a6ff;cursor:pointer;user-select:none;">＋ 新規カテゴリ・コース・レッスンを追加</summary>
-        <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;align-items:end;">
-          <div class="ig">
-            <div class="il">カテゴリ名</div>
-            <input class="tinput" id="new-master-category" placeholder="例: 基本情報技術者" style="min-height:unset;height:32px;font-size:11px;">
-          </div>
-          <div class="ig">
-            <div class="il">コース名</div>
-            <input class="tinput" id="new-master-course" placeholder="例: 午前問題" style="min-height:unset;height:32px;font-size:11px;">
-          </div>
-          <div class="ig">
-            <div class="il">レッスン番号</div>
-            <input class="tinput" id="new-master-lesson" placeholder="例: 1-1" style="min-height:unset;height:32px;font-size:11px;">
-          </div>
-          <div class="ig">
-            <div class="il">タイトル（任意）</div>
-            <input class="tinput" id="new-master-title" placeholder="例: 基礎理論" style="min-height:unset;height:32px;font-size:11px;">
-          </div>
-        </div>
-        <button class="btn btn-p" style="margin-top:6px;width:100%;font-size:12px;" onclick="addMasterData()">＋ 追加してスプレッドシートに保存</button>
-        <div id="master-status" style="display:none;font-size:11px;margin-top:4px;padding:4px 8px;border-radius:4px;"></div>
-      </details>
-    </div>
-
-    <div style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:10px;margin-top:12px;font-size:11px;color:#8b949e;line-height:1.7;">
-      ⚙️ <strong>Gemini APIキーの設定方法</strong><br>
-      GASのスクリプトエディタ → 「プロジェクトの設定」→「スクリプトプロパティ」<br>
-      プロパティ名: <code style="color:#58a6ff;">GEMINI_API_KEY</code> / 値: Gemini APIキー
-    </div>
-
-    <div id="img-status" style="display:none;font-size:12px;padding:8px;border-radius:6px;margin-top:8px;"></div>
-
-    <div class="mact" style="margin-top:12px;">
-      <button class="btn" onclick="closeImageSettings()">キャンセル</button>
-      <button class="btn btn-p" onclick="runImageProcessNow()">▶️ 今すぐ処理実行</button>
-      <button class="btn btn-p" onclick="saveImageSettings()">💾 設定を保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- Import Modal -->
-<div class="overlay" id="modal" style="display:none;">
-  <div class="modal">
-    <h3>📥 レッスンデータのインポート</h3>
-    <div class="modal-desc">コース名・レッスン番号・タイトルを入力し、要約テキストと問題データ（TSV形式）を貼り付けてください。</div>
-    <div class="modal-tabs">
-      <button class="mtab on" onclick="switchMTab('info')">基本情報</button>
-      <button class="mtab" onclick="switchMTab('summary')">要約データ</button>
-      <button class="mtab" onclick="switchMTab('points')">ポイント表</button>
-      <button class="mtab" onclick="switchMTab('quiz')">問題データ</button>
-      <button class="mtab" onclick="switchMTab('bulk')">📦 一括インポート</button>
-    </div>
-    <!-- info tab -->
-    <div id="mtab-info">
-      <div class="ig"><div class="il">コース名（例：Course 1）</div><input class="tinput" id="imp-course" placeholder="Course 1" style="min-height:unset;height:36px;"></div>
-      <div class="ig" style="margin-top:10px;"><div class="il">レッスン番号（例：1-1）</div><input class="tinput" id="imp-lesson" placeholder="1-1" style="min-height:unset;height:36px;"></div>
-      <div class="ig" style="margin-top:10px;"><div class="il">レッスンタイトル</div><input class="tinput" id="imp-title" placeholder="例：IT Challenges" style="min-height:unset;height:36px;"></div>
-    </div>
-    <!-- summary tab -->
-    <div id="mtab-summary" style="display:none;">
-      <div class="ig"><div class="il">原文ベース要約（テキストをそのまま貼り付け）</div><textarea class="tinput" id="imp-summary" placeholder="要約テキストを貼り付けてください..."></textarea></div>
-    </div>
-    <!-- points tab -->
-    <div id="mtab-points" style="display:none;">
-      <div class="ig">
-        <div class="il">ポイント表（スプレッドシートからコピー：カテゴリ・ポイント・補足 の3列）</div>
-        <textarea class="tinput" id="imp-points" placeholder="カテゴリ&#9;ポイント&#9;補足&#10;定義&#9;CMDBはデータリポジトリ&#9;CIs・services・relationshipsを格納"></textarea>
-      </div>
-      <div class="hint-box">形式：カテゴリ[TAB]ポイント[TAB]補足
-スプレッドシートから直接コピー&ペーストで貼り付け可能
-ヘッダー行は自動的にスキップされます</div>
-    </div>
-    <!-- quiz tab -->
-    <div id="mtab-quiz" style="display:none;">
-      <div class="ig">
-        <div class="il">問題データ（スプレッドシートからコピー：問題種別・No.・問題文・選択肢A〜D・正解・解説）</div>
-        <textarea class="tinput" id="imp-quiz" placeholder="基礎&#9;Q1&#9;CMDBとは？&#9;選択肢A&#9;選択肢B&#9;選択肢C&#9;選択肢D&#9;B&#9;解説テキスト"></textarea>
-      </div>
-      <div class="hint-box">形式：問題種別[TAB]No.[TAB]問題文[TAB]A[TAB]B[TAB]C[TAB]D[TAB]正解[TAB]解説
-正解列はA/B/C/Dのいずれかで指定
-スプレッドシートの「スプレッドシート用コピー」ボタンのデータをそのまま貼り付け可能
-先頭のレッスン列・コース列は自動的に無視されます</div>
-    </div>
-    <!-- bulk tab -->
-    <div id="mtab-bulk" style="display:none;">
-      <div class="ig">
-        <div class="il">スプレッドシートを直接貼り付け（見出し行＋カテゴリ〜問題文画像の列をコピー＆ペースト・選択肢は最大10択A〜J、問題文には画像添付も対応）</div>
-        <textarea class="tinput" id="imp-bulk" style="min-height:260px;" placeholder="カテゴリ&#9;コース&#9;レッスン番号&#9;レッスンタイトル&#9;問番号&#9;問題タイプ&#9;問題文&#9;選択肢A&#9;選択肢B&#9;選択肢C&#9;選択肢D&#9;選択肢E&#9;選択肢F&#9;選択肢G&#9;選択肢H&#9;選択肢I&#9;選択肢J&#9;正解&#9;解説&#9;複数選択&#9;問題文画像"></textarea>
-      </div>
-      <div class="hint-box">見出し行（1行目）を付けて貼り付ければ、列名から自動で位置を判定するため<b>列の順番は自由</b>です。列の追加・削除・並び替えをしても、見出し名（カテゴリ／コース／レッスン番号／レッスンタイトル／問番号／問題タイプ／問題文／選択肢A〜J／正解／解説／複数選択／問題文画像）さえ一致していれば取り込めます。見出し行を省略した場合のみ、上のプレースホルダの並び順（問題文画像は最終列）が使われます
-コース・レッスン番号・レッスンタイトル・問番号・問題タイプ・問題文画像は省略／空欄でも構いません（空欄の場合は既定値で取り込まれます）。選択肢は4択の場合、E〜J列は空欄のままでOKです
-問題文画像列には =IMAGE("画像URL") 数式、または画像の素のURLをそのまま入れられます（表・図などを画像として問題文の下に表示します）
-正解列はA〜J／ア〜コのどちらの表記でも認識します
-複数選択列に正解の記号（例：A,C またはア、ウ）を入れると複数選択問題として取り込まれます。空欄なら単一選択（正解列を使用）
-ヘッダー行は自動的にスキップされます。同じカテゴリ・コース・レッスン番号の行は1つのレッスンにまとめられ、既存レッスンがあれば問題が追加されます</div>
-      <div class="mact" style="margin-top:8px;">
-        <button class="btn btn-p" style="width:100%;" onclick="importBulkQuizData()">📦 一括インポート実行</button>
-      </div>
-    </div>
-    <div class="mact">
-      <button class="btn" onclick="closeModal()">キャンセル</button>
-      <button class="btn btn-p" onclick="importLesson()">✅ インポート</button>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -441,7 +263,6 @@ let state = {
   randomMode: false, // 選択肢ランダム表示モード
   shuffleMap: {},    // qkey_qi -> shuffled option indices
   currentCategory: null, // 現在選択中のカテゴリ
-  gasUrl: 'https://script.google.com/macros/s/AKfycbzD7Wh__Zj36jRd4OdoeRqvir-_iCjOwqk6Tuk_OvVugQmZ28Dnc2Wf5xCrELhWt4Y/exec', // GAS Web App URL
   dataSourceUrl: '' // URL of all_lessons_data.html
 };
 
@@ -453,7 +274,6 @@ function save() {
   s.randomMode = state.randomMode;
   s.shuffleMap = state.shuffleMap;
   s.currentCategory = state.currentCategory;
-  s.gasUrl = state.gasUrl;
   localStorage.setItem(STORE_KEY, JSON.stringify(s));
 }
 
@@ -471,7 +291,6 @@ function load() {
     state.randomMode = s.randomMode || false;
     state.shuffleMap = s.shuffleMap || {};
     state.currentCategory = s.currentCategory || null;
-    state.gasUrl = s.gasUrl || 'https://script.google.com/macros/s/AKfycbzD7Wh__Zj36jRd4OdoeRqvir-_iCjOwqk6Tuk_OvVugQmZ28Dnc2Wf5xCrELhWt4Y/exec';
     // コメントキーのマイグレーション（旧形式→新形式）
     if (s.comments) {
       const migratedComments = {};
@@ -503,8 +322,7 @@ function load() {
   renderHomeScreen();
 
   // GitHub管理のJSON(data/lessons.json)から問題データ・メモを読み込み
-  // ※スプレッドシート(GAS)による自動同期は廃止。loadLessonsFromSheet()は
-  //   手動移行機能(migrateDataFromHtml等)からのみ引き続き利用可能。
+  // ※スプレッドシート(GAS)連携は廃止済み
   loadLessonsFromGithub();
 }
 
@@ -580,7 +398,7 @@ function renderSidebar() {
     });
   });
 
-  html += `<button class="add-btn" onclick="openModal()">＋ レッスンを追加</button>`;
+  html += `<button class="add-btn" onclick="requestNewContent()">＋ 新しい問題を追加</button>`;
   el.innerHTML = html;
 }
 
@@ -596,7 +414,7 @@ function renderContent() {
     el.innerHTML = `<div class="welcome">
       <div style="font-size:48px;">📚</div>
       <h2>レッスンを選択してください</h2>
-      <p>左のサイドバーからレッスンを選ぶか、「＋ レッスンを追加」でデータをインポートしてください。</p>
+      <p>左のサイドバーからレッスンを選んでください。新しい問題の追加は「＋ 新しい問題を追加」から。</p>
     </div>`;
     return;
   }
@@ -1454,202 +1272,12 @@ function clearHistory() {
   renderHistory(document.getElementById('content'));
 }
 
-// ── Modal ──────────────────────────────────────────────
-let mTabCurrent = 'info';
-function openModal() {
-  document.getElementById('modal').style.display = 'flex';
-  switchMTab('info');
-}
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-}
-function switchMTab(t) {
-  mTabCurrent = t;
-  ['info','summary','points','quiz','bulk'].forEach(s => {
-    const panel = document.getElementById('mtab-'+s);
-    if (panel) panel.style.display = s===t ? 'flex' : 'none';
-    if (panel) panel.style.flexDirection = 'column';
-  });
-  document.querySelectorAll('.mtab').forEach((b,i) => {
-    b.classList.toggle('on', ['info','summary','points','quiz','bulk'][i]===t);
-  });
-}
-
-function importLesson() {
-  const course = document.getElementById('imp-course').value.trim() || 'Course 1';
-  const lesson = document.getElementById('imp-lesson').value.trim() || '1-1';
-  const title = document.getElementById('imp-title').value.trim() || 'Untitled';
-  const summary = document.getElementById('imp-summary').value.trim();
-  const pointsRaw = document.getElementById('imp-points').value.trim();
-  const quizRaw = document.getElementById('imp-quiz').value.trim();
-
-  const id = course.replace(/\s/g,'') + '_' + lesson.replace(/\./g,'') + '_' + Date.now();
-
-  // Parse points
-  const points = [];
-  if (pointsRaw) {
-    pointsRaw.split('\n').forEach((line,li) => {
-      const cols = line.split('\t');
-      if (cols.length >= 2) {
-        // Skip header
-        if (li===0 && (cols[0]==='カテゴリ'||cols[0].toLowerCase()==='category')) return;
-        points.push([cols[0]||'', cols[1]||'', cols[2]||'']);
-      }
-    });
-  }
-
-  // Parse quiz
-  const quiz = [];
-  if (quizRaw) {
-    quizRaw.split('\n').forEach((line,li) => {
-      const cols = line.split('\t');
-      if (cols.length < 6) return;
-      // Detect format: could start with course/lesson cols or directly with type
-      // Try to find the type column (基礎/意地悪/引っ掛け/試験対策)
-      const types = ['基礎','意地悪','引っ掛け','試験対策'];
-      let offset = 0;
-      for (let i=0; i<Math.min(3,cols.length); i++) {
-        if (types.includes(cols[i])) { offset = i; break; }
-      }
-      const type = cols[offset] || '基礎';
-      if (!types.includes(type)) return; // skip header
-      // offset: type, offset+1: No, offset+2: question, offset+3..6: opts A-D, offset+7: ans, offset+8: exp
-      const q = cols[offset+2] || '';
-      const opts = [cols[offset+3]||'', cols[offset+4]||'', cols[offset+5]||'', cols[offset+6]||''];
-      const ans = resolveAnswerIndex(cols[offset+7], opts);
-      const exp = cols[offset+8] || '';
-      if (q) quiz.push({type, q, opts, ans, exp});
-    });
-  }
-
-  const newLesson = {id, course, lesson, title, summary, points, quiz};
-  if (!newLesson.category) newLesson.category = 'ServiceNow CIS-DF';
-  state.lessons.push(newLesson);
-  state.activeLesson = id;
-  save();
-  closeModal();
-  renderHomeScreen();
-  if (state.currentCategory) {
-    renderSidebar();
-    renderContent();
-  }
-  showToast(`「${title}」をインポートしました（問題:${quiz.length}問）`);
-}
-
-// ── 一括インポート（スプレッドシート14列: カテゴリ/コース/レッスン番号/レッスンタイトル/問番号/問題タイプ/問題文/選択肢A-D/正解/解説/複数選択）──
-// コース・レッスン番号・レッスンタイトル・問番号・問題タイプは空欄可（既定値で取り込む）
-// 一括貼り付けの既定列順（ヘッダー行が無い場合のみ使うフォールバック）。
-// 通常運用ではヘッダー行から列名→位置を動的に解決するため、この並びを変えても
-// 既存の貼り付けデータ（ヘッダー付き）には影響しない。
-const BULK_IMPORT_DEFAULT_HEADER = ['カテゴリ','コース','レッスン番号','レッスンタイトル','問番号','問題タイプ','問題文',
-  '選択肢A','選択肢B','選択肢C','選択肢D','選択肢E','選択肢F','選択肢G','選択肢H','選択肢I','選択肢J',
-  '正解','解説','複数選択','問題文画像'];
-
-function parseBulkQuizRows(text) {
-  const lines = text.replace(/\r\n/g,'\n').split('\n').filter(l => l.trim() !== '');
-  if (lines.length === 0) return [];
-
-  const groups = {}; // category__course__lesson -> {category,course,lesson,title,quiz:[]}
-  const order = [];
-
-  // 列名 -> インデックスのマップを作る。
-  // ヘッダー行があれば実際の見出しセルから動的に解決するので、列の並び替え・追加・削除が
-  // あってもコード修正不要（列名さえ一致していれば良い）。無い列は空欄扱いになる。
-  // ヘッダー行が無い（見出し省略で貼り付けた）場合のみ、後方互換の既定順にフォールバックする。
-  const firstCols = lines[0].split('\t');
-  // ヘッダー判定は列の位置に依存させない：1行目の非空セルが全て既知の列名で、
-  // 1つ以上埋まっていればヘッダー行とみなす（カテゴリ列が先頭に無い並び替えでも検知できる）
-  const knownNames = new Set(BULK_IMPORT_DEFAULT_HEADER);
-  const hasHeader = firstCols.some(c => (c||'').trim() !== '') &&
-    firstCols.every(c => { const n = (c||'').trim(); return n === '' || knownNames.has(n); });
-  const headerRow = hasHeader ? firstCols : BULK_IMPORT_DEFAULT_HEADER;
-  const colIndex = {};
-  headerRow.forEach((name, i) => {
-    const n = (name || '').trim();
-    if (n) colIndex[n] = i;
-  });
-  const col = (cols, name) => {
-    const i = colIndex[name];
-    const raw = (i === undefined ? '' : (cols[i] || '')).trim();
-    // スプレッドシート側で「文字列として強制」した際に付く先頭の ' は、
-    // コピー時に一緒に紛れ込み、URL判定や表示を壊すため、どの列でも除去しておく
-    return raw.replace(/^'(?!')/, '').trim();
-  };
-
-  lines.forEach((line, li) => {
-    if (hasHeader && li === 0) return; // ヘッダー行をスキップ
-    const cols = line.split('\t');
-
-    const category = col(cols, 'カテゴリ') || (state.currentCategory || 'ServiceNow CIS-DF');
-    const course = col(cols, 'コース') || 'Course 1';
-    const lessonNo = col(cols, 'レッスン番号') || '1-1';
-    const title = col(cols, 'レッスンタイトル');
-    const type = col(cols, '問題タイプ') || '基礎';
-    const q = col(cols, '問題文');
-    if (!q) return; // 問題文が無い行は取り込み対象外
-
-    // 選択肢A〜J（最大10択、擬似言語の穴埋め問題などア〜コまである場合に対応）
-    const opts = ['A','B','C','D','E','F','G','H','I','J']
-      .map(letter => col(cols, '選択肢' + letter))
-      .filter(o => o !== '');
-    const ans = resolveAnswerIndex(col(cols, '正解'), opts);
-    const exp = col(cols, '解説');
-    const multi = resolveMultiIndices(col(cols, '複数選択'));
-
-    // 問題文に添付する画像（表・図など）。列の位置は問わない（列自体が無くてもOK）。
-    // =IMAGE("url")形式・素のURLどちらにも対応
-    const img = extractImageUrl(col(cols, '問題文画像'));
-
-    const key = category + '__' + course + '__' + lessonNo;
-    if (!groups[key]) {
-      groups[key] = { category, course, lesson: lessonNo, title, quiz: [] };
-      order.push(key);
-    } else if (title && !groups[key].title) {
-      groups[key].title = title;
-    }
-    groups[key].quiz.push({ type, q, img, opts, ans, multi, exp });
-  });
-
-  return order.map(k => groups[k]);
-}
-
-function importBulkQuizData() {
-  const raw = document.getElementById('imp-bulk').value;
-  if (!raw.trim()) { showToast('データを貼り付けてください'); return; }
-
-  const groups = parseBulkQuizRows(raw);
-  if (groups.length === 0) { showToast('取り込める行が見つかりませんでした'); return; }
-
-  let newLessonCount = 0, updatedLessonCount = 0, qCount = 0;
-  groups.forEach(g => {
-    qCount += g.quiz.length;
-    const existing = state.lessons.find(l =>
-      (l.category || 'ServiceNow CIS-DF') === g.category && l.course === g.course && l.lesson === g.lesson);
-    if (existing) {
-      existing.quiz = (existing.quiz || []).concat(g.quiz);
-      if (!existing.title && g.title) existing.title = g.title;
-      updatedLessonCount++;
-    } else {
-      const id = g.course.replace(/\s/g,'') + '_' + g.lesson.replace(/\./g,'') + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
-      state.lessons.push({
-        id, course: g.course, lesson: g.lesson,
-        title: g.title || `${g.course} ${g.lesson}`,
-        category: g.category, summary: '', points: [], quiz: g.quiz
-      });
-      if (!CATEGORIES[g.category]) CATEGORIES[g.category] = { icon: '📚', desc: '', color: '#e67e22' };
-      newLessonCount++;
-    }
-  });
-
-  save();
-  document.getElementById('imp-bulk').value = '';
-  closeModal();
-  renderHomeScreen();
-  if (state.currentCategory) {
-    renderSidebar();
-    renderContent();
-  }
-  showToast(`📦 一括インポート完了：新規${newLessonCount}レッスン／更新${updatedLessonCount}レッスン／問題${qCount}問`);
+// ── 新規問題追加の案内 ─────────────────────────────────
+// 問題データはこのアプリのGitHubリポジトリ(data/lessons.json)を正として管理する。
+// アプリ内で直接編集する経路は廃止し、Claudeに素材(画像・問題文)を送って
+// data/lessons.jsonを更新してもらう運用に統一する。
+function requestNewContent() {
+  alert('新しい問題・レッスンの追加はClaudeに依頼してください。\n\n画像や問題文などの素材を送っていただければ、Claudeが data/lessons.json を更新してこの一覧に反映します。');
 }
 
 function deleteLesson(id) {
@@ -1771,61 +1399,6 @@ function saveComment(lid, qi, text) {
   save();
 }
 
-// ── 正解列の表記ゆれを吸収してA~Dのインデックスに変換 ──────
-// スプレッドシートのテキスト強制用の先頭アポストロフィ（'B など）・
-// 「B.」「B：」のような区切り文字・数字(1~4)・選択肢本文そのものにも対応
-// 最大10択（A~J／ア~コ）に対応。基本情報技術者試験・科目Bの擬似言語穴埋め問題など
-// 選択肢がア~コまで及ぶケースに対応するため
-const ANSWER_LETTERS = 'ABCDEFGHIJ';
-const ANSWER_KANA = 'アイウエオカキクケコ';
-
-// ── 問題文画像列から画像URLを取り出す ──────────────────
-// スプレッドシートで =IMAGE("url") 数式のまま貼り付けられた場合と、素のURLが
-// 貼り付けられた場合の両方に対応する
-function extractImageUrl(raw) {
-  // 先頭の ' は、スプレッドシート側で「文字列として強制」した際に付く不可視のマーカーで
-  // コピー時に一緒に紛れ込むことがあるため、他の記号と合わせて除去してから判定する
-  const cleaned = (raw || '').trim().replace(/^['"’”]+/, '').trim();
-  if (!cleaned) return '';
-  const formulaMatch = cleaned.match(/=?\s*IMAGE\(\s*"([^"]+)"/i);
-  if (formulaMatch) return formulaMatch[1];
-  if (/^https?:\/\//i.test(cleaned)) return cleaned;
-  return '';
-}
-
-function resolveAnswerIndex(raw, opts) {
-  const cleaned = (raw || '').trim().replace(/^['"’”]+|['"’”]+$/g, '').trim();
-  const letterMatch = cleaned.match(/^([A-Ja-j])[.\s、:：]*$/);
-  if (letterMatch) return ANSWER_LETTERS.indexOf(letterMatch[1].toUpperCase());
-  const kanaMatch = cleaned.match(new RegExp(`^([${ANSWER_KANA}])[.\\s、:：]*$`));
-  if (kanaMatch) return ANSWER_KANA.indexOf(kanaMatch[1]);
-  const numMatch = cleaned.match(/^(10|[1-9])[.\s、:：]*$/);
-  if (numMatch) return parseInt(numMatch[1], 10) - 1;
-  if (opts) {
-    const idx = opts.findIndex(o => (o||'').trim().replace(/^['"’”]+/, '') === cleaned);
-    if (idx >= 0) return idx;
-  }
-  const anyLetter = cleaned.match(/[A-Ja-j]/);
-  if (anyLetter) return ANSWER_LETTERS.indexOf(anyLetter[0].toUpperCase());
-  const anyKana = cleaned.match(new RegExp(`[${ANSWER_KANA}]`));
-  if (anyKana) return ANSWER_KANA.indexOf(anyKana[0]);
-  return 0;
-}
-
-// ── 複数選択の正解列（例: "A,C" または "ア、ウ"）をインデックス配列に変換 ──
-function resolveMultiIndices(raw) {
-  const cleaned = (raw || '').trim();
-  if (!cleaned) return null;
-  const kanaChars = [...cleaned].filter(ch => ANSWER_KANA.includes(ch));
-  if (kanaChars.length > 0) {
-    const idx = [...new Set(kanaChars.map(ch => ANSWER_KANA.indexOf(ch)))].sort((a,b)=>a-b);
-    return idx.length > 0 ? idx : null;
-  }
-  const letters = cleaned.toUpperCase().split(/[^A-J]+/).filter(Boolean);
-  const idx = [...new Set(letters.map(l => ANSWER_LETTERS.indexOf(l)).filter(i => i >= 0))].sort((a,b)=>a-b);
-  return idx.length > 0 ? idx : null;
-}
-
 // ── Quiz field normalizer ────────────────────────────────
 function normalizeQuiz(quiz) {
   if (!Array.isArray(quiz)) return [];
@@ -1937,97 +1510,6 @@ window.addEventListener('message', (event) => {
 // ── データソース機能 ──────────────────────────────────────
 let dataSourceWindow = null;
 
-// ── GAS（スプレッドシート）連携 ─────────────────────────
-// ── スプレッドシートから問題データ読込 ─────────────────
-async function loadLessonsFromSheet() {
-  if (!state.gasUrl) return;
-  try {
-    showLoadingOverlay('📚 問題データを読み込み中...');
-    const res = await fetch(state.gasUrl + '?action=getLessons');
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message);
-
-    const lessons = json.lessons || [];
-    if (lessons.length === 0) {
-      // データが0件の場合は移行を実行
-      hideLoadingOverlay();
-      await migrateDataFromHtml();
-      return;
-    }
-
-    // IDを付与してstate.lessonsに反映（normalizeQuizでフィールド名を統一）
-    state.lessons = lessons.map(l => ({
-      ...l,
-      id: l.id || (l.course.replace(/\s/g,'') + '_' + l.lesson.replace(/\./g,'')),
-      category: l.category || 'ServiceNow CIS-DF',
-      quiz: normalizeQuiz(l.quiz || [])
-    }));
-
-    // errors の初期化（新規レッスンのみ）
-    state.lessons.forEach(l => {
-      if (!state.errors[l.id]) state.errors[l.id] = new Set();
-    });
-
-    save();
-    hideLoadingOverlay();
-
-    // スプレッドシートから取得したカテゴリをCATEGORIESに自動追加
-    state.lessons.forEach(l => {
-      const cat = l.category || 'ServiceNow CIS-DF';
-      if (!CATEGORIES[cat]) {
-        CATEGORIES[cat] = { icon: '📚', desc: '', color: '#e67e22' };
-      }
-    });
-
-    // ホーム画面更新
-    renderHomeScreen();
-    if (state.currentCategory) {
-      renderSidebar();
-      renderContent();
-    }
-
-    // メモも読込
-    loadMemosFromSheet();
-
-  } catch (err) {
-    hideLoadingOverlay();
-    console.error('問題データ読込エラー:', err);
-    showToast('⚠️ 問題データの読込に失敗しました。キャッシュデータを使用します。');
-    // キャッシュが残っていればそのまま使用
-    if (state.lessons.length > 0) {
-      renderHomeScreen();
-      if (state.currentCategory) {
-        renderSidebar();
-        renderContent();
-      }
-    }
-  }
-}
-
-// ── all_lessons_data.htmlからスプレッドシートに移行 ─────
-async function migrateDataFromHtml() {
-  try {
-    showLoadingOverlay('📤 データを移行中...(初回のみ・数分かかる場合があります)');
-    const res = await fetch(state.gasUrl, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'migrateFromHtml' })
-    });
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message);
-
-    hideLoadingOverlay();
-    showToast(`✅ データ移行完了！${json.lessons}レッスン・${json.questions}問をスプレッドシートに保存しました`);
-
-    // 移行完了後に問題データを読込
-    await loadLessonsFromSheet();
-
-  } catch (err) {
-    hideLoadingOverlay();
-    showToast('❌ データ移行に失敗しました: ' + err.message);
-    console.error(err);
-  }
-}
-
 // ── GitHub管理JSON(data/lessons.json)から問題データ・メモを読み込み ─────
 // スプレッドシート(GAS)管理は廃止し、リポジトリ内のJSONを正とする。
 // 進捗データ(quizState/history/errors)はlocalStorageのみで管理し、ここでは一切上書きしない。
@@ -2083,371 +1565,6 @@ async function loadLessonsFromGithub() {
     }
   }
 }
-
-// ── ローディングオーバーレイ ──────────────────────────
-function showLoadingOverlay(msg) {
-  let overlay = document.getElementById('loading-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'loading-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;';
-    overlay.innerHTML = '<div id="loading-msg" style="color:#e6edf3;font-size:16px;"></div><div style="width:48px;height:48px;border:3px solid #30363d;border-top-color:#58a6ff;border-radius:50%;animation:spin 1s linear infinite;"></div>';
-    document.body.appendChild(overlay);
-    // スピナーアニメーション
-    if (!document.getElementById('spin-style')) {
-      const style = document.createElement('style');
-      style.id = 'spin-style';
-      style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
-      document.head.appendChild(style);
-    }
-  }
-  document.getElementById('loading-msg').textContent = msg;
-  overlay.style.display = 'flex';
-}
-
-function hideLoadingOverlay() {
-  const overlay = document.getElementById('loading-overlay');
-  if (overlay) overlay.style.display = 'none';
-}
-
-function gasSetStatus(msg, type) {
-  const el = document.getElementById('gas-status');
-  if (!el) return;
-  el.textContent = msg;
-  el.className = 'gas-status gas-' + type;
-  el.style.display = msg ? 'inline-block' : 'none';
-  if (type === 'ok' || type === 'err') {
-    setTimeout(() => { el.style.display = 'none'; }, 3000);
-  }
-}
-
-async function sendToSheet(action, data) {
-  if (!state.gasUrl) {
-    // GAS URLが未設定の場合はローカルのみ
-    return;
-  }
-  try {
-    const res = await fetch(state.gasUrl, {
-      method: 'POST',
-      body: JSON.stringify({ action, ...data })
-    });
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message);
-  } catch (err) {
-    console.warn('GAS送信エラー:', err);
-  }
-}
-
-async function loadMemosFromSheet() {
-  if (!state.gasUrl) return;
-  try {
-    gasSetStatus('メモ読込中...', 'ing');
-    const res = await fetch(state.gasUrl + '?action=getMemos');
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message);
-    // スプレッドシートのメモをlocalStorageに反映
-    const memos = json.memos || {};
-    if (!state.comments) state.comments = {};
-    Object.keys(memos).forEach(key => {
-      // key: category_course_lesson_qno → course_lesson_qi
-      const parts = key.split('_');
-      // parts[0]=category, parts[1]=course (例:Course 1→"Course 1"), parts[2]=lesson, parts[3]=qno
-      if (parts.length >= 4) {
-        const qno = parts[parts.length - 1]; // Q1, Q2...
-        const qi = String(parseInt(qno.replace('Q','')) - 1);
-        const lesson = parts[parts.length - 2];
-        const course = parts.slice(1, parts.length - 2).join('_');
-        const localKey = course.replace(/\s/g,'') + '_' + lesson + '_' + qi;
-        state.comments[localKey] = memos[key].text;
-      }
-    });
-    save();
-    gasSetStatus('✅ メモ読込完了', 'ok');
-  } catch (err) {
-    gasSetStatus('❌ 読込失敗', 'err');
-    console.error(err);
-  }
-}
-
-async function migrateMemosToSheet() {
-  if (!state.gasUrl) {
-    const url = prompt('GAS Web App URLを入力してください:');
-    if (!url) return;
-    state.gasUrl = url;
-    save();
-  }
-  if (!confirm('既存のメモをスプレッドシートに移行します。よろしいですか？')) return;
-  try {
-    gasSetStatus('移行中...', 'ing');
-    const comments = state.comments || {};
-    const memos = [];
-    Object.keys(comments).forEach(key => {
-      const text = comments[key];
-      if (!text || !text.trim()) return;
-      // key形式: Course1_1-1_0 (course_lesson_qi)
-      const parts = key.split('_');
-      if (parts.length < 3) return;
-      const qi = parts[parts.length - 1];
-      const lesson = parts[parts.length - 2];
-      const courseRaw = parts.slice(0, parts.length - 2).join('_');
-      // courseRaw例: "Course1" → "Course 1"
-      const course = courseRaw.replace(/Course(\d+)/, 'Course $1');
-      // カテゴリを特定
-      const lesson_obj = state.lessons.find(l => l.course === course && l.lesson === lesson);
-      const category = lesson_obj ? (lesson_obj.category || 'ServiceNow CIS-DF') : 'ServiceNow CIS-DF';
-      memos.push({ category, course, lesson, qno: `Q${parseInt(qi)+1}`, text });
-    });
-    await sendToSheet('migrateMemos', { memos });
-    gasSetStatus(`✅ ${memos.length}件移行完了`, 'ok');
-    showToast(`📤 ${memos.length}件のメモをスプレッドシートに移行しました`);
-  } catch (err) {
-    gasSetStatus('❌ 移行失敗', 'err');
-    console.error(err);
-  }
-}
-
-// ── 画像取込設定 ─────────────────────────────────────
-// ── マスターデータ管理 ───────────────────────────────────
-let masterData = {}; // { カテゴリ: { コース: [{lesson, title}] } }
-
-async function loadMasterData(selectCategory, selectCourse, selectLesson) {
-  try {
-    const res = await fetch(state.gasUrl + '?action=getMaster');
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message);
-    masterData = json.master || {};
-
-    // カテゴリプルダウン更新
-    const catSel = document.getElementById('img-category');
-    const curCat = selectCategory || catSel.value;
-    catSel.innerHTML = '<option value="">-- 選択 --</option>';
-    Object.keys(masterData).forEach(cat => {
-      const opt = document.createElement('option');
-      opt.value = cat;
-      opt.textContent = cat;
-      if (cat === curCat) opt.selected = true;
-      catSel.appendChild(opt);
-    });
-
-    // カテゴリが選択済みならコースも更新
-    if (curCat) {
-      onImgCategoryChange(curCat, selectCourse, selectLesson);
-    }
-  } catch (err) {
-    console.warn('マスターデータ読込エラー:', err);
-  }
-}
-
-function onImgCategoryChange(cat, selectCourse, selectLesson) {
-  const courseSel = document.getElementById('img-course');
-  const lessonSel = document.getElementById('img-lesson');
-  courseSel.innerHTML = '<option value="">-- 選択 --</option>';
-  lessonSel.innerHTML = '<option value="">-- 選択 --</option>';
-
-  if (!cat || !masterData[cat]) return;
-
-  const courses = Object.keys(masterData[cat]);
-  courses.forEach(course => {
-    const opt = document.createElement('option');
-    opt.value = course;
-    opt.textContent = course;
-    if (course === selectCourse) opt.selected = true;
-    courseSel.appendChild(opt);
-  });
-
-  if (selectCourse) {
-    onImgCourseChange(selectCourse, selectLesson);
-  }
-}
-
-function onImgCourseChange(course, selectLesson) {
-  const cat = document.getElementById('img-category').value;
-  const lessonSel = document.getElementById('img-lesson');
-  lessonSel.innerHTML = '<option value="">-- 選択 --</option>';
-
-  if (!cat || !course || !masterData[cat] || !masterData[cat][course]) return;
-
-  masterData[cat][course].forEach(item => {
-    const opt = document.createElement('option');
-    opt.value = item.lesson;
-    opt.textContent = item.lesson + (item.title ? ': ' + item.title : '');
-    if (item.lesson === selectLesson) opt.selected = true;
-    lessonSel.appendChild(opt);
-  });
-}
-
-async function addMasterData() {
-  const category = document.getElementById('new-master-category').value.trim();
-  const course   = document.getElementById('new-master-course').value.trim();
-  const lessonNo = document.getElementById('new-master-lesson').value.trim();
-  const title    = document.getElementById('new-master-title').value.trim();
-
-  if (!category) {
-    setMasterStatus('カテゴリ名は必須です', 'err');
-    return;
-  }
-
-  setMasterStatus('保存中...', 'ing');
-  try {
-    const res = await fetch(state.gasUrl, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'addMaster', category, course, lessonNo, title })
-    });
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message);
-
-    setMasterStatus('✅ 追加しました', 'ok');
-    // フォームをクリア
-    document.getElementById('new-master-category').value = '';
-    document.getElementById('new-master-course').value = '';
-    document.getElementById('new-master-lesson').value = '';
-    document.getElementById('new-master-title').value = '';
-    // プルダウンを更新
-    await loadMasterData(category, course, lessonNo);
-
-    // アプリのCATEGORIESにも追加（ホーム画面に反映）
-    if (!CATEGORIES[category]) {
-      CATEGORIES[category] = {
-        icon: '📚',
-        desc: category + 'の試験対策問題集です。',
-        color: '#e67e22',
-      };
-      renderHomeScreen();
-    }
-  } catch (err) {
-    setMasterStatus('❌ ' + err.message, 'err');
-  }
-}
-
-function setMasterStatus(msg, type) {
-  const el = document.getElementById('master-status');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = msg ? 'block' : 'none';
-  el.style.background = type === 'ok' ? '#0d2c1a' : type === 'err' ? '#2c1416' : '#1a2a3a';
-  el.style.color = type === 'ok' ? '#3fb950' : type === 'err' ? '#f85149' : '#58a6ff';
-}
-
-function openImageSettings() {
-  // 現在の設定を取得してフォームに反映
-  fetch(state.gasUrl + '?action=getImageSettings')
-    .then(r => r.json())
-    .then(json => {
-      if (json.status !== 'ok') return;
-      const s = json.settings;
-      document.getElementById('img-root-folder').value   = s.rootFolderId || '';
-      document.getElementById('img-process-count').value = s.processCount || 1;
-      // 時刻設定
-      const h = String(s.scheduleHour || 23).padStart(2,'0');
-      const m = String(s.scheduleMin  || 0).padStart(2,'0');
-      document.getElementById('img-schedule-time').value = h + ':' + m;
-      // フォルダ選択を復元
-      if (s.rootFolderId) loadSubFolders(s.targetFolder);
-      // マスターデータ読込（カテゴリ・コース・レッスンを復元）
-      loadMasterData(s.category || '', s.course || '', s.lessonNo || '');
-    })
-    .catch(() => {
-      // GAS未設定時もマスターデータを読込試行
-      loadMasterData('', '', '');
-    });
-  document.getElementById('img-modal').style.display = 'flex';
-}
-
-function closeImageSettings() {
-  document.getElementById('img-modal').style.display = 'none';
-}
-
-function setImgStatus(msg, type) {
-  const el = document.getElementById('img-status');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = msg ? 'block' : 'none';
-  el.style.background = type === 'ok' ? '#0d2c1a' : type === 'err' ? '#2c1416' : '#1a2a3a';
-  el.style.color = type === 'ok' ? '#3fb950' : type === 'err' ? '#f85149' : '#58a6ff';
-  el.style.border = '1px solid ' + (type === 'ok' ? '#2ea043' : type === 'err' ? '#da3633' : '#1f6feb');
-}
-
-async function loadSubFolders(selectValue) {
-  const rootId = document.getElementById('img-root-folder').value.trim();
-  if (!rootId) { setImgStatus('ルートフォルダIDを入力してください', 'err'); return; }
-  setImgStatus('フォルダ取得中...', 'ing');
-  try {
-    const res = await fetch(state.gasUrl + '?action=getSubFolders&rootFolderId=' + encodeURIComponent(rootId));
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message);
-    const sel = document.getElementById('img-target-folder');
-    sel.innerHTML = '<option value="">-- フォルダを選択 --</option>';
-    (json.folders || []).forEach(f => {
-      const opt = document.createElement('option');
-      opt.value = f.name;
-      opt.textContent = f.name;
-      if (selectValue && f.name === selectValue) opt.selected = true;
-      sel.appendChild(opt);
-    });
-    setImgStatus('✅ ' + (json.folders || []).length + '件のフォルダを取得しました', 'ok');
-  } catch (err) {
-    setImgStatus('❌ ' + err.message, 'err');
-  }
-}
-
-async function saveImageSettings() {
-  const timeVal = document.getElementById('img-schedule-time').value || '23:00';
-  const [h, m] = timeVal.split(':').map(Number);
-  const settings = {
-    rootFolderId: document.getElementById('img-root-folder').value.trim(),
-    targetFolder: document.getElementById('img-target-folder').value,
-    processCount: parseInt(document.getElementById('img-process-count').value) || 1,
-    scheduleHour: h || 23,
-    scheduleMin:  m || 0,
-    category:     document.getElementById('img-category').value,
-    course:       document.getElementById('img-course').value,
-    lessonNo:     document.getElementById('img-lesson').value,
-  };
-  setImgStatus('保存中...', 'ing');
-  try {
-    const res = await fetch(state.gasUrl, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'saveImageSettings', settings, updateTrigger: true })
-    });
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message);
-    setImgStatus('✅ 設定を保存しました（定時処理トリガーを更新しました）', 'ok');
-    showToast('📷 画像取込設定を保存しました');
-  } catch (err) {
-    setImgStatus('❌ ' + err.message, 'err');
-  }
-}
-
-async function runImageProcessNow() {
-  if (!confirm('今すぐ画像処理を実行しますか？\n（処理に数分かかる場合があります）')) return;
-  // まず設定を保存
-  await saveImageSettings();
-  setImgStatus('処理中...（数分かかる場合があります）', 'ing');
-  try {
-    const res = await fetch(state.gasUrl, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'runImageProcess' })
-    });
-    const json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message);
-    setImgStatus('✅ 処理が完了しました。スプレッドシートをご確認ください。', 'ok');
-    showToast('📷 画像処理が完了しました');
-    // 問題データを再読込
-    await loadLessonsFromSheet();
-  } catch (err) {
-    setImgStatus('❌ ' + err.message, 'err');
-  }
-}
-
-function openGasSettings() {
-  const url = prompt('GAS Web App URLを入力してください\n（script.google.comでデプロイ後に表示されるURL）', state.gasUrl || '');
-  if (url !== null) {
-    state.gasUrl = url;
-    save();
-    showToast('✅ GAS URLを保存しました');
-  }
-}
-
 
 function openDataSourceNewTab() {
   const url = state.dataSourceUrl;
@@ -2537,11 +1654,6 @@ document.addEventListener('DOMContentLoaded', () => {
 load();
 
 // 起動時は必ずホーム画面を表示する
-
-// Fix modal tab init
-document.querySelectorAll('#mtab-summary,#mtab-points,#mtab-quiz,#mtab-bulk').forEach(el => el.style.display='none');
-document.getElementById('mtab-info').style.display = 'flex';
-document.getElementById('mtab-info').style.flexDirection = 'column';
 </script>
 </body>
 </html>
