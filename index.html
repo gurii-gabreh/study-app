@@ -406,11 +406,11 @@ textarea.tinput{min-height:180px;}
     <!-- bulk tab -->
     <div id="mtab-bulk" style="display:none;">
       <div class="ig">
-        <div class="il">スプレッドシートを直接貼り付け（カテゴリ〜複数選択の21列をそのままコピー＆ペースト・選択肢は最大10択A〜J、問題文には画像添付も対応）</div>
-        <textarea class="tinput" id="imp-bulk" style="min-height:260px;" placeholder="カテゴリ&#9;コース&#9;レッスン番号&#9;レッスンタイトル&#9;問番号&#9;問題タイプ&#9;問題文&#9;問題文画像&#9;選択肢A&#9;選択肢B&#9;選択肢C&#9;選択肢D&#9;選択肢E&#9;選択肢F&#9;選択肢G&#9;選択肢H&#9;選択肢I&#9;選択肢J&#9;正解&#9;解説&#9;複数選択"></textarea>
+        <div class="il">スプレッドシートを直接貼り付け（見出し行＋カテゴリ〜問題文画像の列をコピー＆ペースト・選択肢は最大10択A〜J、問題文には画像添付も対応）</div>
+        <textarea class="tinput" id="imp-bulk" style="min-height:260px;" placeholder="カテゴリ&#9;コース&#9;レッスン番号&#9;レッスンタイトル&#9;問番号&#9;問題タイプ&#9;問題文&#9;選択肢A&#9;選択肢B&#9;選択肢C&#9;選択肢D&#9;選択肢E&#9;選択肢F&#9;選択肢G&#9;選択肢H&#9;選択肢I&#9;選択肢J&#9;正解&#9;解説&#9;複数選択&#9;問題文画像"></textarea>
       </div>
-      <div class="hint-box">列の形式：カテゴリ[TAB]コース[TAB]レッスン番号[TAB]レッスンタイトル[TAB]問番号[TAB]問題タイプ[TAB]問題文[TAB]問題文画像[TAB]選択肢A〜J（最大10列）[TAB]正解[TAB]解説[TAB]複数選択
-コース・レッスン番号・レッスンタイトル・問番号・問題タイプは空欄でも構いません（空欄の場合は既定値で取り込まれます）。選択肢は4択の場合、E〜J列は空欄のままでOKです
+      <div class="hint-box">見出し行（1行目）を付けて貼り付ければ、列名から自動で位置を判定するため<b>列の順番は自由</b>です。列の追加・削除・並び替えをしても、見出し名（カテゴリ／コース／レッスン番号／レッスンタイトル／問番号／問題タイプ／問題文／選択肢A〜J／正解／解説／複数選択／問題文画像）さえ一致していれば取り込めます。見出し行を省略した場合のみ、上のプレースホルダの並び順（問題文画像は最終列）が使われます
+コース・レッスン番号・レッスンタイトル・問番号・問題タイプ・問題文画像は省略／空欄でも構いません（空欄の場合は既定値で取り込まれます）。選択肢は4択の場合、E〜J列は空欄のままでOKです
 問題文画像列には =IMAGE("画像URL") 数式、または画像の素のURLをそのまま入れられます（表・図などを画像として問題文の下に表示します）
 正解列はA〜J／ア〜コのどちらの表記でも認識します
 複数選択列に正解の記号（例：A,C またはア、ウ）を入れると複数選択問題として取り込まれます。空欄なら単一選択（正解列を使用）
@@ -1546,35 +1546,64 @@ function importLesson() {
 
 // ── 一括インポート（スプレッドシート14列: カテゴリ/コース/レッスン番号/レッスンタイトル/問番号/問題タイプ/問題文/選択肢A-D/正解/解説/複数選択）──
 // コース・レッスン番号・レッスンタイトル・問番号・問題タイプは空欄可（既定値で取り込む）
+// 一括貼り付けの既定列順（ヘッダー行が無い場合のみ使うフォールバック）。
+// 通常運用ではヘッダー行から列名→位置を動的に解決するため、この並びを変えても
+// 既存の貼り付けデータ（ヘッダー付き）には影響しない。
+const BULK_IMPORT_DEFAULT_HEADER = ['カテゴリ','コース','レッスン番号','レッスンタイトル','問番号','問題タイプ','問題文',
+  '選択肢A','選択肢B','選択肢C','選択肢D','選択肢E','選択肢F','選択肢G','選択肢H','選択肢I','選択肢J',
+  '正解','解説','複数選択','問題文画像'];
+
 function parseBulkQuizRows(text) {
-  const lines = text.replace(/\r\n/g,'\n').split('\n');
+  const lines = text.replace(/\r\n/g,'\n').split('\n').filter(l => l.trim() !== '');
+  if (lines.length === 0) return [];
+
   const groups = {}; // category__course__lesson -> {category,course,lesson,title,quiz:[]}
   const order = [];
 
-  lines.forEach((line, li) => {
-    if (!line.trim()) return;
-    const cols = line.split('\t');
-    if (li === 0 && (cols[0]||'').trim() === 'カテゴリ') return; // ヘッダー行をスキップ
+  // 列名 -> インデックスのマップを作る。
+  // ヘッダー行があれば実際の見出しセルから動的に解決するので、列の並び替え・追加・削除が
+  // あってもコード修正不要（列名さえ一致していれば良い）。無い列は空欄扱いになる。
+  // ヘッダー行が無い（見出し省略で貼り付けた）場合のみ、後方互換の既定順にフォールバックする。
+  const firstCols = lines[0].split('\t');
+  // ヘッダー判定は列の位置に依存させない：1行目の非空セルが全て既知の列名で、
+  // 1つ以上埋まっていればヘッダー行とみなす（カテゴリ列が先頭に無い並び替えでも検知できる）
+  const knownNames = new Set(BULK_IMPORT_DEFAULT_HEADER);
+  const hasHeader = firstCols.some(c => (c||'').trim() !== '') &&
+    firstCols.every(c => { const n = (c||'').trim(); return n === '' || knownNames.has(n); });
+  const headerRow = hasHeader ? firstCols : BULK_IMPORT_DEFAULT_HEADER;
+  const colIndex = {};
+  headerRow.forEach((name, i) => {
+    const n = (name || '').trim();
+    if (n) colIndex[n] = i;
+  });
+  const col = (cols, name) => {
+    const i = colIndex[name];
+    return (i === undefined ? '' : (cols[i] || '')).trim();
+  };
 
-    const category = (cols[0]||'').trim() || (state.currentCategory || 'ServiceNow CIS-DF');
-    const course = (cols[1]||'').trim() || 'Course 1';
-    const lessonNo = (cols[2]||'').trim() || '1-1';
-    const title = (cols[3]||'').trim();
-    const type = (cols[5]||'').trim() || '基礎';
-    const q = (cols[6]||'').trim();
+  lines.forEach((line, li) => {
+    if (hasHeader && li === 0) return; // ヘッダー行をスキップ
+    const cols = line.split('\t');
+
+    const category = col(cols, 'カテゴリ') || (state.currentCategory || 'ServiceNow CIS-DF');
+    const course = col(cols, 'コース') || 'Course 1';
+    const lessonNo = col(cols, 'レッスン番号') || '1-1';
+    const title = col(cols, 'レッスンタイトル');
+    const type = col(cols, '問題タイプ') || '基礎';
+    const q = col(cols, '問題文');
     if (!q) return; // 問題文が無い行は取り込み対象外
 
-    // 問題文に添付する画像（表・図など）。=IMAGE("url")形式・素のURLどちらにも対応
-    const img = extractImageUrl(cols[7]);
-
     // 選択肢A〜J（最大10択、擬似言語の穴埋め問題などア〜コまである場合に対応）
-    const opts = [cols[8],cols[9],cols[10],cols[11],cols[12],cols[13],cols[14],cols[15],cols[16],cols[17]]
-      .map(o => (o||'').trim())
+    const opts = ['A','B','C','D','E','F','G','H','I','J']
+      .map(letter => col(cols, '選択肢' + letter))
       .filter(o => o !== '');
-    const ans = resolveAnswerIndex(cols[18], opts);
-    const exp = (cols[19]||'').trim();
+    const ans = resolveAnswerIndex(col(cols, '正解'), opts);
+    const exp = col(cols, '解説');
+    const multi = resolveMultiIndices(col(cols, '複数選択'));
 
-    const multi = resolveMultiIndices(cols[20]);
+    // 問題文に添付する画像（表・図など）。列の位置は問わない（列自体が無くてもOK）。
+    // =IMAGE("url")形式・素のURLどちらにも対応
+    const img = extractImageUrl(col(cols, '問題文画像'));
 
     const key = category + '__' + course + '__' + lessonNo;
     if (!groups[key]) {
