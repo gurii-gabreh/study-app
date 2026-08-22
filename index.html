@@ -512,10 +512,10 @@ function load() {
   document.getElementById('hdr-tabs').style.display = 'none';
   renderHomeScreen();
 
-  // GASから問題データ・メモを読み込み
-  if (state.gasUrl) {
-    loadLessonsFromSheet();
-  }
+  // GitHub管理のJSON(data/lessons.json)から問題データ・メモを読み込み
+  // ※スプレッドシート(GAS)による自動同期は廃止。loadLessonsFromSheet()は
+  //   手動移行機能(migrateDataFromHtml等)からのみ引き続き利用可能。
+  loadLessonsFromGithub();
 }
 
 // ── Mode ───────────────────────────────────────────────
@@ -2038,6 +2038,62 @@ async function migrateDataFromHtml() {
     hideLoadingOverlay();
     showToast('❌ データ移行に失敗しました: ' + err.message);
     console.error(err);
+  }
+}
+
+// ── GitHub管理JSON(data/lessons.json)から問題データ・メモを読み込み ─────
+// スプレッドシート(GAS)管理は廃止し、リポジトリ内のJSONを正とする。
+// 進捗データ(quizState/history/errors)はlocalStorageのみで管理し、ここでは一切上書きしない。
+async function loadLessonsFromGithub() {
+  try {
+    const res = await fetch('data/lessons.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const lessons = json.lessons || [];
+    if (lessons.length === 0) return;
+
+    // IDを付与してstate.lessonsに反映(normalizeQuizでフィールド名を統一)
+    state.lessons = lessons.map(l => ({
+      ...l,
+      id: l.id || (l.course.replace(/\s/g,'') + '_' + l.lesson.replace(/\./g,'')),
+      category: l.category || 'ServiceNow CIS-DF',
+      quiz: normalizeQuiz(l.quiz || [])
+    }));
+
+    // メモ(comments)はローカルの編集を優先し、未設定分のみJSON側で補完
+    if (json.comments) {
+      Object.keys(json.comments).forEach(k => {
+        if (!(k in state.comments)) state.comments[k] = json.comments[k];
+      });
+    }
+
+    // errors の初期化(新規レッスンのみ)
+    state.lessons.forEach(l => {
+      if (!state.errors[l.id]) state.errors[l.id] = new Set();
+      const cat = l.category || 'ServiceNow CIS-DF';
+      if (!CATEGORIES[cat]) {
+        CATEGORIES[cat] = { icon: '📚', desc: '', color: '#e67e22' };
+      }
+    });
+
+    save();
+
+    // ホーム画面更新
+    renderHomeScreen();
+    if (state.currentCategory) {
+      renderSidebar();
+      renderContent();
+    }
+  } catch (err) {
+    console.error('問題データ読込エラー(GitHub JSON):', err);
+    // 取得に失敗した場合はlocalStorageのキャッシュデータをそのまま使用
+    if (state.lessons.length > 0) {
+      renderHomeScreen();
+      if (state.currentCategory) {
+        renderSidebar();
+        renderContent();
+      }
+    }
   }
 }
 
