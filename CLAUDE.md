@@ -54,3 +54,12 @@
 <!-- CORE-RULES:END -->
 
 上記ブロックは`gurii-gabreh/progress-tracker-dashboard`の`data/claude-core-rules.md`が正本で、GitHub Actionsが自動同期する。直接編集しても次回同期で上書きされる。
+
+## このリポジトリ固有の補足
+
+### 環境変数`GOOGLE_SERVICE_ACCOUNT_JSON`について(2026-08-29調査)
+
+- **study-appのコード内では未使用**: `index.html`・`CLAUDE.md`・`all_lessons_data.html`・`data/lessons.json`を検索したが参照箇所なし。`.github/workflows`自体が存在しないため、GitHub Secretsとして参照される経路もそもそも無い
+- study-appは旧GAS連携(スプレッドシート経由の問題データ管理・Googleドライブ画像取込設定等)を2026-08-26に全廃止済みのため、仮に過去バージョンでGoogle認証情報を使う設計があったとしても現行コードには残っていない
+- この環境変数の**記録の正本はユーザーのローカルファイル**: ファイル名「Claude 環境変数」、保存場所`/Users/takadanariaki/IT/AI`(ユーザーのMac上。Claudeからはアクセス不可)
+- 削除・失効の判断はユーザー自身がこのローカルファイルおよびGoogle Cloud側の実際の利用状況を確認した上で行うこと(Claude側から見える範囲では「study-appでは不要」までしか確定できない)
