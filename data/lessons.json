@@ -12694,9 +12694,9 @@
     },
     {
       "category": "基本情報技術者試験",
-      "course": "平成30年",
-      "lesson": "平成30年",
-      "title": "平成30年",
+      "course": "平成30年秋期",
+      "lesson": "平成30年秋期",
+      "title": "平成30年秋期",
       "summary": "",
       "points": [],
       "quiz": [
@@ -12997,7 +12997,7 @@
         {
           "type": "試験対策",
           "q": "2入力NAND素子を用いて4入力NAND回路を構成したものはどれか。(選択肢はいずれも論理回路図)",
-          "img": "https://drive.google.com/file/d/1i32ST_KURf0WA1LmCrSYH1pa6b1nUZuO/view?usp=drivesdk",
+          "img": "https://lh3.googleusercontent.com/d/1i32ST_KURf0WA1LmCrSYH1pa6b1nUZuO",
           "opts": [
             "ア",
             "イ",
@@ -13053,7 +13053,7 @@
         {
           "type": "試験対策",
           "q": "UMLを用いて表した図のデータモデルのa，bに入れる多重度はどれか。(選択肢はいずれも論理回路図ではなくUMLクラス図。「部門」「所属履歴」「社員」の3つのクラスが連結線で結ばれ、部門-所属履歴間の多重度がa、所属履歴-社員間の多重度がb) 〔条件〕 (1) 部門には1人以上の社員が所属する。 (2) 社員はいずれか一つの部門に所属する。 (3) 社員が部門に所属した履歴を所属履歴として記録する。",
-          "img": "https://drive.google.com/file/d/1VR1vCm53ONjr3HZsuzcVqFUuqM108MQw/view?usp=drivesdk",
+          "img": "https://lh3.googleusercontent.com/d/1VR1vCm53ONjr3HZsuzcVqFUuqM108MQw",
           "opts": [
             "a=0..*, b=0..*",
             "a=0..*, b=1..*",
@@ -13417,7 +13417,7 @@
         {
           "type": "試験対策",
           "q": "図のプロジェクトの日程計画(アローダイアグラム/PERT図)において，プロジェクトの所要日数は何日か。(作業A(10日)→B(5日)またはC(10日)/D(15日)…と分岐・合流し、ダミー作業を含む複雑なネットワーク図。図を参照)",
-          "img": "https://drive.google.com/file/d/1UHYK5Ka7YBnMk5xQNV_YmfGe9-fIkPQE/view?usp=drivesdk",
+          "img": "https://lh3.googleusercontent.com/d/1UHYK5Ka7YBnMk5xQNV_YmfGe9-fIkPQE",
           "opts": [
             "40",
             "45",
@@ -13821,7 +13821,7 @@
           "exp": ""
         }
       ],
-      "id": "平成30年_平成30年"
+      "id": "平成30年秋期_平成30年秋期"
     }
   ],
   "comments": {
