@@ -3,7 +3,7 @@
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 1",
-      "lesson": "Thu Jan 01 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "1-1",
       "title": "IT Challenges / CMDBの課題",
       "summary": "現代のエンタープライズにおいて、ITインフラへの visibility（可視性）は mission-critical（事業継続に不可欠）である。hardware、software、appliances、virtual machines、cloud resources、IoT devices、mobile devices、container technologies、orchestrators の普及により複雑化し続けている。\n\nCMDB 導入成功の3本柱は Ingest（取り込み）・Govern（管理）・Insight（洞察）である。\n\nGovern の課題：incorrectly classified CIs（誤分類されたCI）・unwanted or irrelevant data（不要・無関係データ）・inconsistent data quality（データ品質のばらつき）。non-discoverable attributes（support groups・managed by groups）を付加することでデータ品質を向上できる。\n\nGartner 推計：システムダウンのコストは最大 $300K／時。金融業界ではさらに高額。信頼できる CMDB 構築で ongoing IT efforts を最大 40%削減できる。\n\nServiceNow CMDB は CIs・services・configured assets の single system of record（単一の信頼できる情報源）として機能する。",
       "points": [
@@ -206,12 +206,12 @@
           "exp": "Govern の課題は incorrectly classified CIs・unwanted or irrelevant data・inconsistent data quality の3点。insufficient server capacity は含まれない。"
         }
       ],
-      "id": "Course1_Thu Jan 01 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course1_1-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 1",
-      "lesson": "Fri Jan 02 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "1-2",
       "title": "CMDB Overview（CMDB概要）",
       "summary": "CMDB（Configuration Management Database）とは、CIs（configuration items・構成アイテム）・services（サービス）・relationships（関係性）の属性を格納する data repository（データリポジトリ）である。configuration management process（構成管理プロセス）によって維持される。\n\nIT professionals は ServiceNow CMDB を活用して IT landscape への visibility を確保し、fact-based decisions（事実に基づく意思決定）を実施できる。顧客が最も成功するのは「CMDB を実装すること」ではなく「configuration management（構成管理）を実装すること」に集中したときである。\n\nCSDM（Common Service Data Model・共通サービスデータモデル）は ServiceNow 製品・プラットフォーム全体の標準化・共有されたサービス関連定義のセット。true service-level reporting を可能にし、CMDB 内の service modeling に prescriptive guidance（規範的なガイダンス）を提供する。ServiceNow AI Platform にも対応。\n\nCMDB は CIs のデータベース。CSDM は common CIs を含む broader（より広範な）共通データモデル。CSDM に従うことでデータが適切な CMDB テーブルに正しくマッピングされ、foundational data（users・groups）が正しく参照される。",
       "points": [
@@ -385,12 +385,12 @@
           "exp": "原文では Service Management・Asset Management・Operations Management が挙げられている。Financial Management は記載がない。"
         }
       ],
-      "id": "Course1_Fri Jan 02 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course1_1-2"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 1",
-      "lesson": "Sat Jan 03 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "1-3",
       "title": "CMDB Basics（CMDBの基本）",
       "summary": "主要用語：Configuration Item（CI・構成アイテム）、Attributes（属性）、Class（クラス）、Base Table（ベーステーブル）、Parent and Child Class（親子クラス）、Principal Class（主要クラス）、Logical CI（論理CI）。\n\nApplication・Application Service・Business Application は異なる概念で、CSDM フレームワーク内で異なる位置に存在する。\n\nFoundational data（基盤データ）は common data tables に格納され、CMDB には格納されないが CI データから参照される必要がある。参照することで routing・approvals・accurate reporting が実現される。\n\nCMDB の base parent table は Configuration Items [cmdb_ci]。User [sys_user]・Location [cmn_location] などへの参照を持つ。\n\nクラスは parent-child relationships でサブクラスに分割できる。子クラスは親クラスの specialization（特化版）。CI Class Manager または ServiceNow schema map で確認。baseline classes を可能な限り使用することを推奨。\n\ndiscoverable attributes（自動検出可能）：host name・IP address・operating system。\nnon-discoverable attributes（自動検出不可）：Data Manager・certification policies・CMDB Health Dashboard で管理。\n\nsolid business case（明確なビジネス根拠）なしに custom attributes を追加すると CMDB initiatives が失敗するリスクがある。attributes は extended classes（拡張クラス）に継承されるため設定レベルが重要。",
       "points": [
@@ -599,12 +599,12 @@
           "exp": "automated discovery solution を使用する場合、カスタム属性が自動収集されるか確認し、されない場合は manual update process を実装してデータの正確性を確保する。"
         }
       ],
-      "id": "Course1_Sat Jan 03 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course1_1-3"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 1",
-      "lesson": "Sun Jan 04 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "1-4",
       "title": "Asset & Configuration Management Lifecycles",
       "summary": "Asset（資産）とは intrinsic financial value（本質的な財務価値）を持つもの。CI（構成アイテム）とはサービス提供に必要で tracking（追跡管理）したいエンティティ。Asset は CI であることが多いが、CI は必ずしも Asset ではない（例：business service は CI だが Asset ではない）。\n\nCI の種類：physical entities（computer・router など）と logical entities（データベースインスタンス・Tomcat など）。\nAsset は financial value の管理 → Asset Management application で管理。\nCI は operational use での tracking → CMDB に格納。\n\nAsset は deploy（展開）されると CI になり、stock（在庫）に戻されるか dispose（廃棄）されるまで CI であり続ける。\n\nConfiguration Management：サービスデータと relationships の operational use に焦点。CI の status・attributes・relationships を追跡して IT 環境の正確な情報を維持。\nIT Asset Management：procurement（調達）・cost management・depreciation（減価償却）・compliance・disposal（廃棄）の管理。\n\nCSDM はライフサイクルのステージとステータスを整合させ hardware assets と CMDB の CI を同期させる。\n\n両者は complementary（補完的）であり ITSM において統合されることが多い。目標は operational efficiency と financial accountability の両立。",
       "points": [
@@ -783,12 +783,12 @@
           "exp": "Asset と CI のライフサイクルを効果的に管理することで IT インフラの holistic view が実現し、operational efficiency と financial accountability の両立が達成できる。"
         }
       ],
-      "id": "Course1_Sun Jan 04 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course1_1-4"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 1",
-      "lesson": "Mon Jan 05 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "1-5",
       "title": "Why Implement a CMDB?",
       "summary": "ServiceNow CMDB 導入は IT・非IT 両方の管理を変革する。centralized・accurate・up-to-date なリポジトリを提供し、streamlined operations・reduced downtime・proactive issue resolution を実現する。\n\nhealthy CMDB が答える問い：インシデントの影響サービス / 提案された変更の影響 / regulatory requirements への準拠 / physical assets の把握 / vendor contracts の詳細 / Business Application 廃止時に撤去できるハードウェア / ビジネスユニット売却時の廃止インフラ\n\nIT 関連ユースケース：IT Asset Management・Incident and Problem Management・Change Management・Security and Compliance・Vendor and Contract Management・Cost Management\n\n非IT 関連ユースケース：Facility Management・Healthcare・Transportation and Logistics・Manufacturing・Real Estate・Energy and Utilities\n\ndata health の3条件：①up to date（最新）であること ②proper relationships が確立・維持されていること ③foundational data（location・ownership・support group）が configuration data に関連付けられていること\n\nhealthy CMDB はすべての ServiceNow 製品のビジネス価値実現において foundational（基盤的）。incident resolution・vulnerability age など多くの operational metrics との positive correlation（正の相関）を示す。\n\nstakeholders は異なる goals と outcomes を持つ。configuration management 目標への agreement によって alignment を確保し、組織の strategic goals と IT の tactical goals に明確に結びつけることが重要。",
       "points": [
@@ -953,12 +953,12 @@
           "exp": "agreement によって stakeholders の alignment を確保し、取り組みを組織の strategic goals と IT 部門の tactical goals に結びつけることが最重要。"
         }
       ],
-      "id": "Course1_Mon Jan 05 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course1_1-5"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 1",
-      "lesson": "Tue Jan 06 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "1-6",
       "title": "Steps to Deploying a Trustworthy CMDB",
       "summary": "key business initiatives と strategic IT initiatives を特定することが出発点。会社が既に使用している言語で表現することで faster buy-in が得られる。4つのステップは必ずしも linear（線形）ではない。\n\nStep 1：Set Direction\nclear goals・actionable objectives・measurable business outcomes から始める。What・How・Why・Measure の4つの問いに答える。reporting needs はデータ投入前の設計段階で決定する。方向性なしの構築は「flying while building a plane（飛行中に飛行機を組み立てる）」ようなもの。\n\nStep 2：Build Team and Governance Model\nConfiguration Control Board（CCB・構成管理委員会）を結成。executives からの early buy-in が credibility・trust・adoption を向上。CMDB のデータは CMDB チームが所有しない。適切な data owners を特定しガバナンスに参加させることが不可欠。CMDB チームが検証できるのは duplicate records・missing attributes などの基本的なチェックのみ。\n\nStep 3：Design Data Model\nuse cases を支援するデータのみを格納。out-of-the-box CI classes で fastest time to value を目指す（例：Firewall・Server・Application）。CSDM を理解し活用することを推奨。\n\nStep 4：Operationalize and Govern\n3本柱：Ingestion（データフローの自動化）・Governance（データの管理・維持）・Insight（データの可視化・活用）。「garbage in – garbage out」の原則を意識する。\n\n導入効果：incident/problem/change/asset management の促進・strategic planning の支援・single source of truth による collaboration 強化・failed changes リスクの低減・audits の促進・root cause analysis の支援。",
       "points": [
@@ -1181,12 +1181,12 @@
           "exp": "信頼できる CMDB の導入により、CMDB は単なる情報リポジトリではなく actively used and maintained resource として機能し efficiency・service quality・strategic business goals の支援を実現する。"
         }
       ],
-      "id": "Course1_Tue Jan 06 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course1_1-6"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 1",
-      "lesson": "Wed Jan 07 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "1-7",
       "title": "CMDB Management Tools（管理ツール）",
       "summary": "ServiceNow CMDB は ingest・govern・insight するための suite of management tools を提供する。\n\nCMDB Workspace：3本柱すべてにまたがる comprehensive・centralized プラットフォーム。Single Pane of Glass・Dashboards and Charts・Task Management を提供。有償ライセンス不要。\n\nIngestion ツール：\n・ServiceNow Discovery（Horizontal/Agentless discovery）：自動ディスカバリー・インフラマッピング。有償（ITOM Visibility の一部）。non-discoverable data で補完が必要。\n・Service Mapping（Top-down/ML powered mapping）：Top-Down Mapping・Dynamic Updates。有償（ITOM Visibility の一部）。CSDM ガイドライン準拠を推奨。\n・Agent Client Collector（ACC/Agent based discovery）：エージェントインストール必須。software utilization data を収集。有償。\n・Service Graph Connectors：Azure・InTune・MS SCCM・Jamf・AWS など。有償（SCCM のみ無償）。credentials 必要。\n・IntegrationHub ETL：ETL 自動化。non-CMDB テーブルもサポート。無償（Store 経由）。\n・Import Sets and Transform Maps：最古の方法。デフォルトで IRE を使用しない→transform map script で IRE 通過を強制することを推奨。無償。\n\nGovernance ツール：\n・CMDB Health Dashboard：Completeness・Correctness・Compliance の3観点。scheduled jobs はデフォルトでオフ→手動アクティベートが必要。無償。\n・CMDB Data Manager：Data Certification・Lifecycle Policies・Attestation Policies。無償。\n・Duplicate CI Remediation Wizard：重複CIの自動検出・Merge/Delete。manual effort 必要。無償。\n・De-Duplication Templates：スケジュール自動実行。公開前に in-depth testing を推奨。無償。\n\nInsight ツール：\n・CMDB Query Builder：drag-and-drop・AND/OR フィルタリング。無償。\n・Unified Map：Interactive Visualization・Dependency Mapping。無償。\n・Intelligent Search：NLQ（natural language query）による AI-Powered 検索。NLQ により必要スキルが大幅削減。無償。\n・CMDB and CSDM Data Foundations Dashboards：Visibility・Policy Compliance・Playbooks。無償（Store 経由）。",
       "points": [
@@ -1380,12 +1380,12 @@
           "exp": "Governance ツールは CMDB Health Dashboard・CMDB Data Manager・Duplicate CI Remediation Wizard・De-Duplication Templates である。"
         }
       ],
-      "id": "Course1_Wed Jan 07 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course1_1-7"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 1",
-      "lesson": "Thu Jan 08 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "1-8",
       "title": "Knowledge Check（確認テスト）",
       "summary": "本レッスンは Course 1 の総まとめ確認テストです。\n\nQ1（複数選択）：CMDB 実装失敗の主な理由\n→ 正解：Ill-defined relationships among CIs・Inconsistent data quality・Vast amounts of unused data\n\nQ2（複数選択）：CMDBの健全性を維持するための pillars to success\n→ 正解：Ingest・Govern・Insight\n\nQ3（単一選択）：stakeholder の役割\n→ 正解：ケーパビリティをサポートするために必要な特定のCI情報を決定しorganizational buy-inを構築する\n\nQ4（マッチング）：用語と説明の対応\n→ Class＝共通attributesを持つCIグループのテーブル / Attributes＝CIをさらに説明する情報 / CI＝管理が必要な物理的・論理的コンポーネント / CSDM＝サービス関連定義の標準化・共有されたセット / Printers and Physical Servers＝Assets / Databases and Virtual Servers＝Configuration Items / Foundational Data＝Users・groups・locations / CMDB＝configuration recordsを格納するDB / Contracts and Software Licenses＝Both Assets and CIs\n\nQ5（単一選択）：Server class は Computer class から extended → parent class は Computer",
       "points": [
@@ -1507,12 +1507,12 @@
           "exp": "Foundational Data は Users・groups・locations などを指す。"
         }
       ],
-      "id": "Course1_Thu Jan 08 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course1_1-8"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 2",
-      "lesson": "Sun Feb 01 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "2-1",
       "title": "CI Class Manager（CIクラスマネージャー）",
       "summary": "CI Class Manager は CMDB 内の CI とクラスを管理する centralized ツール。tree-view format でCMDBクラス階層を一元管理する。\n\n主な利点：Centralized Management・Class Definitions and Settings（identification rules・reconciliation rules・CMDB Health）・Hierarchy and Relationships・Attributes and Rules Management・Health and Compliance（compliance audits・certification filters・templates）・Extensibility・Improved Data Accuracy\n\n【重要】新しい CMDB クラスの作成は慎重に。ライセンス・governance・insight への影響あり。まず CMDB CI Class Models をインストールして既存クラスを確認し、必要なら既存クラスを extend することを推奨。作成権限：sn_cmdb_admin and personalize_dictionary または admin ロールのみ。\n\ntechnical debt 解消：CI Class Manager で baseline class を特定し、CIをカスタムクラスから標準クラスへ attributes を正しくマッピングして移動。\n\nPrincipal Class：ITSMレコードの「Configuration Item」参照フィールドに表示されるCIをフィルタリング。例：「Servers」を設定するとサーバー関連CIのみが表示される。\n\nManaged By Group：technical service offering で設定した場合は CI Class Manager の設定より優先される。\n\nIdentification Rules：Name・Serial Number・Device ID・Object ID・Configuration file などで一意に識別。\nReconciliation Rules：どの discovery sources が特定のCI属性を更新できるかを指定。未承認ソースによる上書きを防止。Data refresh rules で上位優先度ソースが更新していない場合のデータ更新方法を管理。\nSuggested Relationships：predefined recommendations。例：Provides Power for :: Receives Power From / Runs on :: Hosts。不適切例：a rack runs on a server / a server runs on a database。\n\n従来の設定方法：application navigator から各アプリケーションに直接アクセス。複数テーブルの設定を single list view で確認したい場合に有用。",
       "points": [
@@ -1687,12 +1687,12 @@
           "exp": "CI Class Manager の主な利点は Centralized Management・Class Definitions and Settings・Hierarchy and Relationships・Attributes and Rules Management・Health and Compliance・Extensibility・Improved Data Accuracy の7つ。Financial Management は含まれない。"
         }
       ],
-      "id": "Course2_Sun Feb 01 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course2_2-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 2",
-      "lesson": "Mon Feb 02 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "2-2",
       "title": "IRE（Identification and Reconciliation Engine）概要",
       "summary": "IRE（Identification and Reconciliation Engine・識別と照合エンジン）は CMDBを維持するために payloads（ペイロード）を処理する framework。新しいCIの作成と既存CIの更新を担う。\n\n複数ソース（Discovery・AWS・SCCM など）からのデータ取り込みで、最後に更新したソースによってデータ属性が flop back and forth（行き来）する問題が生じる。IRE はこの問題を解決する。\n\nIRE は CMDB への healthy data 取り込みにおいて crucial（不可欠）な中心的コンポーネント。accurate and consistent data の確保・duplicate CIs の削減・CMDBの integrity の維持・unauthorized data sources からの更新の防止を実現。\n\n4つのコア機能：\n・Identification（識別）：CIがCMDB内に存在するか newly discovered CI かを判断。identification rules に基づいてattributes からCIを一意に識別\n・Reconciliation（照合）：複数データソースからのCIデータを照合・統合\n・Deduplication（重複排除）：重複CIを検出・解決（後続レッスンで詳細）\n・Reclassification（再分類）：CIを適切なクラスに再分類（後続レッスンで詳細）\n\nIRE は centralized set of APIs を提供。データソースは CMDB に直接書き込まず APIs を呼び出す→inconsistencies（不整合）を防止。\n\nIdentification Rules と Reconciliation Rules はデータ取り込み時に連携して duplicate CI records の防止・CI attributes の照合・authoritative data sources のみがCIを更新できることを確保する。",
       "points": [
@@ -1838,12 +1838,12 @@
           "exp": "IRE を使用することで accurate and consistent data の確保・duplicate CIs の削減・integrity の維持・unauthorized data sources からの更新の防止が実現される。"
         }
       ],
-      "id": "Course2_Mon Feb 02 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course2_2-2"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 2",
-      "lesson": "Tue Feb 03 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "2-3",
       "title": "Identification Rules（識別ルール）",
       "summary": "Identification Rules（識別ルール）は CMDBの integrity と accuracy を確保するためにCIを一意に識別し duplicate records の作成を防止する。\n\nBenefits：Data Integrity（duplicate CIs を防止）・Consistency（centralized method）・Efficiency（自動化）・Improved Data Quality\n\n識別プロセス：Data Ingestion → Attribute Matching → Duplicate Prevention の順。CIが CMDB で更新される前に実行。マッチ→既存CI更新 / マッチなし→新規CI作成。\n\nDuplicate CIs：単一のCIを表す重複CIがCMDB内に存在する状態。\nOverloaded CIs：逆の問題で、異なるCIが同一のCIとして識別され1つのCIしか作成されない状態。\n\nHardware Rule：すべてのハードウェアの挿入・更新を管理するデフォルトルール。識別ステップ：①serial_number＋serial_number_type → ②serial_number → ③name → ④mac_address＋name\n\nDiscovery Source フィールドが空の場合はデータが IRE を通過していないことを示し重複が発生しやすくなる。\n\nAttribute Flapping（属性フラッピング）：複数のデータソースが同一属性を異なる値で更新し値が行き来する現象。reconciliation rules で防止できる。\n\n有効な識別ルールの2条件：①criterion attributes がCIに対して unique（一意）であること ②CIのライフタイム全体を通じて変化しないこと（IP address は変化するため不適切）\n\n良い識別例：Cfg File Path または Installation Directory。Independent checkbox を非選択でホストに依存させると更に有効。\n悪い識別例：Name（Overloaded CI の原因）・Version（変化するため不適切）\n\nOptional IRE Condition：非 lookup 型フィールドへの拡張には glide.identification_engine.enable_identifier_optional_condition を true に設定。\n\nIRE がサポートする非CMDBテーブル（base system に preset されているもののみ）：Location [cmn_location]・Department [cmn_department]・Cost Center [cmn_cost_center]・Building [cmn_building]・User [sys_user]・Group [sys_user_group]。CI Class Manager では管理不可。各テーブルのリストビューで直接管理。各テーブルに1つの identification rule のみ関連付け可能。",
       "points": [
@@ -2037,12 +2037,12 @@
           "exp": "CI Class Manager は非CMDBテーブルの IRE 関連ルールの管理に使用できない。各テーブルのリストビューで直接管理する。"
         }
       ],
-      "id": "Course2_Tue Feb 03 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course2_2-3"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 2",
-      "lesson": "Wed Feb 04 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "2-4",
       "title": "Reconciliation Rules（照合ルール）",
       "summary": "Reconciliation Rules（照合ルール）はIREによって使用され、複数のソースからCMDBにデータが取り込まれる際にCIのクラスと属性をどのようにマージ・更新するかを決定する。最も accurate かつ authoritative なデータがCMDBに保持されることを確保する。\n\nServiceNowはベースラインインスタンスにreconciliation rulesを提供しない。各データソースに対して設定することを推奨する。適切に設定された場合、reconciliation rulesは信頼できるデータソースとauthoritative source of truthを決定するプロセスの90%を管理できる。\n\nWhy Configure：Data Accuracy（信頼性の高い最新データの確保）・Conflict Resolution（異なるソースのデータ競合を解決）・Data Prioritization（複数ソースが同じCI情報を提供する場合の優先順位決定）\n\nReconciliation Process：identification processの後・CIがCMDBで更新される前に実行される。CIのcreation（作成）プロセスの一部ではない。プロセスフロー：Data Ingestion → Identification → Reconciliation\n\norder value（オーダー値）が低いほどpriority（優先度）が高い。例：ServiceNowが最低order value＝最高優先度。ServiceNowが更新後はAltiris・SCCMは同じレコードを更新できない。\n\nInserts のブロックには IRE Data Source Rules を設定（Configuration > Identification/Reconciliation > IRE Data Source Rules）。Reconciliation rulesは主にupdates（更新）に焦点。\n\nData Source Histories [cmdb_datasource_last_update]テーブル：各データソースの最終更新時刻を追跡。reconciliation rulesが設定されデータが取り込まれた後に初めてpopulatedされる。\n\nData Refresh Rules：上位優先度データソースがCIクラスを更新しなければならないtime intervalを定義。例：ServiceNow（高優先度）が14日間更新しない場合、Altiris（低優先度）がWindows Serverレコードを更新可能になる。CI Class Managerの特定クラスのReconciliation RulesタブでオプションとしてData Refresh Rulesを設定できる。",
       "points": [
@@ -2197,12 +2197,12 @@
           "exp": "Reconciliation Rulesはデータソースの優先順位とupdatesの制御。Data Refresh Rulesは高優先度ソースがinterval内に更新しない場合に低優先度ソースの更新を許可。IRE Data Source Rulesは特定データソースからのinsertsをブロックするために使用する。"
         }
       ],
-      "id": "Course2_Wed Feb 04 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course2_2-4"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 2",
-      "lesson": "Thu Feb 05 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "2-5",
       "title": "CMDB 360 / Multisource CMDB",
       "summary": "CMDB 360 / Multisource CMDB は CIの属性を更新する際に関与したディスカバリーソースと提案された値の完全な履歴を保持する機能である。Multisource CMDB機能はCMDB WorkspaceのCMDB 360機能の一部。CMDB 360はMultisource CMDBのすべての機能＋analytics dashboard＋新しいquery functionalityを提供する。\n\nCMDB 360がない場合：低優先度のディスカバリーソースの値の詳細は破棄・消失し、低優先度のデータソースから取り込まれたCI属性値を特定することがほぼ不可能になる。\n\nCMDB 360がある場合：選択・非選択すべてのディスカバリーソースのraw details（生データの詳細）が保持される。CMDB MultiSource Data [cmdb_multisource_data]テーブルに格納される。\n\n利点：Track（様々なディスカバリーソースがCIの属性レベルでCMDBをどのようにpopulateしているかを追跡）・Revert（特定のディスカバリーソースからのCI更新を元に戻す）・Recompute（更新されたreconciliation rulesを使用して属性値を再計算する）\n\nMultisource CMDB ユースケース解決：① CIデータに貢献する各ディスカバリーソースの attribute-level data を可視化 ② マルチソースデータから operational insights を取得 ③ reconciliation rulesを変更し最新ルールでCMDBデータをrecompute ④ ディスカバリーソースが提供したCMDBデータをrevert\n\nアーキテクチャ：CIデータは通常通りCMDBに格納（golden CIs）。Multisource CMDB有効化後はすべてのディスカバリーソースのCIデータもCMDB Multisource Dataテーブルに格納される。\n\nアクティベーション：① ITOM Discovery License（com.snc.itom.vis.license）プラグインをアクティベート ② glide.identification_engine.multisource_enabled を true に設定\n\nCI Class ManagerのRecompute機能注意事項：一度にrecomputeできるCIレコードは100,000件の制限あり。クラス階層の上位ではなく特定クラスに焦点を当てることを推奨。\n\nCMDB Workspaceの CMDB 360ビュー：ディスカバリーソース数・各ソースのCI数・単一ソースのCI・複数ソースのCIを表示。「Multisource Dashboard Analytics Population」スケジュールジョブ実行後に毎日更新。\n\nCMDB 360 Query：CMDB Workspaceの CMDB 360ビューで最大20件のクエリを表示・編集・実行・新規作成できる。",
       "points": [
@@ -2325,12 +2325,12 @@
           "exp": "Recompute機能の制限：一度にrecomputeできるCIレコードは100,000件の上限がある。スコープを限定するためにクラス階層の上位ではなく特定のクラスに焦点を当てることを推奨する。"
         }
       ],
-      "id": "Course2_Thu Feb 05 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course2_2-5"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 2",
-      "lesson": "Fri Feb 06 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "2-6",
       "title": "Dynamic Reconciliation Rules（動的照合ルール）",
       "summary": "Dynamic Reconciliation Rules（動的リコンシリエーション・ルール）はMultisource CMDBのデータを活用して複雑なデータ照合シナリオを処理するルール。「最大の値」や「最初に報告された値」などの基準に基づいて値を選択する。\n\nStatic vs Dynamic：Static Reconciliation Rules（静的ルール）はどのディスカバリソースがクラス属性を更新する権限を持つかを定義し優先順位を確立する。Dynamic Reconciliation Rulesは Multisource CMDBデータを使用して基準に基づいて値を選択する。\n\n同じCI属性に静的ルールと動的ルールの両方がある場合、動的ルールが優先される（Dynamic wins over Static）。\n\n前提条件：「動的リコンシリエーション・ルール」オプションはMultisource CMDBが有効化された後にのみ利用可能。\n\n動的ルールのタイプ（5種類）：\n・First Reported（最初に報告された）：最初にディスカバリされた値を使用\n・Most Reported（最も報告された）：最も多くのソースから報告された値を使用\n・Last Reported（最後に報告された）：最後にディスカバリされた値を使用\n・Largest Value（最大値）：数値フィールドにのみ適用。最も大きい値を使用\n・Smallest Value（最小値）：数値フィールドにのみ適用。最も小さい値を使用\n\n注意：Largest Value・Smallest Valueは数値フィールド型にのみ適用。「属性の選択」タブには数値フィールド型のみが表示される。\n\nIRE処理フロー：まず現在のpayloadを処理し、次にMultisource CMDBデータをレビューして適切な値を決定する。\n\n例1：Windows ServerクラスのRAM属性に「Largest Value」ルール設定。ServiceNow(100)・Tivoli(200)・LANDesk(300)の静的ルールも存在。→ 動的ルールが優先されるため、Multisource CMDBのプレビューデータに基づきLANDesk最大値で更新。\n\n例2：Serverクラス→Largest Value / Windows Serverクラス→Most Reported。→ Windows Serverクラスにより具体的なルールがあるためServerクラスの動的ルールは使用されない。\n\n重要ポイント（優先順位ルール）：\n1. 特定クラス内の動的ルールは親クラスのルールより優先される\n2. クラスにルールがなければ親クラスのルールを継承する\n3. 同一属性に静的と動的の両方がある場合は動的が優先される",
       "points": [
@@ -2438,7 +2438,7 @@
           "exp": "Dynamic Reconciliation Rulesの3つの重要な優先順位ルール：①特定のクラス内の動的ルールは親クラスより優先 ②クラスにルールがない場合は親クラスのルールを継承 ③同じCI属性に静的ルールと動的ルールの両方がある場合は動的ルールが優先（Dynamic wins over Static）。"
         }
       ],
-      "id": "Course2_Fri Feb 06 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course2_2-6"
     },
     {
       "category": "基本情報技術者試験",
@@ -3112,7 +3112,7 @@
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 3",
-      "lesson": "Mon Mar 02 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "3-1",
       "title": "ServiceNow Discovery 詳細",
       "summary": "ServiceNow Discovery はスケジュールベースの automated discovery solution（自動ディスカバリソリューション）。別名：Horizontal discovery・Agentless discovery・IP-based discovery。ITOM Visibility の一部として提供され有償ライセンス必要。\n\n対応プラットフォーム：Windows・Linux・macOS・クラウド環境。収集データはすべて IRE に送信され CMDB での重複レコードを回避する。スケジュールベースのため real-time discovery solution（リアルタイムディスカバリ）ではない。真のリアルタイムディスカバリには Agent Client Collector（ACC）を使用する。\n\nDiscovery の4フェーズ：\n1. Scan Phase（スキャンフェーズ）：ネットワークをスキャンしてすべての IP 対応デバイスを特定する。IP アドレスまたは範囲をスイープしてネットワーク内のライブホストを検出する。\n2. Classification Phase（分類フェーズ）：検出されたデバイスをタイプ（サーバー・ルーター・スイッチ・プリンターなど）に基づいて分類する。probes と sensors を使用してデバイスタイプを判定する。\n3. Identification Phase（識別フェーズ）：デバイスを一意に識別するためにシリアル番号・MAC アドレス・ホスト名・IP アドレスなどを収集する。identification rules を使用して既存CIとのマッチングを行い、マッチが見つからない場合は新しいCIを作成する。\n4. Exploration Phase（探索フェーズ）：各識別デバイスの詳細データを収集する。Discovery probes と patterns の組み合わせを使用する。\n\nMID Server：ServiceNow インスタンスと組織の内部ネットワークの bridge（橋渡し）として機能。ファイアウォール・セキュリティ・ネットワークセグメンテーションがある環境で特に重要。組織の trusted network environment 内で動作し機密データが組織外に出ないことを確保。encrypted communication を使用。プロトコル：WMI（Windows）・SSH（Unix/Linux）・SNMP（ネットワークスイッチ・プリンター）\n\nDiscovery Schedules：Discovery Admin Workspace の Schedules ページが central hub。スコープ・タイミング・MID Servers を定義する。\n\n範囲制限：初期実装では Limited Range から開始を推奨。Broader Range（192.168.0.0/24）はネットワーク・ブロードキャストアドレスを含み過剰データの可能性あり。Limited Range（192.168.0.1〜192.168.0.254）は初期実装に推奨。最大範囲 /16（65,000 IP アドレス）に制限推奨。\n\nDiscovery Configuration Console：検出するデバイス・アプリケーション・ソフトウェアのタイプを指定。アクセス：Discovery Definition > Configuration Console。\n\nDiscoverable Data：Hardware（CPU・メモリ・ストレージ）・Software（インストール済みアプリ・OS）・Network（IP・MAC・トポロジー）・Cloud（AWS・Azure・GCP）。Discovery がデバイスを識別すると discovery source フィールドが「ServiceNow」に設定される。Asset Management で作成されたレコードは「SNAssetManagement」→Discovery 後「ServiceNow」に更新。\n\nNon-Discoverable Data：Assigned to・Owned by・Support group・Change Group・Managed By Group などは自動検出不可。ServiceNow はディスカバリデータに non-discoverable data を補充することを強く推奨する。",
       "points": [
@@ -3254,12 +3254,12 @@
           "exp": "Non-Discoverable Data の例は Assigned to・Owned by・Support group・Change Group・Managed By Group などである。ServiceNow はディスカバリデータに non-discoverable data を補充することを強く推奨する。グループ情報はインシデント対応や変更管理において essential（不可欠）。"
         }
       ],
-      "id": "Course3_Mon Mar 02 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course3_3-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 3",
-      "lesson": "Thu Mar 05 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "3-3",
       "title": "IntegrationHub ETL",
       "summary": "ServiceNow IntegrationHub ETL（IH-ETL）はサードパーティデータをCMDBまたは非CMDBテーブルに統合するためのETL（Extract・Transform・Load）transform mapsを作成・管理するストアアプリケーション。インポートされたデータはIREを通じて自動処理され、データ品質の向上と重複の最小化が図られる。Service Graph ConnectorsはIntegrationHub ETLのtransform mapsを活用してCMDBへのデータ取り込みを準備する。\n\nWhy Use：Data Integrity（IRE経由でデータをルーティングしCMDBの整合性を維持）・Consistent and Efficient（ソースデータのtransformとマッピングを簡素化）・Improved Data Quality（少量サンプルデータでテスト・レビューを繰り返して期待する成果を達成）\n\n2つの主要コンポーネント：\n1. RTE（Robust Transform Engine）：ステージングテーブルのraw source dataをETL transform mapsを使用してマッピング・統合されたデータに変換する\n2. IRE（Identification and Reconciliation Engine）：様々なデータソースにわたる識別と照合を管理するcentralized framework。duplicate CIsなどの問題を防止しターゲットテーブルの整合性を確保する\n\nプロセスフロー：①外部データをImport Setsとしてステージングテーブルに保存→②RTEがIRE payloadsを生成→③IREが照合を実行→④CMDBに格納\n\n用語：CMDB Application（サードパーティベンダーの名前。Name・Discovery Sourceの2属性。1つのCMDB Applicationは複数のETL transform mapsを持てる）・ETL Transform Map（IntegrationHub ETLが生成する出力物）・Data Source（生ソースデータのソースフィード。異なるタイプのデータには各REST endpointが独自のData SourceとETL transform mapに関連付けられる）\n\nETL Transform Map Assistant（ガイド付きセットアップ）4ステップ：①Basic Details（基本情報入力）②Preview and Prepare Source Data（データプレビュー・クレンジング）③Select CMDB Classes and Map Source Data（CMDBクラス選択・フィールドマッピング）④Preview and Schedule（テスト実行・スケジュール設定）\n\nCMDB Integrations Dashboard：Integration Commons for CMDB（sn_cmdb_int_util）に含まれる。全CMDB統合のkey performanceとエラーメトリクスを公開する。\n\nNon-CMDB Table Support：glide.identification_engine.non_cmdb_tablesで指定されたテーブルのみサポート。サポートテーブル：Location・Department・Cost Center・Building・User・Group。identification rulesの作成が必要。",
       "points": [
@@ -3367,12 +3367,12 @@
           "exp": "IntegrationHub ETLはネイティブでIRE（identification rules）を活用して重複を防止する。Import Sets and Transform MapsはデフォルトでIREを使用せず、IREを使用するにはonBefore scriptを設定してCMDBTransformUtil APIを呼び出す必要がある。"
         }
       ],
-      "id": "Course3_Thu Mar 05 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course3_3-3"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 3",
-      "lesson": "Sat Mar 07 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "3-4",
       "title": "Service Graph Connectors（サービスグラフコネクター）",
       "summary": "Service Graph Connectors（サービスグラフコネクター）は外部システムとデータソースをServiceNowと接続することで、CMDBへのデータのインポート・正規化・高品質なデータの維持を支援するspecialized integrations（専門的な統合）である。\n\nCMDBはorganizationのdigital foundationでありServiceNowの基盤。CMDBがhealthyかつtrustworthy状態を維持するために自動化された方法でデータを取り込むことを推奨。ITOM Visibility（Discovery・ACC・Service Graph Connectors）がfastest time to valueを提供。\n\nカテゴリ（7種類）：Partner cloud providers・Endpoint or IT asset management applications・Monitoring and observability applications・Security solutions・Software/server/network applications・Operational Technology（OT）applications・Partner-built connectors\n\nout-of-the-box connectors：AWS・Azure・VMwareなど。extensive customizationなしで統合プロセスを簡素化するよう設計。\n\n特徴：\n・各コネクターはIREを使用してデータが適切に取り込まれることをレビュー済み（重複防止・重要データの上書き回避）\n・各コネクターはCSDM conformance（CSDMへの準拠）についてレビュー済み\n・すべてのコネクターはIntegrationHub ETLを活用（管理者がマッピングを表示・変更可能）\n・ServiceNowはニーズの拡大や問題発生時にコネクターを継続的に改善する\n\nライセンス要件：IREを活用するService Graph ConnectorsにはITOM Visibilityライセンスが必要。例外：SCCMコネクターは無料。\n\nカスタマイズの注意：Service Graph Connectorsまたはそのマッピングにカスタマイズを行うと、そのコネクターのサポートと責任が全面的に顧客に移行する。",
       "points": [
@@ -3461,12 +3461,12 @@
           "exp": "Service Graph ConnectorsはIntegrationHub ETLのtransform mapsを活用してCMDBへのデータ取り込みを準備する。IREを通じて重複を防止しデータ整合性を確保する。管理者はIntegrationHub ETLでマッピングをプレビュー・調整できる。"
         }
       ],
-      "id": "Course3_Sat Mar 07 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course3_3-4"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 3",
-      "lesson": "Sun Mar 08 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "3-5",
       "title": "Import Sets and Transform Maps",
       "summary": "Import Sets and Transform Maps はCMDBにデータをインポート・変換するための最も古い方法。最新リリースではIntegrationHub ETLがより現代的で簡素化されたUIを提供しネイティブでIREを活用して重複を防止するため推奨される。\n\nImport Sets（インポートセット）：CSV・Excel・外部データベースなどの外部ソースからraw dataをServiceNowの temporary staging table（一時的なステージングテーブル）にインポートする。\n\nTransform Maps（変換マップ）：Import Set（ステージングテーブル）のデータをIncident・Problem・CMDBテーブルなどの適切なターゲットテーブルにマッピングする。カスタムロジック・データクレンジング・検証もサポート。field mappings・coalesce values・scriptable actionsを定義する。\n\nCMDBデータインポート計画時の考慮事項：①どのCIクラスが関与するか②どの属性がインポートされるか③ユニークレコードの識別方法（coalesce fieldsまたはIRE identification rules）④ターゲットクラスのmandatory fieldsのマッピング⑤特定の処理やカスタムロジックの要否\n\nCMDBインポートプロセスの3ステップ：①ソースデータをレビューしターゲットテーブル要件を理解→②変換マップを構築し実行順序を定義→③インポートデータとrelationshipsが期待通りに作成されていることを確認\n\nIREのデフォルト動作：デフォルトではIREは使用されない。管理者がTransform MapにカスタムのonBefore scriptを設定しない限りIREは使用されない→重複レコードが発生する可能性がある。\n\nIREを使用するには：Transform MapにonBefore scriptを設定してCMDBTransformUtil APIを呼び出す。APIがソースデータを前処理しImport SetのデータをIREに渡す。CMDBTransformUtil APIが呼び出されるとcoalesce valuesは無視される（技術的に不要）。\n\nIREの処理結果：新規→ターゲットテーブルにレコードを挿入 / 既存→CMDBの既存CIをソースレコードのデータで更新。",
       "points": [
@@ -3545,12 +3545,12 @@
           "exp": "最も重要な違いはIREの活用方法。IntegrationHub ETLはネイティブでIREを活用して重複を防止する。Import Sets and Transform MapsはデフォルトでIREを使用せず、IREを使用するにはonBefore scriptを設定してCMDBTransformUtil APIを呼び出す必要がある。"
         }
       ],
-      "id": "Course3_Sun Mar 08 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course3_3-5"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 3",
-      "lesson": "Mon Mar 09 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "3-6",
       "title": "Populate Foundation Group Data（基盤グループデータの投入）",
       "summary": "Discovery等でデータ取り込み後、non-discoverable dataであるグループ情報・ロケーション情報を補充することがCMDB管理者のcrucial（不可欠）な次のステップ。グループ情報はインシデント発生時・変更実施時にessential（不可欠）。\n\n主要なグループフィールド：\n・Managed By Group：Data Managerタスク（attestation・life cycle・certification policies）の割り当てを効率化\n・Support Group：Incident Assignment Groupにマッピングされincident routing（インシデントルーティング）を効率化\n・Change Group：Change Assignment Groupにマッピングされchange routing（変更ルーティング）を効率化\n\nIncident Routing：受信インシデントを事前定義された基準に基づいて適切なチームまたは個人に自動的に振り分けるプロセス。応答時間の改善・解決時間の短縮・IT サービス管理の効率向上を実現。\n\nChange Routing：変更管理プロセス内の事前定義されたルールに基づいて変更リクエストを適切なグループまたは個人に自動的に振り分けるプロセス。\n\nグループデータ追加後は定期的にaudit（監査）して正確性を確保することがcrucial。ServiceNow の Data Manager で certification policies を設定可能。\n\nグループフィールドを自動投入する2つの方法：\n\nMethod 1：CI Class Manager\n・特定クラスのManaged By Groupを設定。クラス内すべてのCIに自動同期される\n・Technology Management Offeringに関連付けられていないCIのみに適用\n・extended classesのCIには同期されない\n\nMethod 2：Technology Management Offering（旧称：Technical Service Offering）\n・Support group・Change group・Managed By Groupの3つをオファリング内で直接設定\n・オファリングに関連付けられたCIに適用\n・Managed By GroupはまずdynamicCI groupと同期され、次にその動的CIグループの一部のCIと同期→CI Class Managerの設定を上書き\n・設定方法①：Forms（各種フォームを直接入力）②：Service Builder（ServiceNow Storeの無償アプリ。ガイド付きステップバイステップフロー）\n\n優先順位：Priority 1→Technology Management Offering / Priority 2→CI Class Manager（Offeringの設定がCI Class Managerより優先）",
       "points": [
@@ -3653,12 +3653,12 @@
           "exp": "CI Class Manager（Method 1）はManaged By Groupのみ設定可能でextended classesには同期されない。Technology Management Offering（Method 2）はSupport Group・Change Group・Managed By Groupの3つをすべて設定できる。優先順位はTechnology Management Offering（Priority 1）がCI Class Manager（Priority 2）より高く、Offeringの設定がCI Class Managerの設定を上書きする。"
         }
       ],
-      "id": "Course3_Mon Mar 09 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course3_3-6"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 3",
-      "lesson": "Tue Mar 03 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "3-2",
       "title": "ServiceNow Service Mapping（サービスマッピング）",
       "summary": "Service Mapping（サービスマッピング）はTop-Downアプローチでサービスを構成するCIs間のrelationshipsとdependenciesを自動的に検出・モデル化してCMDBに投入するServiceNowの製品。別名：Top-down discovery・Tag-based discovery・ML-powered mapping。\n\nforward-thinking（先進的）なIT組織は特定のインフラよりも critical services（重要なサービス）を重視。service mapsはenterprise visibility（エンタープライズの可視性）を提供し、特定のサービスをサポートするためにどのCIがcriticalかを理解できる。\n\nIT Operations とビジネスユーザー間のギャップ：IT はサービスをインフラにマッピングすることが困難だった。Service Mappingはこのギャップを解消する。マップなしではカスタマーポータルなどのサービスがダウンした理由をほぼ特定できない。\n\n90%の自動化：最も効果的なCMDBは自動化ツールでpopulatedされる。CMDBデータの90%は自動的に投入されるべきで、残り10%は適切なガバナンス後に手動更新する。\n\nApplication Service（アプリケーションサービス）：展開されたシステム・アプリケーション・製品スタックを論理的に表すサービスタイプ。親クラス [cmdb_ci_service_auto] またはそのサブクラスに格納。環境ごと（Dev・Test・QA・Prod）・地理的地域ごと（AMS・EMEA・APJ）・組織ごと（HR・Marketing・Sales）に作成可能。\n\nApplication Serviceのタイプ：Service Mapping（Top-Down）・Dynamic CI Group・Tag-based\n\nCSDMとの関係：Accurate Service Modeling（CSDMフレームワークと一致）・Enhanced Data Quality（CMDB自動投入によりCSDM標準への準拠）・Dependency Management（サービスヘルス・影響分析の基盤）\n\n主なメリット：Enhanced Visibility・Improved Incident and Problem Management（インシデント根本原因をより速く特定）・Proactive Change Management（変更の影響への洞察）・Enhanced Compliance and Governance",
       "points": [
@@ -3771,12 +3771,12 @@
           "exp": "Service Mappingが解決する主要な課題はITがサービスをインフラにマッピングできないギャップである。サービスマップを自動構築することでEnhanced Visibility・Improved Incident and Problem Management・Proactive Change Management・Enhanced Compliance and Governanceが実現される。"
         }
       ],
-      "id": "Course3_Tue Mar 03 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course3_3-2"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 4",
-      "lesson": "Thu Apr 02 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "4-1",
       "title": "Introduction to CMDB Health（CMDB健全性の概要）",
       "summary": "多くの企業がCMDBを実装しているにもかかわらず、データの運用化に苦戦している。CMDBのhealth issuesはaccuracy・completeness・reliabilityにdownstream effects（下流への影響）をもたらす。\n\n重要な名言：「You can't manage what you can't measure.（測定できないものは管理できない）」― Peter Drucker\n\nCMDB Health Dashboardの3スコアカード：\n1. Completeness（完全性）：required・recommendedフィールドデータの投入状況へのinsightを提供。使用メトリクス：Recommended・Required\n2. Compliance（コンプライアンス）：auditsと呼ばれる確立された標準とポリシーへのCMDBの準拠状況の可視性を提供。使用メトリクス：Audit\n3. Correctness（正確性）：CMDB内のデータが正確でIT環境の真の状態を反映しているかを検証。使用メトリクス：Duplicate・Orphan・Staleness\n\n全体スコアの計算：個々のメトリクスの平均ではない。すべての定義されたメトリクス基準を通過したCIのパーセンテージ。例：個々メトリクスが93%・100%・96%でも全体スコアが89%になる場合がある。\n\nHealth Inclusion Rules：管理者がCMDB Health Dashboardの評価に含めるCIクラスを定義できるconfiguration settings。組織が管理責任を持つCIクラスのみのメトリクスを計算するよう設定することがbest practice。利点：Selective Class Tracking・Granular Control・Customizable Metrics・Operator-Based Rules（「is a」でクラス階層全体を含める）\n\nCMDB Group Health Dashboard：CMDBグループの集約されたヘルスレポートのcentralized view。グループ内すべてのCIの全体的な健全性を表示。クラスを切り替えなくてもすべてのCIクラスの健全性メトリクスを一箇所で表示可能。\n\nチェックリスト：①Prevent bad data（baseline identification rulesの有効性確保・定期レビュー）②Regularly review the CMDB Health Dashboard（duplicate・stale CIの特定とタスク割り当て）③Conduct data quality reviews（Managed By Group・Support Group・Serial Numberなどの欠落確認）",
       "points": [
@@ -3899,12 +3899,12 @@
           "exp": "チェックリスト：①Prevent bad data（baseline identification rulesの有効性確保と定期レビュー）②Regularly review the CMDB Health Dashboard（duplicate・stale CIの特定とタスク割り当て）③Conduct data quality reviews（Managed By Group・Support Group・Serial Numberなどの欠落確認）。"
         }
       ],
-      "id": "Course4_Thu Apr 02 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course4_4-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 4",
-      "lesson": "Fri Apr 03 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "4-2",
       "title": "Completeness Scorecard（完全性スコアカード）",
       "summary": "Completeness Scorecard（完全性スコアカード）はCMDBのCIとCIクラスがどの重要なデータを欠いているかを追跡するツール。Recommended・Requiredの2つのメトリクスを使用する。\n\n重要：ServiceNow base systemはCMDB内のrequiredまたはrecommended CI attributesの事前定義された提案を提供しない。どのフィールドが必須かを決定するのはCMDB管理者と他のステークホルダーの責任。\n\nRequired Fields（必須フィールド）：database functionality（データベース機能）として強制。フィールドが空の場合エラーが発生する。システムプロパティglide.required.attribute.enabledはデフォルトでtrue。\n\nRecommended Fields（推奨フィールド）：visibility（可視性）のためにのみ使用。属性が投入されていない場合でもデータベースエラーは発生しない。\n\n推奨事項：support groupなどのフィールドはほとんどのディスカバリツールが収集しないため、requiredではなくrecommendedとして設定することを推奨。\n\nRequired Fields の設定方法：CI Class Manager > Hierarchy > クラス検索 > Class Info > Attributes タブ > フィールド > Mandatory チェックボックス > Update。Dictionary Overrideで子クラスにのみrequiredを適用できる（例：Serial NumberをHardwareクラスとその拡張クラスにのみrequiredにする場合）。\n\nRecommended Fields の設定方法：CI Class Manager > Hierarchy > クラス検索 > Health > Completeness > Recommended Fields タブ > フィールドを右側に移動。\n\nCompleteness Score 計算ジョブ：CMDB Health Dashboard > CMDB Health Settings > Scheduled Jobs > Completeness Score Calculation。ステータス確認：cmdb_health_metric_status.list\n\nRequired フィールドでのIRE統合エラー回避：glide.required.attribute.enabledをfalseに設定（Configuration > CMDB Properties > Identification/Reconciliation Propertiesまたはsys_properties.listから）\n\nメリット：Improved Data Quality・Proactive Issue Identification・Enhanced Visibility・Process Efficiency・Better Compliance・Supports CMDB Governance",
       "points": [
@@ -4027,12 +4027,12 @@
           "exp": "Required FieldsはDatabase functionalityとして強制されフィールドが空の場合エラーが発生する。Recommended FieldsはVisibilityのためにのみ使用されデータベースエラーは発生しない。Discovery toolsが収集しないsupport group等のフィールドはrequiredではなくrecommendedとして設定することを推奨する。"
         }
       ],
-      "id": "Course4_Fri Apr 03 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course4_4-2"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 4",
-      "lesson": "Sat Apr 04 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "4-3",
       "title": "Compliance Scorecard（コンプライアンススコアカード）",
       "summary": "Compliance Scorecard（コンプライアンススコアカード）は監査結果に基づきCIが組織の定義した基準に準拠しているかを監査・可視化するツール。使用メトリクス：Audit。\n\n例：すべてのワークステーションにウイルス対策ソフト必要 / すべてのLinuxサーバーに最新パッチ適用 / すべての本番サーバーにサポートグループと管理グループ割り当て。一般的ユースケース：システムアップグレードの管理（OSアップグレードに必要な最小ハードウェア要件を満たしていないサーバーを特定）。\n\n監査は特定フィールドの実際の値を、テンプレートまたはスクリプト監査で定義された期待値と比較する。CIがCMDB Health監査テストに合格するにはすべての監査に準拠が必要。\n\n4つの構成要素：\n①Certification Filter（認証フィルター）：特定タイプのCIから監査の範囲を定義。設定：CI Class Manager > Hierarchy > クラス > Health > Compliance > Certification Filter。Compliance > Filtersからも設定可能。\n②Certification Template（認証テンプレート）：監査に合格するための条件を定義（属性・relationships・参照フィールド値）。設定：CI Class Manager > Health > Compliance > Certificate Template > 監査タイプをDesired Stateに設定 > 保存。Compliance > Templatesからも設定可能。\n③Audit（監査）：認証テンプレートで定義された期待値に対して実際の属性を比較。フォローオンタスクの作成・割り当て可能。設定：CI Class Manager > Health > Compliance > Audit。Compliance > Auditsからも設定可能。\n④Compliance Score Calculation Job：Configuration > Health Preferences > Scheduled Jobs > Compliance Score Calculationジョブ > Activate > Execute Now。ステータス確認：cmdb_health_metric_status.list。管理者ロールで実行が必須。\n\n重要：CMDB Health Dashboardに含めるには監査タイプを「Desired State」に設定が必要。「Compliance」や「Compliance Architecture」などはCMDB Health Dashboardには含まれない。\n\nスクリプト監査：Certification Templateの条件が具体的でない場合の代替手段。certification_adminロールが必要。設定：Compliance > Desired State > Scripted Audits > Audits（CI Class Managerからは作成不可）。コンプライアンススコアカードで計算される監査タイプはDesired State監査とスクリプト監査の2つのみ。\n\nData Manager Certification Policy vs Desired State監査：前者は属性の手動検証用（non-discoverable data向け）、後者は特定フィールドが空でないかの自動チェック用。",
       "points": [
@@ -4192,12 +4192,12 @@
           "exp": "CMDB Data Manager Certification Policy（認証ポリシー）は属性の手動検証が必要な場合に使用し、所有者・サポートグループ・変更グループなどのnon-discoverable dataを検証するために一般的に使用される。一方、Desired State監査は特定フィールドが空でないことを自動的にチェックする。"
         }
       ],
-      "id": "Course4_Sat Apr 04 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course4_4-3"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 4",
-      "lesson": "Sun Apr 05 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "4-4",
       "title": "Correctness Scorecard（正確性スコアカード）",
       "summary": "Correctness Scorecard（正確性スコアカード）はCMDBデータの品質を3つのメトリクス（Duplicates・Orphans・Staleness）で評価する。重複・陳腐化・孤立CIを含むCMDBはユーザーの信頼を損なう可能性がある。\n\n重複メトリクス（Duplicates）：識別ルールに基づいて重複CIを検出し、最も古いCIレコード（作成日基準）がデフォルトで非重複として扱われる。新しいCIは「Duplicate Of」フィールドでフラグ付けされる。独立したCIのみが評価対象（例：ハードウェアレコードなどの非アプリケーションCI）。\n\n孤立メトリクス（Orphans）：他のCIとの必要な関係性を維持しなくなったCIをフラグ付けする。ベースシステムには孤立ルールが存在しない。孤立CIを追跡するには管理者が孤立ルールを自分で作成する必要がある。クラスごとに1つの孤立ルールのみが許可される。\n孤立ルール例：サーバーとの関係がないアプリケーション / WARファイルとの関係がないTomcatアプリケーション / 所有者のないハードウェアデバイス / ESXサーバーとの関係がない仮想マシン\n\n陳腐化メトリクス（Staleness）：指定された期間CMDBで更新されていないCIを検出する。ベースシステムではcmdb_ciクラスレベルで1つの陳腐化ルールが定義されており、CIが60日間更新されていない場合に陳腐化と見なす。更新はsys_updated_onフィールドで判定。\n\n陳腐化ルールのカスタマイズ推奨：ディスカバリー頻度に基づいてクラスごとにカスタマイズ可能。例：ネットワークデバイスが14日ごとにスキャン→21日に設定推奨 / サーバーが毎日検出→7日に設定可能。",
       "points": [
@@ -4337,12 +4337,12 @@
           "exp": "Duplicates：識別ルールに基づく重複CIの検出（最も古いCIが正規、「Duplicate Of」フィールドで重複をマーク）。Orphans：必要な関係性を持たないCI（ベースシステムにルールなし、クラスごとに1つのみ設定可能）。Staleness：指定期間更新されていないCI（デフォルト60日、sys_updated_onで判定）。"
         }
       ],
-      "id": "Course4_Sun Apr 05 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course4_4-4"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 4",
-      "lesson": "Mon Apr 06 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "4-5",
       "title": "重複の管理（Managing Duplicates）",
       "summary": "CMDB内の重複CI（Duplicate CI）は重大なデータ整合性の問題を引き起こす。レポート・インシデント解決・変更管理など全般に影響する。\n\n重複CIの発生原因：①自動ディスカバリーツール（複数ツールが同じCIを異なる方法で識別）②インポートセット（適切な識別・調整ルールなし）③サードパーティ統合（適切な識別ロジックなし）④手動入力（ガバナンス不足・命名規則未遵守）⑤不完全または不正確な識別ルール⑥ガバナンスの欠如\n\n重複の判定：IREがCIが属するクラスの識別ルールに基づいて一致する2つ以上のCIを見つけた場合に重複と判定。ServiceNow Discovery中に重複CIが見つかった場合も同様の処理。最も古いCI（作成日基準）を更新し、重複排除タスクを作成してCMDB Workspaceから確認可能。\n\n重要：Discovery Sourceフィールドが入力済みの重複CIはCMDB Health Dashboard正確性スコアカードでフラグ付けされない（IREがすでに処理済みと判断するため）。ただし再検出・再処理されると重複としてフラグ付けされ重複排除タスクが生成される。\n\n重複排除タスク：潜在的な重複CIが識別されると自動的に作成。①重複の識別②タスクの作成③レビューと解決（マージ・更新・削除）のフロー。レガシーインスタンスはDe-duplication Tasksモジュール、CMDB Workspace導入後はワークスペースから直接表示・解決可能。\n\nシステムプロパティ：glide.identification_engine.skip_duplicates（デフォルトtrue）・glide.identification_engine.skip_duplicates.threshold（デフォルト5）。trueかつ重複数がthreshold未満の場合、最も古いCIが一致として選択・更新され、残りは「Duplicate of」フィールドでタグ付けされる。\n\n防止策：識別ルールに焦点を当て、インポート・サードパーティ統合中にIREを活用し、CIレコードの手動作成に関するガバナンスを確立する。",
       "points": [
@@ -4473,12 +4473,12 @@
           "exp": "IREによる重複処理：①識別ルールに基づいて一致する2つ以上のCIを検出②最も古いCI（作成日基準）が正規として選択・更新③残りは「Duplicate of」フィールドでタグ付け④重複排除タスクが生成⑤CMDB Workspace（新）またはDe-duplication Tasksモジュール（レガシー）で管理する。"
         }
       ],
-      "id": "Course4_Mon Apr 06 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course4_4-5"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 4",
-      "lesson": "Tue Apr 07 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "4-6",
       "title": "重複の修復（Remediation of Duplicates）",
       "summary": "重複CIの処理が重要な理由：①データの整合性と正確性（情報に基づいた意思決定のため）②IT運用の改善（インシデント・変更管理プロセスの混乱防止）③レポートとコンプライアンスの強化（正確なレポートと規制遵守）④より良い意思決定（信頼性の高いデータによる分析・予測）\n\n主要な修復ツール：\n1. 重複CIリメディエーター（Duplicate CI Remediator）：ウィザード形式のツール。管理者が潜在的な重複を確認し、保持するメインCIを選択し、重複から関連データをマージできる。コンプライアンスとトレーサビリティのための監査証跡を維持。重複排除プロセスの多くを自動化。\nレガシー：De-duplication Tasksモジュールからアクセス / 新バージョン：CMDB Workspaceから直接表示・解決\n\n2. 重複排除テンプレート（De-Duplication Templates）：事前構成された一貫した修復を重複排除タスクに一括でクラスごとに適用。CMDB Workspaceの重複排除ダッシュボードで作成・ライブラリ管理・テンプレート実行が可能。単一の操作で複数の重複排除タスクを修復できる。\n\n重要な更新：重複を示すフィールドがDiscovery sourceフィールドからDuplicate ofフィールドに変更。理由：Discovery sourceフィールドの値を、レコードを更新した最後のDiscoveryソースで保持するため。\n\nNow Assist for CMDB：生成AIの力をCMDB管理にもたらす。AI駆動の重複CI検出と修復提案を提供。管理者をステップバイステップの解決プロセスに導く。重複排除テンプレートを活用して単一の操作で複数の重複排除タスクを修復できる。\n\n用語：Main CI（メインCI）＝重複マージ時に保持される正規のCIレコード / Duplicate Ofフィールド＝重複CIが参照する正規CIを示すフィールド / Merge（マージ）＝複数の重複CIのデータを1つのメインCIに統合するプロセス。",
       "points": [
@@ -4590,12 +4590,12 @@
           "exp": "重複CIリメディエーター（個別修復・ウィザード形式・監査証跡維持）・重複排除テンプレート（一括修復・CMDB Workspaceの重複排除ダッシュボードで作成・管理・単一操作で複数タスク修復）・Now Assist for CMDB（AI駆動・自動重複CI検出と修復提案・ステップバイステップガイド）の3つがそれぞれ異なる用途で提供されている。"
         }
       ],
-      "id": "Course4_Tue Apr 07 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course4_4-6"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 4",
-      "lesson": "Wed Apr 08 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "4-7",
       "title": "CIの再分類（CI Reclassification）",
       "summary": "CI再分類（Reclassification）はCIがあるクラスから別のクラスに移動するプロセス。インポートまたは手動で入力されたCIデータが間違ったテーブルに格納される場合がある。ServiceNowにはこれを効果的に処理する機能がある。\n\nデフォルトではCIは自動的に再分類される。自動再分類が無効な場合は再分類タスクが生成され手動レビュー・再分類が可能。\n\n再分類のシナリオ例：管理者が300件のサーバーレコードをServer [cmdb_ci_server]テーブルに直接インポート → 2週間後にDiscoveryを実装 → DiscoveryがIREを通してCIを処理 → Server テーブルからWindows Server・Linux ServerテーブルへCIレコードが自動的にアップグレード・再分類される。\n\n再分類の3タイプ：\n・Upgrade（アップグレード）：CIをクラス階層内でより具体的な（下位の）子クラスに移動。例：Server [cmdb_ci_server] → Linux Server [cmdb_ci_linux_server]\n・Downgrade（ダウングレード）：CIをクラス階層内でより一般的な（上位の）親クラスに移動。例：Linux Server [cmdb_ci_linux_server] → Server [cmdb_ci_server]\n・Switch（スイッチ）：CIをクラス階層内で別のブランチのクラスに移動。例：Linux Server [cmdb_ci_linux_server] → Windows Server [cmdb_ci_win_server]\n\n基本再分類システムプロパティ（すべてデフォルトtrue）：\n・glide.class.upgrade.enabled：アップグレードの自動化を制御\n・glide.class.downgrade.enabled：ダウングレードの自動化を制御\n・glide.class.switch.enabled：スイッチの自動化を制御\n\n重要：自動CI再分類が有効な場合（デフォルト）、CIクラスのダウングレードおよびスイッチ操作はデータ損失につながる可能性がある。\n\n自動再分類が無効な場合：識別プロセス中に自動的に再分類されないCIに対して再分類タスクが作成される。割り当てられた管理者はタスクを確認してCIを特定し、再分類すべきかどうかを決定する必要がある。\n\n追加の制御プロパティ：glide.identification_engine.update_without_switch_enabled / glide.identification_engine.update_without_downgrade_enabled / glide.identification_engine.update_without_upgrade_enabled",
       "points": [
@@ -4731,12 +4731,12 @@
           "exp": "再分類のリスク：Upgrade（より具体的な子クラスへ→データ損失リスク低）・Downgrade（より一般的な親クラスへ→データ損失の可能性あり）・Switch（別ブランチへ→データ損失の可能性あり）。ダウングレードとスイッチはデータ損失につながる可能性があるため注意が必要。"
         }
       ],
-      "id": "Course4_Wed Apr 08 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course4_4-7"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 5",
-      "lesson": "Fri May 01 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "5-1",
       "title": "Data Manager（データマネージャー）",
       "summary": "CMDB Data Manager は CI（構成アイテム）のエンドオブライフ操作と認証の一括管理のための policy-driven framework（ポリシー駆動型フレームワーク）である。\n\n含まれるポリシー：\n・Retire・Archive・Delete（エンドオブライフポリシー）\n・Attestation（証明）\n・Certification（認証）\n\n時間の経過とともに大規模なCMDBは大量の古くなったCIを蓄積し全体的なパフォーマンスに悪影響を与える可能性がある。Data Manager は CIライフサイクル操作を自動化・管理するポリシーを作成・公開・管理する機能を提供し、CMDBが健全で効率的な運用状態を維持することを保証する。大規模なCMDBに対してスケーラブルであり、クラウドベース環境の急速な変化に適応可能。\n\n【ユースケース】\n・データアーカイブ（Data Archive）\n・データ削除（Data Delete）\n・定期的な証明と認証（Periodic Attestation and Certification）\n・ライフサイクル管理（Lifecycle Management）：CIをアクティブから廃止ステータスへなどライフサイクルのさまざまなステージを通じてCIの移行を自動化\n\n【レガシー Data Manager】\nConfiguration > CMDB Data Manager からアクセスできる。Yokohama リリースまでに非推奨（deprecated）となり、ユーザーは CMDB Workspace の新しい Data Manager を使用することが求められる。\n\n【CMDB Workspace からアクセス可能な Data Manager（新しい Data Manager）】\nCMDB Workspace を通じてアクセスでき UI Builder で設計されている。レガシー Data Manager で作成されたポリシーは新しい Data Manager と完全に互換性がある。CMDB Workspace バージョン 6.0.1 以降、Certification ポリシーをサポートするようになった。\n\n【CMDB Data Manager を使用する前に】\nCSDM標準に従い、CIは廃止の状態からアーカイブまたは削除へと進行する。CIはアーカイブまたは削除される前に、まず廃止されてエンドオブライフステージにある必要がある。\n\n【Managed By Group の活用】\nData Manager ポリシータスクが正しく割り当てられるようにするには Managed By Group を活用することを推奨する。この属性値は ServiceNow Discovery や Service Mapping によって自動的に検出されない（non-discoverable data）。\n\n【Data Manager のロール】\n・data_manager_admin（管理者ロール）\n・data_manager_user（ユーザーロール）",
       "points": [
@@ -4942,12 +4942,12 @@
           "exp": "Managed By GroupはServiceNow DiscoveryやService Mappingによって自動的に検出されないnon-discoverable data。テクニカルサービスオファリング・動的CIグループ・CI Class Managerを活用することで維持できる。"
         }
       ],
-      "id": "Course5_Fri May 01 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course5_5-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 5",
-      "lesson": "Sat May 02 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "5-2",
       "title": "CMDB Query Builder（クエリビルダー）",
       "summary": "CMDB Query Builder は、ユーザーが SQL コードを記述することなく複雑なデータベースクエリを視覚的に作成できるツールである。リレーションシップを持つ複数のテーブルにまたがるクエリを構築する際に特に役立つ。\n\n【クエリタイプ（3種類）】\n1. CMDB Query：CIクラスとリレーションシップ・参照についてインフラストラクチャをクエリする。オプションで非CMDBテーブルのコンテキストを追加可能。\n2. Service Mapping Query：アプリケーションサービスをクエリする。パターンを定義してそのパターンを持つアプリケーションサービスマップをクエリする。\n3. Combination Query：保存されたService MappingクエリをCMDBクエリに組み込むことで2つのクエリタイプを組み合わせる。\n\n【インターフェース】\nCIクラスをドラッグするキャンバスを提供し、CIクラス間にAND/OR操作を追加してクエリするリレーションシッププロパティを定義する。構築・保存したクエリを使用してCMDBグループにCIを入力し、グループ内のすべてのCIにまとめてアクションを適用できる。\n\n【レポートのエクスポート】\nクエリ結果ペインからリストコンテキストメニューを選択しExportを選択して希望するエクスポート形式（PDF等）を選ぶ。\n\n【スケジュールクエリ】\n定期的にスケジュールされた時間にクエリを実行するスケジュールクエリを作成できる。出力は電子メールで個人またはグループに送信され、クエリ結果は添付ファイルとして送られる（zip圧縮オプションあり）。\n\n【クエリのインポート/エクスポート】\nCMDB Query Builder の定義はエクスポートとインポートを使用してインスタンス間で移行できる（例：開発→テスト→本番）。\n\n【システムプロパティ】\nCMDB Query Builder の動作を制御するシステムプロパティは Configuration > CMDB Properties > Query Builder Properties からアクセスできる。",
       "points": [
@@ -5125,12 +5125,12 @@
           "exp": "スケジュールクエリは①定期的にスケジュールされた時間にクエリを実行②結果を電子メールで個人またはグループに送信③添付ファイルのzip圧縮オプションあり。"
         }
       ],
-      "id": "Course5_Sat May 02 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course5_5-2"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 5",
-      "lesson": "Sun May 03 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "5-3",
       "title": "Unified Map（統合マップ）",
       "summary": "Unified Map 機能は、選択したCI（ホームノード）を中心として、CI（構成アイテム）とそれらの間のリレーションシップの階層マップをグラフィカルに表示する。Dependency View と Application Service マップの多くの機能を単一のマップ体験に統合している。\n\nCMDB Workspace の一部として含まれ、継続的に機能強化を受けている。\n\n【有用な製品】\n・Incident Management\n・Problem Management\n・Change Management\n・Event Management\n\n【主な機能要素（6つ）】\nマップキャンバス・コンテンツコントロール・ツールボックス・コンテキストサイドパネル・ミニマップナビゲーター・タイムライン\n\n【Unified Map の利点】\n・CIがリレーションシップと参照によって他のCIにどのように接続されているかを視覚的に表示し、変更の影響を理解するのに役立つ\n・アプリケーションサービスの構成も表示するため、Event Management や Incident Management などの製品で役立つ\n・履歴の変更を確認し、CIを簡単にフィルタリングできる\n\n【アクセス方法】\nCMDB Workspace に移動 → Home ビューから Quick Links の下にある Unified Map を選択 → CI検索フィールドでマッピングされたアプリケーションサービスを検索\n\nノードバッジはインシデントまたは変更の存在を示す。",
       "points": [
@@ -5308,12 +5308,12 @@
           "exp": "Unified Mapは変更の影響を理解するためにCIの接続関係を視覚的に表示し、ノードバッジでインシデントや変更の存在を示す。履歴の変更を確認しCIを簡単にフィルタリングできる。"
         }
       ],
-      "id": "Course5_Sun May 03 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course5_5-3"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 5",
-      "lesson": "Mon May 04 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "5-4",
       "title": "CMDB and CSDM Data Foundations Dashboards",
       "summary": "CMDB and CSDM Data Foundations Dashboards は、CMDB と Common Service Data Model（CSDM）の主要な基盤指標に関する洞察を提供するダッシュボードを含む ServiceNow ストアアプリケーションである。\n\n【CMDB Data Foundations Dashboard】\nCMDB内のさまざまな構成とカスタマイズを評価しデータの品質と安定性を確保する。重要なデータが有効で適切に構成されていることを検証し、潜在的な実装リスクを特定し可視化する。ギャップを強調しリスク修復をガイドするプレイブックを提供。\n\n【CSDM Data Foundations Dashboard】\nフレームワークが適切に実装され価値を提供していることを確認するためにCSDMの主要な指標を評価する。\n\n【インストールとアクセス】\nSystem Applications > All Available Applications > All に移動 → CMDB and CSDM Data Foundations Dashboards ストアアプリケーションを検索してインストール。Configuration > CMDB Data Foundations Dashboard または CSDM Data Foundations Dashboard に移動。または CMDB Workspace の Management タブからアクセス。\n\n【スケジュールジョブ】\nインストール後、最初はデータが表示されない。スケジュールジョブが自動実行されるまで待つか、System Definition > Scheduled Jobs で「Get Well」を含むジョブを検索してExecute Nowを選択して手動実行。\n\n【修復プレイブック】\n各プレイブックは指標の概要・問題の概要・対処の重要性・スコアの修正/改善方法を提供する。\n\n【Data Foundations Dashboards と CMDB Health Dashboard の違い】\n・Data Foundations Dashboards：構成不可。固定メトリクスでカスタマイズ不可\n・CMDB Health Dashboard：表示・除外したいデータのタイプに完全な柔軟性を提供\n\nData Foundation DashboardメトリクスはServiceNow Health Scan Definitionsのサブセットである。ダッシュボード上部セクション：コンプライアンス準拠CIのパーセンテージとして表示。下部セクション：非コンプライアンスCIのタイル。",
       "points": [
@@ -5477,12 +5477,12 @@
           "exp": "ダッシュボード上部セクションには指標のスコープ内のCIのスキャン結果がコンプライアンス準拠CIのパーセンテージとして表示される。62.1%はスコープ内のCIの62.1%がシリアル番号を持っている（準拠している）ことを意味する。"
         }
       ],
-      "id": "Course5_Mon May 04 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course5_5-4"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 5",
-      "lesson": "Tue May 05 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "5-5",
       "title": "Intelligent Search（インテリジェント検索）",
       "summary": "Intelligent Search は、CMDB管理者とユーザーがCMDBで自然言語クエリ（NLQ: Natural Language Query）を実行できるようにし、複雑なCMDBデータモデルに精通する必要をなくす。CMDB Query Builder の使用方法を知らなくても複雑なマルチテーブルクエリを実行できる。\n\n【主な機能】\n・平易な言葉で検索クエリを入力すると、テーブル名・部分フレーズ・過去の検索用語を含む動的な提案を受け取る\n・事前設定されたサンプル検索がすぐに使用できる状態で利用可能\n・最新の5件の検索にアクセスでき、各個人向けにパーソナライズされている\n\n【Intelligent Search と CMDB Query Builder の統合】\nシステムプロパティ glide.cmdb.query.nlq.activated によって管理され、デフォルトで有効。CMDBクエリが複数のテーブルを含む場合「View in Query Builder」ボタンが表示される。選択すると CMDB Query Builder が開き、クエリがキャンバス上に完全に構築される。\n\n【サンプル検索】\nCMDB管理者（sn_cmdb_admin ユーザーロール）は NLQ Sample Search テーブルのレコードを直接編集することでサンプル検索を変更できる。\n\n・サンプル検索は NLQ Sample Search [sn_cmdb_ws_nlq_sample_search] テーブルに保存\n・参照されるテーブルは NLQ Sample Search Table [sn_cmdb_ws_nlq_sample_search_table] テーブルに保存\n・サンプル検索への変更は CMDB Workspace と CMDB Query Builder の両方に反映される",
       "points": [
@@ -5655,12 +5655,12 @@
           "exp": "CMDBクエリが複数のテーブルを含む場合「View in Query Builder」ボタンが表示される。選択するとCMDB Query Builderが開き、クエリがキャンバス上に完全に構築される。"
         }
       ],
-      "id": "Course5_Tue May 05 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course5_5-5"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 5",
-      "lesson": "Wed May 06 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "5-6",
       "title": "Product Views（製品ビュー）",
       "summary": "健全で成熟し、適切にメンテナンスされたCMDBは、ServiceNow AIプラットフォームでの成功の重要なコンポーネントであり、ITサービスマネジメントやその他多くのエンタープライズプロセスにとって価値ある意思決定支援ツールである。\n\n【健全なCMDBとServiceNow ITSMの効果】\n・インシデント解決が38%高速化\n・失敗した変更が82%減少\n・問題管理で解決されたインシデントが604%増加\n・適切に構成されたCMDBによりITコストを最大40%削減\n\n【Incident Management】\nCMDBからの情報をインシデントの回復やサービスとインフラストラクチャCIのステータス通知に活用する。CI属性の入力によりAssignment Group（Support Group）などのルーティング詳細を決定する。Impacted Services関連リストにServicesとService Offeringsを表示。\n\n【Change Management】\nCMDBに保存された情報を使用して変更要求（RFC）を評価・承認する。CI間のリレーションシップでビジネスアプリケーションとサービスへの影響分析を提供する。\n\n【Event Management】\nサードパーティの監視ツールからインフラストラクチャイベントのアラートを収集する。DiscoveryによってIT関連情報を収集し、アラートをCIにマッピングする。イベント相関・自動応答の機能を提供。\n\n【Asset Management】\nCMDBを入力する際、ハードウェア資産についてCI対資産の同期が発生する。SAMはCMDBに保存されたデータに基づいてソフトウェアライセンスの使用を最適化する。コスト管理（過小利用資産の特定）・ライフサイクル管理（耐用年数終了・ライセンス期限を自動フラグ）。\n\n内部ユーザーがデータ正確性への信頼を失うと独自のデータソースを使用しServiceNowの有効性が損なわれる。一般的な問題：重複したCI・古いCI・不完全なCI。",
       "points": [
@@ -5814,7 +5814,7 @@
           "exp": "CIのConfiguration Item属性の入力によりAssignment Group（Support Group）などのルーティング詳細を決定する。依存関係を通じてサービスへの影響に関する洞察を提供し、Impacted Services関連リストにServicesとService Offeringsを表示する。"
         }
       ],
-      "id": "Course5_Wed May 06 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course5_5-6"
     },
     {
       "category": "基本情報技術者試験",
@@ -5905,7 +5905,7 @@
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Mon Jun 01 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-1",
       "title": "Activate Health Dashboard",
       "summary": "Activate Health Dashboard",
       "points": [],
@@ -6023,12 +6023,12 @@
           "exp": "正しい手順：①Configuration > Health Preferences > Scheduled Jobsで各ジョブをActivate②Execute Now③ジョブ完了まで待機④cmdb_health_metric_status.listで9メトリクス完了確認⑤CMDB Workspace > Management > CMDB Healthで確認⑥Completeness・Correctnessの範囲が3.01Kであることを確認"
         }
       ],
-      "id": "Course6_Mon Jun 01 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Tue Jun 02 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-2",
       "title": "Create CMDB Group",
       "summary": "Create CMDB Group",
       "points": [],
@@ -6160,12 +6160,12 @@
           "exp": "CMDB Groupを使用すると複数クラスを統合したビューを提供でき、組織が管理責任を持つCIクラスのみに絞り込んだ意味のあるメトリクスを確認できる。シナリオ2でもUnix・Windows Serverという管理対象クラスのみをグループ化している。"
         }
       ],
-      "id": "Course6_Tue Jun 02 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-2"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Wed Jun 03 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-3",
       "title": "Configure Schedule for Health Dashboard Job",
       "summary": "Configure Schedule for Health Dashboard Job",
       "points": [],
@@ -6227,12 +6227,12 @@
           "exp": "シナリオ：「Cloud Dimensions understands the metrics on the Group Health Dashboard are only as current as the last executed job.」グループヘルスダッシュボードのメトリクスは最後に実行されたジョブの時点のデータのみ反映されるため、より頻繁な実行でデータの鮮度を保つ。"
         }
       ],
-      "id": "Course6_Wed Jun 03 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-3"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Thu Jun 04 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-4",
       "title": "Configure Recommended Fields",
       "summary": "Configure Recommended Fields",
       "points": [],
@@ -6308,12 +6308,12 @@
           "exp": "要件：「After the recommended fields are configured, execute the CMDB Health Dashboard - Completeness Scorecard job.」推奨フィールドはCompleteness（完全性）スコアカードのメトリクスのため、Completeness Score Calculationジョブを実行する。"
         }
       ],
-      "id": "Course6_Thu Jun 04 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-4"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Fri Jun 05 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-5",
       "title": "Configure Desired State Audit Rule",
       "summary": "Configure Desired State Audit Rule",
       "points": [],
@@ -6389,12 +6389,12 @@
           "exp": "CMDB Health DashboardのComplianceスコアカードに含めるには、監査タイプを「Desired State（望ましい状態）」に設定する必要がある。「Compliance」や「Compliance Architecture」はCMDB Health Dashboardには含まれない。"
         }
       ],
-      "id": "Course6_Fri Jun 05 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-5"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Sat Jun 06 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-6",
       "title": "Display Audit Results on Compliance Scorecard",
       "summary": "Display Audit Results on Compliance Scorecard",
       "points": [],
@@ -6456,12 +6456,12 @@
           "exp": "要件：「to prevent unwanted audit results from displaying on the compliance scorecard, Cloud Dimensions wants to deactivate any baseline audits provided by ServiceNow and only have the Windows Server audit active.」自作監査の結果のみをスコアカードに表示するために不要な監査を非アクティブにする。"
         }
       ],
-      "id": "Course6_Sat Jun 06 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-6"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Sun Jun 07 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-7",
       "title": "Create Orphan Rule",
       "summary": "Create Orphan Rule",
       "points": [],
@@ -6523,12 +6523,12 @@
           "exp": "要件：「execute the Health Dashboard Correctness Scorecard job to calculate the results and display them on the CMDB Health Dashboard for the Email Server class.」孤立はCorrectnessスコアカードのメトリクスのためCorrectnessジョブを実行する。"
         }
       ],
-      "id": "Course6_Sun Jun 07 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-7"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Mon Jun 08 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-8",
       "title": "Create Staleness Rules",
       "summary": "Create Staleness Rules",
       "points": [],
@@ -6590,12 +6590,12 @@
           "exp": "ベースシステムではcmdb_ci（Configuration Item）のベースクラスレベルで1つの陳腐化ルールが定義されており、CIが60日間更新されていない場合に陳腐化と見なされる。すべての拡張クラスに適用される。シナリオ8ではクラス固有の陳腐化ルールを追加設定する。"
         }
       ],
-      "id": "Course6_Mon Jun 08 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-8"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Tue Jun 09 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-9",
       "title": "Remediate Duplicates",
       "summary": "Remediate Duplicates",
       "points": [],
@@ -6685,12 +6685,12 @@
           "exp": "検証条件：「From the De-Duplication Task list verify the Windows task displays with a State of Closed Complete.」重複排除完了後はClosed Completeステートになる。"
         }
       ],
-      "id": "Course6_Tue Jun 09 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-9"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Wed Jun 10 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-10",
       "title": "Configure Reclassification System Property",
       "summary": "Configure Reclassification System Property",
       "points": [],
@@ -6738,12 +6738,12 @@
           "exp": "シナリオ：「Cloud Dimensions prefers to have more of a manual intervention regarding possible CIs that need reclassification.」プロパティをfalseにすることで自動再分類が無効になり代わりに再分類タスクが生成され手動での確認・処理が可能になる。"
         }
       ],
-      "id": "Course6_Wed Jun 10 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-10"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Thu Jun 11 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-11",
       "title": "Build Simple Query",
       "summary": "Build Simple Query",
       "points": [],
@@ -6791,12 +6791,12 @@
           "exp": "シナリオ：「Using CMDB Query Builder, they would like to build a saved query to compare and verify the results on the Health Dashboard are calculated correctly.」ヘルスダッシュボードの結果の正確性をQuery Builderのクエリ結果で検証することが目的。"
         }
       ],
-      "id": "Course6_Thu Jun 11 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-11"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Fri Jun 12 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-12",
       "title": "Build Query with Non-CMDB Table",
       "summary": "Build Query with Non-CMDB Table",
       "points": [],
@@ -6844,12 +6844,12 @@
           "exp": "CMDB QueryのオプションでNon-CMDBテーブルのコンテキストを追加できる。シナリオ12では「CI（Owned by空）」と「Incident（Priority 1-Critical）」を組み合わせた複合クエリを実行するためにこの機能を使用する。"
         }
       ],
-      "id": "Course6_Fri Jun 12 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-12"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 6",
-      "lesson": "Sat Jun 13 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "6-13",
       "title": "Configure Remediation",
       "summary": "Configure Remediation",
       "points": [],
@@ -6925,12 +6925,12 @@
           "exp": "検証条件：「Locate and open the orphan task for the Email Server named AUS01-EXCH → Click the Remediate button → Select the Remediate Orphans rule」。対象Email ServerはAUS01-EXCH。"
         }
       ],
-      "id": "Course6_Sat Jun 13 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course6_6-13"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Wed Jul 01 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-1",
       "title": "MID Serverを検証する",
       "summary": "MID Serverを検証する",
       "points": [],
@@ -6978,12 +6978,12 @@
           "exp": "MID ServerはServiceNowインスタンスと組織の内部ネットワークのbridge（橋渡し）として機能する。ファイアウォール・セキュリティ・ネットワークセグメンテーションがある環境で特に重要。組織のtrusted network environment内で動作し、機密データが組織外に出ないことを確保する。"
         }
       ],
-      "id": "Course7_Wed Jul 01 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Thu Jul 02 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-2",
       "title": "新しいクラスを作成する",
       "summary": "新しいクラスを作成する",
       "points": [],
@@ -7073,12 +7073,12 @@
           "exp": "Dependentをtrueに設定すると、Identification RuleはAdd Dependent Relationships（依存関係性の追加）を必要とする。シナリオ2ではMongoose Web ServerがハードウェアCIに事前に構成されていることを確認するために使用する。"
         }
       ],
-      "id": "Course7_Thu Jul 02 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-2"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Fri Jul 03 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-3",
       "title": "Identification Ruleをテストする",
       "summary": "Identification Ruleをテストする",
       "points": [],
@@ -7154,12 +7154,12 @@
           "exp": "Identification RuleはRunning process commandを識別子エントリとして使用する。2回目のスクリプト実行時に同じRunning process commandで既存のMongoose Web Serverと一致するため、重複を作成せず既存のCIを更新する（またはスキップする）。"
         }
       ],
-      "id": "Course7_Fri Jul 03 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-3"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Sat Jul 04 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-4",
       "title": "バージョンアップグレードのIdentification Ruleをテストする",
       "summary": "バージョンアップグレードのIdentification Ruleをテストする",
       "points": [],
@@ -7207,12 +7207,12 @@
           "exp": "注記：「Mongoose Web Serverアプリケーションは、スクリプトによってServiceNowに統合されると、実行中のプロセスコマンドに基づいて照合され、アプリケーションのバージョンが更新され、重複は作成されません」。Running process commandが識別子であるためバージョン変更は重複を生まない。"
         }
       ],
-      "id": "Course7_Sat Jul 04 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-4"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Sun Jul 05 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-5",
       "title": "同じホストに展開された2番目のMongooseアプリのIdentification Ruleをテストする",
       "summary": "同じホストに展開された2番目のMongooseアプリのIdentification Ruleをテストする",
       "points": [],
@@ -7260,12 +7260,12 @@
           "exp": "シナリオ3・4・5の結果：同じRunning process command→既存CI更新（重複なし）。異なるRunning process command（異なるディレクトリ）→新規CI作成。つまりRunning process commandで個々のアプリケーションインスタンスを一意に識別できる。"
         }
       ],
-      "id": "Course7_Sun Jul 05 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-5"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Mon Jul 06 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-6",
       "title": "2番目のDiscovery Sourceからの統合をテストする",
       "summary": "2番目のDiscovery Sourceからの統合をテストする",
       "points": [],
@@ -7327,12 +7327,12 @@
           "exp": "注記：「Show XML（XML表示）は、フォームに表示されない場合でも、管理者がレコードとそのすべてのフィールドと値を表示するための便利なオプションです」。ヘッダーを右クリック→Show XML（XML表示）を選択してアクセスする。"
         }
       ],
-      "id": "Course7_Mon Jul 06 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-6"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Tue Jul 07 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-7",
       "title": "Multisource CMDBを有効化する",
       "summary": "Multisource CMDBを有効化する",
       "points": [],
@@ -7366,12 +7366,12 @@
           "exp": "Multisource CMDB（CMDB 360）の3つの利点：①Track：様々なDiscovery SourceがCIをどのようにpopulateしているかを追跡②Revert：特定のDiscovery SourceからのCI更新を元に戻す③Recompute：更新されたReconciliation Rulesを使用して属性値を再計算する"
         }
       ],
-      "id": "Course7_Tue Jul 07 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-7"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Wed Jul 08 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-8",
       "title": "Multisource CMDBデータを検証する",
       "summary": "Multisource CMDBデータを検証する",
       "points": [],
@@ -7419,12 +7419,12 @@
           "exp": "注記：「Multisource CMDBを有効にすると、CMDB内のCIを作成および更新するすべてのDiscovery SourceからのデータがCMDB MultiSource Data [cmdb_multisource_data]テーブルにキャプチャされます」。低優先度ソースのデータも保持される。"
         }
       ],
-      "id": "Course7_Wed Jul 08 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-8"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Thu Jul 09 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-9",
       "title": "Reconciliation Rule（調整ルール）",
       "summary": "Reconciliation Rule（調整ルール）",
       "points": [],
@@ -7472,12 +7472,12 @@
           "exp": "Reconciliation RuleではOrder value（オーダー値）が低いほどPriority（優先度）が高い。ServiceNowがorder value最低＝最高優先度を持つ。これによりServiceNowが更新したレコードはLANDeskによる上書きが防がれる。"
         }
       ],
-      "id": "Course7_Thu Jul 09 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-9"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Fri Jul 10 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-10",
       "title": "ServiceNowのReconciliation Ruleをテストする",
       "summary": "ServiceNowのReconciliation Ruleをテストする",
       "points": [],
@@ -7511,12 +7511,12 @@
           "exp": "検証条件：「Windows Serverモジュールで、OWA-SD-01という名前のサーバーのRAMが2048で、Discovery SourceがServiceNowであることを確認する」。ServiceNowのReconciliation Ruleが機能し、LANDeskで最後に更新されたレコードをServiceNowが更新できた。"
         }
       ],
-      "id": "Course7_Fri Jul 10 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-10"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Sat Jul 11 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-11",
       "title": "LANDeskの調整をテストする",
       "summary": "LANDeskの調整をテストする",
       "points": [],
@@ -7564,12 +7564,12 @@
           "exp": "注記：「Reconciliation Rule（調整ルール）はData Source Histories（データソース履歴）[cmdb_datasource_last_update]テーブルを使用して、どのデータソースがレコードとそのフィールド属性を最後に更新したかを特定します」。"
         }
       ],
-      "id": "Course7_Sat Jul 11 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-11"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Sun Jul 12 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-12",
       "title": "Data Refresh Ruleを作成する",
       "summary": "Data Refresh Ruleを作成する",
       "points": [],
@@ -7617,12 +7617,12 @@
           "exp": "3つのルールの違い：①Identification Rule：CIを一意に識別する②Static Reconciliation Rule：Discovery Sourceの優先度と更新権限を定義③Data Refresh Rule：高優先度ソースが指定期間内に更新しない場合に低優先度ソースの更新を許可。シナリオ9・12・6でそれぞれ使用。"
         }
       ],
-      "id": "Course7_Sun Jul 12 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-12"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Mon Jul 13 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-13",
       "title": "Data Refresh Ruleをテストする",
       "summary": "Data Refresh Ruleをテストする",
       "points": [],
@@ -7670,12 +7670,12 @@
           "exp": "注記：「Discovery Source LANDeskのWindowsServerレコードは、前のタスクで構成されたData Refresh RuleによりServiceNowによって最後に更新されたWindows Server上のRAMフィールドを更新することができました」。Data Refresh RuleはStatic Reconciliation Ruleの時間ベースの例外として機能する。"
         }
       ],
-      "id": "Course7_Mon Jul 13 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-13"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Tue Jul 14 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-14",
       "title": "Dynamic Reconciliation Ruleを作成する",
       "summary": "Dynamic Reconciliation Ruleを作成する",
       "points": [],
@@ -7737,12 +7737,12 @@
           "exp": "Dynamic Reconciliation RuleのLargest Value・Smallest Valueは数値フィールド型にのみ適用できる。属性の選択タブには数値フィールド型のみが表示される。RAMは数値フィールドのため適用可能。"
         }
       ],
-      "id": "Course7_Tue Jul 14 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-14"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 7",
-      "lesson": "Wed Jul 15 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "7-15",
       "title": "Dynamic Reconciliation Ruleをテストする",
       "summary": "Dynamic Reconciliation Ruleをテストする",
       "points": [],
@@ -7790,12 +7790,12 @@
           "exp": "Static Reconciliation RuleはDiscovery Sourceの優先度（Order Value）で更新権限を定義。Dynamic Reconciliation RuleはMultisource CMDBのデータを基にFirst/Last/Most Reported・Largest/Smallest Valueで値を選択。同一属性に両方がある場合はDynamic Reconciliation Ruleが優先される（Dynamic wins over Static）。"
         }
       ],
-      "id": "Course7_Wed Jul 15 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course7_7-15"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 8",
-      "lesson": "Sat Aug 01 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "8-1",
       "title": "Terminology and Initial Considerations（用語と基礎概念）",
       "summary": "Terminology and Initial Considerations\\nコース：CSDM Fundamentals（約30分）\\n\\nMarkとScottの対話形式で、CSDMを実装・活用する際に最初に理解すべき用語と基礎概念を解説するレッスンです。\\n\\n【必須暗記】3種類のApplicationオブジェクト\\n・cmdb_ci_appl → Application：最も古いテーブル。ポートフォリオ管理・設計用途。運用（ITSM）には使わない\\n・cmdb_ci_service → Application Service：CSDMで最重要オブジェクト。業務アプリの「インスタンス」を表す。インシデント・変更管理等で使用\\n・cmdb_ci_business_app → Business Application：ビジネス視点でのアプリケーション定義\\n\\nApplication ServiceはService Instance型であり、同一ビジネスアプリでも環境（dev/QA/prod）や地域（EMEA/APACなど）ごとに別インスタンスとして記録する。\\n\\n【必須理解】3種類のサービスと役割\\n・Application Service（cmdb_ci_service）：テクノロジーの実インスタンス。CIのスタックと結びつく中心オブジェクト\\n・Business Service：ビジネスがそのテクノロジーを利用する側の視点。技術障害時の業務影響を把握するために使用\\n・Technology Management Service（旧称：Technical Service）：テクノロジーを提供・維持管理する支援グループの視点。オーナーシップと責任範囲を示す\\n\\n【試験頻出】CSDM 5のドメイン構成（6ドメイン）\\n・Foundation：Location / Company / Group などの参照データ。CMDBの基盤データ。最初に整備すべき領域\\n・Ideation & Strategy：製品アイデアのキャプチャ・投資判断。CSDM 5で新設（CSDM 4には存在しない）\\n・Design & Planning：設計段階のオブジェクト\\n・Build & Integrate：構築・統合\\n・Service Delivery：サービス提供（サービスインスタンス、技術スタック等）\\n・Service Consumption：サービス消費・ビジネスオファリング\\n\\n【モデル読解】関係タイプとReferenceの違い\\n・Cardinality（矢印）：方向を持つ正式な関係タイプ（Relationship）。CMDBのRelationship tableに格納される\\n・Reference：関係タイプではなく、フィールドレベルの参照（Reference field）。別の挙動・意味を持つ\\n\\n【ガバナンスとペルソナ】\\n・ペルソナはServiceNow上のロールと1対1対応ではない（試験で誤答を誘うポイント）\\n・成功するCSDM実装にはガバナンス体制と複数チームの協力が不可欠\\n・重要ペルソナ例：Data Steward（基盤データ管理）、Contract Manager、CMDB Manager\\n・CSDM 5のコンテンツカットオフは2025年5月\\n\\n【新ビジュアル】CSDM 5のダイアグラム変更\\n・従来図：全オブジェクトを一度に表示 → 初見者には難解\\n・CSDM 5：左から右へのライフサイクルフロー形式に変更。データの実体・関係性は変わらず「見せ方」を改善",
       "points": [
@@ -8039,12 +8039,12 @@
           "exp": "CSDM 5のコンテンツカットオフは2025年5月（Store App + Familyリリース）。"
         }
       ],
-      "id": "Course8_Sat Aug 01 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course8_8-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 10",
-      "lesson": "Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "10-1",
       "title": "CIS-DF 試験対策問題集",
       "summary": "CIS-DF（Certified Implementation Specialist - Discovery and CMDB Foundations）試験対策問題集。実際の試験で出題された問題・出題傾向のある問題を収録。\n\n収録内容：\n・関係タイプ（Runs on::Runs / Used by::Used）\n・Data Managerポリシータイプ（Attestation・Archive・Retire・Delete・Certification）\n・データ収集ソリューション（Agent Client Collector・Service Graph Connector・Discovery・IntegrationHub ETL・Service Mapping・Import Sets）\n・識別ルール（IRE・Principal Class・Identifier Entry）\n・調整ルール（Static・Dynamic・優先順位）\n・CMDB 360・Multisource CMDB\n・CSDMフレームワーク（Information Object・CSDM標準）\n・CMDBヘルスダッシュボード（重複メトリクス計算）\n・統合マップ（Unified Map）\n・変換マップ（Transform Map）とIRE連携",
       "points": [
@@ -8524,12 +8524,12 @@
           "exp": "正解はA「Principal Class（プリンシパルクラス）としてフラグ付け」とB「識別ルールにインストールパスを追加」の2つ。Principal Classフラグを設定することでIREが同一ホスト上の複数インスタンスを個別のCIとして認識できる。さらに識別ルールにインストールパスを追加することで、異なるディレクトリの同名アプリを一意に識別できる。（2つ選択問題のため、アプリではAが正解として表示されます）"
         }
       ],
-      "id": "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course10_10-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 11",
-      "lesson": "Sun Nov 01 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "11-1",
       "title": "用語と初期段階の考慮事項",
       "summary": "CSDMでは「Application」という言葉に3つの異なるテーブルがある。\n\n①Application（cmdb_ci_appl）：最も古いテーブル。Discoveryがホスト上で検出したインストール済みコード（bits and bytes）を格納。運用目的（Incident・Problem・Change）で使用する operational CI。\n②Business Application（cmdb_ci_business_app）：アプリケーションのポートフォリオリスト。バージョン非依存・non-operational。企業が保有するアプリの一覧管理に使用。\n③Application Service（cmdb_ci_service_auto等）：Business Applicationのインスタンス。CSDMで最重要オブジェクト。dev/QA/prodなど環境ごとのインスタンスを識別。Incident・Problem・Changeで使用するoperational CI。\n\nサービスタイプは3種類：Application Service（Business Applicationのインスタンス）・Business Service（テクノロジーを消費するビジネス機能）・Technology Management Service（テクノロジーの提供者・責任グループを識別）。\n\nCSDM以前は120以上のサービス定義箇所があったが、CSDMが3種類に絞り込んだ。\n\nCSDM5でのリレーション変更：Business ApplicationとApplication ServiceのリレーションがCSDM4の「Consumes::Consumed by」からCSDM5で新しいリレーションに変更（旧リレーションはハードコードされていたため変更が困難だった）。",
       "points": [
@@ -8669,12 +8669,12 @@
           "exp": "Incident管理ではoperational CIであるApplication（Discoveryが検出したインストール済みコード）またはApplication Service（デプロイ済みインスタンス）を使用する。Business Applicationはnon-operationalのため直接使用しない。"
         }
       ],
-      "id": "Course11_Sun Nov 01 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course11_11-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 11",
-      "lesson": "Mon Nov 02 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "11-2",
       "title": "Foundationドメイン",
       "summary": "Foundationドメインは全ドメインで参照される参照データ（referential data）を提供する最重要ドメイン。CIのフィールドから参照されるデータや、CMDBのCIを参照する他のオブジェクトが含まれる。\n\n主要オブジェクト：\n・Business Process：CMDB内のCIクラスだが、ロケーション・ドキュメント・ユーザーなどCMDB外のオブジェクトも参照できる唯一のCIの一つ。そのためFoundationに配置。ビジネス継続性（BCM）の観点でも重要。\n・Knowledge：ライフサイクル全体に渡って重要。AIエージェントの燃料（fuel）として機能。\n・Value Stream：ビジネスが提供する価値の流れ。ハーバード大学の研究を基に15カテゴリが標準提供。Value Stream→Stage→Business Capabilityの階層構造。CMDB外のオブジェクトだがCMDBのオブジェクトを参照。\n・Lifecycle Stage / Stage Status：CSDM4で導入。従来9つ以上あった状態フィールドを整理。クラスごとに異なる値セットを提供。編集不可（カスタマイズ不可）。CSDM5で「End of Operation」ステージを新規追加。\n\nLifecycleの2区分：\n①有形物（Tangible/Physical）：資産とCMDBのCI両方で共有。アイデア→購入→ビルド→運用→End of Operation→廃棄のフロー。\n②無形物（Intangible/Logical）：CIのみ（廃棄フェーズなし）。Business Service・Business Applicationなどが対象。",
       "points": [
@@ -8805,12 +8805,12 @@
           "exp": "KnowledgeはCSDMのLifecycle全体にわたって重要な参照データ。特にAIエージェントの燃料（fuel）として機能し、情報提供・自動化・人間インターフェースを支援することが動画で強調されている。"
         }
       ],
-      "id": "Course11_Mon Nov 02 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course11_11-2"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 11",
-      "lesson": "Tue Nov 03 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "11-3",
       "title": "Ideation & Strategyドメイン",
       "summary": "Ideation & StrategyドメインはCSDM5で新規追加されたドメイン（CSDM4には存在しなかった）。アイデアの発生からビジネス判断までを管理する。\n\n6つのオブジェクト：Product Idea・Strategic Plan・Goal・Business Capability（一部）・Value Stream（参照）・Product/Product Feature。\n\nCSDM5での追加理由：アイデアの段階からライフサイクルを管理するため。投資判断・ミッション・ビジョン・組織価値の定義に使用。\n\n関連製品：Strategic Portfolio Management（SPM）・Enterprise Architecture（旧APM、2024年後半にリネーム）・Digital Portfolio Management（DPM）\n\nDPMはほぼ全てのCSDMデータを活用する最も包括的な製品の一つ。CSDM全ドメインのデータを可視化（クリスマスツリーのように）する。",
       "points": [
@@ -8893,12 +8893,12 @@
           "exp": "Ideation & Strategyドメインで主に使用される製品はStrategic Portfolio Management（SPM）・Enterprise Architecture（旧APM）・Digital Portfolio Management（DPM）。"
         }
       ],
-      "id": "Course11_Tue Nov 03 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course11_11-3"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 11",
-      "lesson": "Wed Nov 04 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "11-4",
       "title": "Design & Planningドメイン",
       "summary": "Design & Planningドメインは投資対象の定義・計画を管理するドメイン（Enterprise Architecture/旧APMが主管）。CSDM4からの変更なし。\n\n主要オブジェクト：\n・Business Capability：企業が「何を行うか」を定義。サブケイパビリティに分解可能な階層構造。People・Process・Technologyの視点で分析。\n・Business Application：アプリケーションポートフォリオ。TCO（Total Cost of Ownership）の管理。Dev/QA/Prod環境を含む全インスタンスと基盤インフラを把握。\n・Information Object [cmdb_ci_information_object]：Business Applicationが扱うデータの種類を論理的に記述。PII→GDPR/HIPAA、クレジットカード情報→PCI監査を自動トリガー。CA・Erwinなどのツールを置き換えるものではない。ガバナンス・コンプライアンス目的の概念的・論理的エンティティ。\n\n関連製品：Enterprise Architecture（APM）・Digital Portfolio Management（DPM）・Integrated Risk Management（IRM/GRC）",
       "points": [
@@ -8981,12 +8981,12 @@
           "exp": "cmdb_ci_information_object（Information Object）を使用する。Business Applicationが扱うデータ種類（患者診断記録はPII→HIPAAに該当）を論理的に記述してアプリに関連付けることで、HIPAAコンプライアンス監査要件が自動トリガーされる。"
         }
       ],
-      "id": "Course11_Wed Nov 04 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course11_11-4"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 11",
-      "lesson": "Thu Nov 05 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "11-5",
       "title": "Build & Integrateドメイン",
       "summary": "Build & Integrateドメインは開発・統合活動の可視性を提供するドメイン。\n\n主要オブジェクト：\n・STLC Component（Software Development Lifecycle Component）：モノリシックなビジネスアプリを個々に開発されたパーツ（マイクロサービス・API等）に分解する際に使用。任意（オプション）の使用。大規模・複雑なアプリのみで使用推奨。\n・DevOps Change Data Model（旧有料→CSDM5から無償）：開発活動の詳細（何を開発しているか・どのアプリに対してか・どのパッケージとしてリリースされるか）を提供。ServiceNow内での開発ではなく、外部開発プラットフォームとの統合。\n・AIデータ（新規）：CIクラスではなく資産（Asset）レコードとして管理。デプロイ可能なパッケージ（deployable）を表す。AI Control Towerと連携予定。",
       "points": [
@@ -9050,12 +9050,12 @@
           "exp": "DevOps Change Data ModelはCSDM5で有料機能（paywall）から無償に変更された。ServiceNowでの開発ではなく外部開発プラットフォームとの統合でビルド活動の可視化を提供する。"
         }
       ],
-      "id": "Course11_Thu Nov 05 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course11_11-5"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 11",
-      "lesson": "Fri Nov 06 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "11-6",
       "title": "Service Deliveryドメイン",
       "summary": "Service Deliveryドメインは最も一般的に使用されるドメイン。Discoveryが大量のCIをCMDBに投入するドメイン。\n\n重要な変更点（CSDM5）：\n・Service Instance（旧: Application Service）：最上位テーブルはcmdb_ci_service_auto。「Application Service」から「Service Instance」にリネーム。Application Serviceは引き続きタイプの一つとして存在。\n\nService Instanceの6タイプ（CSDM5で追加）：\n①Application Service（既存）\n②Data Service Instance（新規）\n③Network Service Instance（新規）\n④Connection Service Instance（新規）\n⑤Facility Service Instance（新規）\n⑥Operational Process Service Instance（新規）\n※新規5タイプは現時点でデータモデルのみ。UIや機能はAustralia+リリースで予定。\n\nService Delivery Network：Service Instanceを提供するために必要な全CIの集合体（概念。特定のオブジェクトではない）。\n\nTechnology Management Service / Technology Management Offering（旧: Technology Service / Technology Service Offering）にリネーム。\n\nDynamic CI Group：プログラム的にCIをグループ化。パッチ管理等で活用。\n\nAPI専用クラス：CSDM5で新規追加。\n\nAIのCI分類：AI Function（クラウドで発見）・AI Application（オンプレミスで発見）。",
       "points": [
@@ -9176,12 +9176,12 @@
           "exp": "クラウドで発見されたAIはAI Function、オンプレミスで発見されたAIはAI Applicationに格納される。"
         }
       ],
-      "id": "Course11_Fri Nov 06 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course11_11-6"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 11",
-      "lesson": "Sat Nov 07 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "11-7",
       "title": "Service Consumptionドメイン",
       "summary": "Service Consumptionドメインは、テクノロジーを消費するビジネス側の視点を定義するドメイン。CSDM4からの変更なし・ラベル変更なし。\n\n主要オブジェクト：Business Service・Business Service Offering\n\nService Classification：Business ServiceをはじめとするService系テーブルに設定する分類属性。フィルタリング・レポーティングに使用。Business Serviceには「Business Service」の分類値を設定。\n\nビジネスサービス構築のポイント：\n・テクノロジーの詳細ではなくビジネスの観点で定義する\n・内部・外部・両方のいずれかに分類（Used Internally/Externally/Both）\n・SLA・OLAの管理が可能（Offeringに設定）\n・Subscriber（加入者）の識別：グループ・部門・その他エンティティ\n\nビジネスサービスの定義はITの専門家だけでは困難。ビジネスサイドのステークホルダーを巻き込む必要がある。\n\nService Builder：ビジネスサービスとオファリングを構築するためのツール。",
       "points": [
@@ -9264,12 +9264,12 @@
           "exp": "Service ConsumptionドメインはService Builder（ビジネスサービス・オファリングの構築ツール）とService Portfolio Managementが主に管理する製品。"
         }
       ],
-      "id": "Course11_Sat Nov 07 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course11_11-7"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 11",
-      "lesson": "Sun Nov 08 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "11-8",
       "title": "ポートフォリオ管理・廃止アイテム・移行と次のステップ",
       "summary": "【ポートフォリオ管理】\n4つのポートフォリオカテゴリ：\n①Technology Management Services（共有ITサービス）\n②Business Services（ビジネスサービス）\n③Service Instances（サービスインスタンス）\n④外部販売製品（Product Lines）\n\n【廃止アイテム（Deprecation）】\n・「used for」属性（環境識別用）→「environment」に置き換え\n・hardware status・sub status・install status → Lifecycle Stage/Statusに移行予定\n・基底Serviceクラスへの直接CI作成 → 拡張テーブル（Business Service・Technical Service等）を使用\n・cmdb_rel_group / cmdb_rel_group_type → Teams機能に置き換え\n・Software Package / Software Installテーブル → SAM Foundationsに置き換え（SAMライセンス不要でインストール推奨）\n\n【実装アプローチ（3種類）】\n①Outcome Centric：特定の成果に必要なデータ要件からアプローチ（大規模組織で有効）\n②Domain Centric：特定のドメイン・製品エリアに集中してアプローチ\n③Stepwise：旧来のCrawl・Walk・Run・Flyアプローチ（大規模組織では成果が見えにくい）\n\n【CSDM移行の原則】\n・CSDM5への移行でやり直し不要\n・CSDMは繰り返し進化（iterate）するモデル\n・テーブルは残存。ラベル変更のみが主な変化",
       "points": [
@@ -9404,12 +9404,12 @@
           "exp": "Teams機能はcmdb_rel_group / cmdb_rel_group_typeをリプレイスする。Teamsはサポート・変更・管理・脆弱性・開発グループ等をCI関連リストとして一元管理する新機能。"
         }
       ],
-      "id": "Course11_Sun Nov 08 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course11_11-8"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 12",
-      "lesson": "Tue Dec 01 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "12-1",
       "title": "エグゼクティブ概要・北極星・CSDMとは何か",
       "summary": "CSDMの歴史的背景：ITSM・ITBM・ITOMなど複数製品が存在し「サービスとは何か」の定義が120種類以上あった問題を解決するために誕生。\n\nCSDMとは：\n・製品をまたいだデータモデリングのガイダンス（SKUや製品ではない）\n・CMDBを含む全製品に適用されるプラットフォーム全体のデータモデルアプローチ\n・全製品・パートナーによって実装される\n・アーキテクチャとエンジニアリングを含む複数のステークホルダーが主導\n・ServiceNow外部でも受け入れられている\n・マルチプロダクトアウトカムに必須\n\nCSDMでないもの：販売されるSKU・製品・ITSM等のプロセス実装ガイド・レポートセット・過去実装の自動修正手段\n\nCSDM Evolution（バージョン履歴）：\n・v1（London/NY）：Application Service center、サービスタイプ集約\n・v2（Paris）：Design/Build/Sell、Business Service→Service改名\n・v3（Rome）：Foundationドメイン追加、Lifecycle stage/status、Multisource CMDB\n・v4（Rome後）：Buildドメイン追加、Teams、CMDB Data Manager\n・CSDM5（Yokohama+）：Ideation & Strategyドメイン追加、SBOM、DevOpsデータモデル、Service Instances\n\n北極星：Digital Value Network（デジタルバリューネットワーク）\n\nビジネス価値データ（信頼できるデータが生む効果）：\n・失敗変更26%削減\n・重大インシデント解決時間27%短縮\n・重大脆弱性期間28%削減\n・優先度高インシデント46%削減\n・リクエスト処理時間20%短縮\n・問題解決インシデント485%増加\n・サービスオンボーディング速度20-40%向上\n・新サービス導入10-15%高速化\n・アプリコスト削減10-20%\n・運用コスト削減15-25%",
       "points": [
@@ -9587,12 +9587,12 @@
           "exp": "スライド21に記載のテクニカルデット例は「Business Applicationが正しいテーブルを使用していない・カスタム/不整合なライフサイクル・ベースServiceクラス上のサービス・動的CIグループの未活用・不十分なEOLライフサイクルプロセス・不適切なFoundationデータ（ロケーション等）・Teamsを使っていない」など。IRE設定誤りやDiscovery設定不備は含まれていない。"
         }
       ],
-      "id": "Course12_Tue Dec 01 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course12_12-1"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 12",
-      "lesson": "Wed Dec 02 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "12-2",
       "title": "用語と初期段階の考慮事項（スライド詳細）",
       "summary": "Applicationの3種類（スライド24詳細）：\n\nApplication（cmdb_ci_appl）：\n・Operational CI\n・Incident、Problem、Change（IPC）で使用\n・発見可能な特定ホスト上のコードのインストール（コンパイル済みコードのユニークなデプロイメント）\n・例：Database Instances、Java、WebSphere、Tomcat\n・特定のポートで通信するプログラム・モジュール・グループ\n\nBusiness Application（cmdb_ci_business_app）：\n・Operational CIではない\n・IPC（Incident、Problem、Change）では使用しない\n・バージョン非依存\n・ビジネスのインベントリ（ポートフォリオ）\n・全インスタンスの論理的表現\n・メタデータを含む\n・階層可能（プラットフォーム等）\n\nApplication Service（cmdb_ci_service_auto）：\n・Operational CI\n・IPC（Incident、Problem、Change）で使用\n・Business Applicationのユニークなインスタンス\n・環境別（Dev、Test、Prod）に作成可能\n・リージョン別に作成可能\n・作成方法：手動マッピング・Service Mapping（Entry Point）・タグ・Dynamic Query\n・階層可能（マイクロサービス等）\n\nBusiness Service（cmdb_ci_service）：\n・Operational CI\n・IPC（Incident、Problem、Change）でインパクト管理に使用\n・変更承認にも使用\n・階層なし（1レベル）\n・内部・外部・両方向けに公開\n・コンシューマー・販売フォーカス\n\nTechnology Management Service（cmdb_ci_service_technical）：\n・Operational CI\n・IPC（Incident、Problem、Change）でインパクト管理に使用\n・階層なし（1レベル）\n・プロバイダーフォーカス（ビジネスが消費・販売するために提供されるテクノロジー）",
       "points": [
@@ -9713,12 +9713,12 @@
           "exp": "Service Deliveryドメインは「デプロイされたサービスインスタンスと、それに関連する発見可能なコンポーネント。それらのサービスインスタンスを提供・サポートするサービス」（スライド28）。"
         }
       ],
-      "id": "Course12_Wed Dec 02 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course12_12-2"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 12",
-      "lesson": "Thu Dec 03 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "12-3",
       "title": "Foundationドメイン（スライド詳細）",
       "summary": "Foundation Domainの定義（スライド35 CSDM5 Paper引用）：\n「他のCSDMドメインのオブジェクトから、またはオブジェクトへ参照される基本データを含むテーブル群。Foundationドメインで識別されるテーブルはCMDBリレーションシップでは使用されない。代わりに、これらは重要な参照データである。」\n\nFoundation Domainの配置理由：\n・他の全ドメインから参照される参照データ（referential data）\n・CMDB リレーションシップでは使用しない\n・ほとんどのServiceNow製品実装前に必要となることが多い\n・マスターデータ管理（MDM）のコンテキスト\n\nValue Stream（新規オブジェクト）：\n・Foundation Domainに配置\n・Detailed Model（詳細モデル）として提供\n\nLifecycle（ライフサイクル）アプローチ（CSDM4で導入）：\n・問題：ITAM・CMDBにわたって9つ以上の状態/ステータス属性が存在。値間の相互作用が少ない。ServiceNowクライアントの50%以上がこれらのチョイスリストをカスタマイズ。ライフサイクルプロセスの一貫性がない。\n・解決策：\n  - Lifecycle Stage（ライフサイクルステージ）：ライフサイクルプロセスのステージ\n  - Life Cycle Status（ライフサイクルステータス）：ライフサイクルステージ内のステータス\n  - Lifecycle：ライフサイクル全体の位置\n・Physical vs Logical（有形物 vs 無形物）：異なる値セット\n・編集不可（can NOT edit）\n・移行を急ぐ必要なし（No Rush to Migrate）\n\nFoundation Domainの関連製品：\n・ライフサイクル管理：Lifecycle Sync・SBOMプラグイン・DevOps（SBOM）・Vulnerability Response（SBOM）\n・ほぼ全製品がこのデータを使用\n・ワークプレイス管理はロケーションを個別テーブルに拡張",
       "points": [
@@ -9820,12 +9820,12 @@
           "exp": "Foundation Domainのライフサイクル管理に関連する製品・機能はLifecycle Sync・SBOMプラグイン・DevOps（SBOM）・Vulnerability Response（SBOM）。ほぼ全製品がFoundationデータを使用する。"
         }
       ],
-      "id": "Course12_Thu Dec 03 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course12_12-3"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 12",
-      "lesson": "Fri Dec 04 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "12-4",
       "title": "Ideation & Strategy・Design & Planning・Build & Integrateドメイン（スライド詳細）",
       "summary": "Ideation & Strategy Domain（スライド44）：\n・Strategic Plan：Mission（何をしているか・なぜするか）・Vision（将来の目標）・Value（行動を導く原則）を設定\n・Goals（ゴール）：組織が達成したい広範なアウトカム。ビジネスユニット固有または戦略的優先事項に沿ったもの。定性的ステートメント。ポートフォリオに関連付けてより良い投資決定を支援。\n・関連製品（管理）：Strategic Portfolio Management・Enterprise Architecture / APM\n・関連製品（データ利用）：Digital Portfolio Management\n\nDesign & Planning Domain（スライド47）：\n・Business Capability：組織がビジネスモデルを実行・ミッションを果たすために必要な高レベルのケイパビリティ\n・Business Application：ビジネス機能を提供するために設定された全ソフトウェアとインフラの表現（タイトルのカタログ等）。ビジネスアプリケーションは全インスタンスの論理的表現。\n・Information Object：ガバナンスとコンプライアンス目的のためのデータタイプのスコーピングをサポート。概念的/論理的階層でのデータタイプを表示するCI。\n・関連製品（管理）：Strategic Portfolio Management・Enterprise Architecture / APM\n・関連製品（データ利用）：Digital Portfolio Management・Integrated Risk Management\n\nBuild & Integrate Domain（スライド50）：\n・AI Digital Assets（AI System Digital Asset）：AI・GenAIサービスのソフトウェア/アプリケーションコンポーネントを表す。ビルド・統合・AIガバナンスのために、デプロイ可能なソフトウェアソース・バイナリ・コンポーネントを表す（ServiceNow製・サードパーティ製・カスタム製のいずれも対象）。\n・関連製品（管理）：DevOps・Digital Product Release\n・関連製品（データ利用）：Digital Portfolio Management・SecOps・GRC・EA（APM）・Asset Management",
       "points": [
@@ -9937,12 +9937,12 @@
           "exp": "Goalsは「組織が達成したい広範なアウトカム。ビジネスユニット固有または戦略的優先事項に沿ったもの。定性的ステートメント。ポートフォリオに関連付けてより良い投資決定を支援する」（スライド44）。定量的KPIではなく定性的ステートメント。"
         }
       ],
-      "id": "Course12_Fri Dec 04 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course12_12-4"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 12",
-      "lesson": "Sat Dec 05 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "12-5",
       "title": "Service Delivery・Service ConsumptionドメインとAI関連CI（スライド詳細）",
       "summary": "Service Delivery Domain（スライド53-55）：\n\nService Instanceに関するUI注意事項：\n「Service Instanceの新UIは存在しない。Application ServiceはApplication Service Wizardから引き続き作成。全サービス向けの新UIはAustralia+タイムライン（翌年）を予定。」\n\nService Delivery Network（サービスデリバリーネットワーク）：\n・発見可能なコンポーネントとの関係性による技術ワークフロー（Tech Workflows）\n\nAI Function（スライド55定義）：\n「パブリッククラウドプラットフォームにデプロイされたAI SaaSアプリケーション。スケーラブルでオンデマンドの機械学習・データ処理・AIドリブンタスクのサービスを提供。オンプレミスインフラ管理不要の柔軟なソリューション。」\n\nAI Application（スライド55定義）：\n「Linux・Windows・Dockerコンテナ・Kubernetesクラスター等のさまざまなプラットフォームで動作するAIソフトウェアアプリケーション。機械学習モデル・データ分析・インテリジェントサービス・AI対応アプリケーションなど多様なAIワークロードをサポート。」\n\nAPI（スライド55）：\n「APIデータモデルはAPIデータ管理を支援するためCMDB内で提供。API Insightsの一部として、APIの詳細表示・比較・データギャップの特定/解決・サービスリレーションシップの管理を含むAPIの集中管理が可能。」\n\nService Deliveryの関連製品：\n・管理：ITOM Visibility・Service Graph Connectors・IH-ETL・Asset Management（HAM・SAM）\n・データ利用：ITSM・Digital Portfolio Management・SecOps・GRC・EA（APM）・ITOM Health・CSM\n\nService Consumption Domain（スライド58-59）：\n・Service Builder・Service Portfolio Managementで管理\n・ITSM・Digital Portfolio Management・GRC・EA（APM）・CSM・BCM・Catalogが利用",
       "points": [
@@ -10049,12 +10049,12 @@
           "exp": "Incident等のITSM処理では、Service DeliveryドメインのApplication ServiceやApplicationからCIを選択し、そのインパクトとしてService ConsumptionドメインのBusiness Serviceが関連付けられる。スライド41の例（SN Yokohama Prod → Business Service Onboarding）がこの流れを示している。"
         }
       ],
-      "id": "Course12_Sat Dec 05 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course12_12-5"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 12",
-      "lesson": "Sun Dec 06 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "12-6",
       "title": "ポートフォリオ管理・廃止アイテム・実装アプローチ（スライド詳細）",
       "summary": "Current Portfolios（スライド61）：\n・Enterprise / Service（DPM）\n・Personal（DPM）\n・Application（EA）\n・Project（SPM）\n・Technology（EA）\n\nSPM Lenses（ポートフォリオを使用するレンズ機能）：\nValue Stream・Product・Organization・Goals・Project Portfolio・Project Program・Strategic Investments\n\n4 Main Digital Product Portfolios（スライド62）：\n①Provided Externally（外部提供）：顧客向け製品・サービス → Business Service、Sold Product、Product Lines\n②Provided Internally（内部提供）：従業員・パートナー向けエンタープライズサービス → Technology Management Service\n③Manufacture & Delivery（製造・デリバリー）：ビルドチーム向けツールチェーン → Service Instance\n④Foundational（基盤）：ポートフォリオマネージャー向け基盤サービス\n\n廃止アイテム（スライド64）：\n・Use_for属性 → environmentに置き換え\n・Hardware status & substatus\n・Install Status\n・Base Service classの使用 → Business・Technical拡張クラスを使用（Service Builderを参照）\n・TEAMs：cmdb_rel_group・cmdb_rel_group_type参照の置き換え\n・SW Package table vs. SW Install table\n\n3つの実装アプローチ（スライド66-67）：\n①Outcome Centric：\n  メリット：アウトカムへの速い価値創出・特定インサイトへの集中・優先度高いリソース確保が容易\n  デメリット：他のアウトカム・ユースケースを考慮しない可能性・アウトカム外のチームが協力しない可能性・「データの孤島」が生じる可能性\n\n②Domain Centric：\n  メリット：1つのドメインに集中・製品・ポートフォリオ・チームの能力に合わせやすい・共通ペルソナで作業\n  デメリット：クロスドメインの価値を提供しない可能性・他ドメイン依存先との関与が困難な場合も\n\n③Step Wise（Crawl, Walk, Run, Fly）：\n  メリット：最初にFoundationを完成・EAと運用チームを早期に関与・計画と運用の接続を早期に確立\n  デメリット：早期の価値実現が困難・「何の意味があるの？」という価値提案が困難・後からサービスを確立・「CSDM Bingo」に陥るリスク\n\nCSDM移行の原則（スライド73）：\n・各バージョンは前のバージョンに積み重ねる\n・可能な限りアップグレードパスを提供\n・主な変更：Technology Management Service名称変更・Application ServiceのベースクラスがService Instanceに変更\n・曖昧さと詳細は「共通」なものへ対応\n・製品ロードマップの変更は毎四半期調整\n・「Seamless upgrade path, mostly（概ねシームレスなアップグレードパス）」",
       "points": [
@@ -10175,12 +10175,12 @@
           "exp": "スライド62の4 Main Digital Product Portfoliosによると、「Manufacture & Delivery（製造・デリバリー）」はビルドチーム向けのツールチェーン・デリバリー自動化に対応し、主なCSDMオブジェクトはService Instance。外部提供→Business Service/Product Lines、内部提供→Technology Management Service。"
         }
       ],
-      "id": "Course12_Sun Dec 06 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course12_12-6"
     },
     {
       "category": "ServiceNow CIS-DF",
       "course": "Course 12",
-      "lesson": "Mon Dec 07 2026 09:00:00 GMT+0900 (日本標準時)",
+      "lesson": "12-7",
       "title": "3 Pillar・Service Graph・技術的負債・実践事例（スライド詳細）",
       "summary": "3 Pillar approach（スライド17）：\n①Ingest（取り込み）：\n・データを継続的に取り込み、マージ・更新・削除\n・物理CIとクラウドリソース/構造の自動化\n・複数ソースを1つの信頼できるモデルにマージ\n・発見可能なものと発見不可能なものを接続\n・管理されたオーナーシップを確保\n\n②Govern（ガバン）：\n・分析ガイダンスの確立\n・Incident・変更管理の運用支援\n・レポートとメトリクスへの活用\n・計画への活用\n・消費製品・ロール・ペルソナ・プロセスのサポート\n\n③Insight（洞察）：\n・ガバナンスチームとロール\n・ヘルスメトリクスの改善を確保\n・ライフサイクルプロセスの確立\n・構造と定義を管理・伝達\n・使用とカスタマイズ/拡張ニーズのサポート\n・CSDMへのアライン\n\nService Graph Overview（スライド19）：\n・Connected：全機能を接続しデジタル製品をモダンITスタックの全レイヤーで管理\n・Integrated：計画・アーキテクチャ・DevOps・従来型・クラウドを1つのCSDMフレームワークでガイド\n・Comprehensive：従来のCMDBより広範なスコープと能力\n\nService GraphのFull Lifecycle Management：\n・Digital Products and Services：データサービス・設定状態・アプリケーションリレーションシップ\n・CSDM Guidance\n・Projects・People・Process・Core Data\n・Infrastructure・Configuration・Applications・Relationships（CMDB & beyond）\n\nService Graph Connectors（スライド20）：\n・ServiceNowがテスト・サポートしたIREの使用\n・CSDMアライン\n・Multisource & reconciliation対応\n・取得方法：Service Graph Connector Central・Store.Servicenow.comを閲覧・Service Graph Connector Centralをダウンロード\n\nコンテキストの多層性（スライド18）：\nAIドリブンアウトカムには多層的なコンテキストが必要\n\nProduct & Serviceの違い（スライド22）：\n・Product：顧客に価値を提供する財（もの）またはサービス（インタラクション）\n・Serviceは製品そのものである場合、または製品をサポートするために存在する場合がある",
       "points": [
@@ -10287,7 +10287,7 @@
           "exp": "Service Graph Connectorの入手方法はService Graph Connector Central・Store.Servicenow.comを閲覧・Service Graph Connector Centralをダウンロード（スライド20）。Developer Portalではない。"
         }
       ],
-      "id": "Course12_Mon Dec 07 2026 09:00:00 GMT+0900 (日本標準時)"
+      "id": "Course12_12-7"
     },
     {
       "category": "ServiceNow CIS-DF",
@@ -12840,80 +12840,7 @@
     "Course14_14-1_71": "なぜAが正解か\n各Application Serviceの種類と用途を整理すると以下の通りです。\nDynamic CI Group = フィルタやCMDB Queryによる小規模サービス向け：条件式でCIを動的にグループ化する軽量な方法で、小規模サービスに適しています。\nService Mapping（Connection Suggestion）= カスタムアプリ向けでフィンガープリンティングにより迅速にマップ作成：カスタムアプリケーションに対してフィンガープリンティング技術で素早くマッピングできます。\nService Mapping（Top-down）= パターンを利用した厳密なマッピングが必要なミッションクリティカルサービス向け：エントリポイントから下位CIへ厳密にマッピングするため、重要システムに適しています。\nTag-based = クラウドネイティブ・コンテナ・仮想マシン環境向け：クラウド環境のタグ情報を利用してCIを自動的にグループ化します。\n\n用語解説\nDynamic CI Group：フィルタ条件やCMDB Queryで定義した条件に一致するCIを動的にグループ化する方式のこと\nService Mapping（Top-down）：サービスのエントリポイントから下位のCIへ向かって依存関係を厳密にマッピングする方式のこと\nService Mapping（Connection Suggestion）：フィンガープリンティング技術でカスタムアプリを迅速にマッピングする方式のこと\nTag-based：クラウド・コンテナ・仮想マシン環境のタグ情報を利用してCIを自動グループ化する方式のこと\nフィンガープリンティング：アプリケーションの特徴的なパターンを識別してマッピングする技術のこと\nミッションクリティカル：業務継続に不可欠な重要システムのこと",
     "Course14_14-1_72": "なぜAが正解か\n各メトリクスの役割を整理すると以下の通りです。\nAudits = 実際の値と期待値を比較する：CIの実際の属性値が定義された期待値と一致しているかを監査します。\nDuplicate CIs = IREで検出され修復タスクが生成される：重複CIはIREが自動検出し、修復のためのタスクを生成します。\nOrphan CIs = 属性値または関係が欠落している：親CIや必要な関係が存在しない孤立したCIのことです。\nRecommended Fields = 入力されているとトラブルシュートに役立つ：必須ではないが入力することで障害対応時に役立つ推奨フィールドのことです。\nRequired Fields = 使用を最小限にすべき：必須フィールドは多すぎるとデータ入力の負担が増すため最小限にすべきです。\nStale CIs = 更新されておらず古くなっている：一定期間更新されていない陳腐化したCIのことです。\n\n用語解説\nAudits：CIの実際の値と期待値を比較して差異を検出する監査メトリクスのこと\nDuplicate CIs：CMDBに重複登録されているCIのこと\nOrphan CIs：必要な親CIや関係が欠落している孤立したCIのこと\nRecommended Fields：入力必須ではないが障害対応時に役立つ推奨属性フィールドのこと\nRequired Fields：CIレコードに必須の属性フィールドのこと\nStale CIs：長期間更新されず情報が古くなっているCIのこと\nIRE（Identification and Reconciliation Engine）：CMDBへのデータ取り込み時にCIの識別・照合・重複検出を行うエンジンのこと",
     "Course14_14-1_74": "なぜAが正解か\n各オブジェクトの役割を整理すると以下の通りです。\nlife_cycle_stage_status = レコードの下位レベル状態：life_cycle_stageの配下にある詳細なステータスを表します。例えば「運用中」というstageの中の「通常稼働」「縮退稼働」などの細かい状態です。\nlife_cycle_object = CIタイプに応じて利用可能な下位ステータスを決定：CIの種類（サーバー・アプリケーションなど）ごとに、どのステータスが選択可能かを制御します。\nlife_cycle_mapping = レガシーステータスとCSDMライフサイクル値のマッピングを保持：従来のCMDBステータス値とCSDMの新しいライフサイクル値を対応付けて保持します。\nlife_cycle_stage = レコードの上位レベル状態：CIの大きな状態区分を表します。例えば「計画中・運用中・廃止」などの上位レベルです。\n\n用語解説\nlife_cycle_stage：CIのライフサイクルにおける上位レベルの状態区分を管理するテーブルのこと\nlife_cycle_stage_status：life_cycle_stageの配下にある詳細な下位レベルの状態を管理するテーブルのこと\nlife_cycle_object：CIのタイプごとに利用可能な下位ステータスを制御するテーブルのこと\nlife_cycle_mapping：レガシーステータス値とCSDMライフサイクル値の対応関係を保持するテーブルのこと\nレガシーステータス：CSDM導入以前の従来のCMDBステータス値のこと",
-    "Course1_Thu Jan 01 2026 09:00:00 GMT+0900 (日本標準時)_3": "non-discoverable attributes（ディスカバリ不可能な属性）",
-    "Course1_Thu Jan 01 2026 09:00:00 GMT+0900 (日本標準時)_4": "CIs（構成アイテム）、services（サービス）、configured assets（構成済み資産）を統合したsingle system of record（単一の信頼できる情報源）とは、まさに「CMDB（Configuration Management Database）」そのものを指します。",
-    "Course1_Thu Jan 01 2026 09:00:00 GMT+0900 (日本標準時)_5": "「Gartner（ガートナー）の推計」と言えば、主にIT資産管理（ITAM）の不備がもたらす経済的損失についての予測を指します。\n核心データ: 単一の信頼できる情報源（Single System of Record）がない組織は、IT資産への支出が初年度に30%増加する。\n試験の論点: CMDBや資産管理（ITAM）を導入するビジネス上の正当性（ROI）を裏付ける標準的な根拠。\n重要ワード: 30%増、コスト削減、可視化（Visibility）。",
-    "Course1_Thu Jan 01 2026 09:00:00 GMT+0900 (日本標準時)_7": "Ongoing IT efforts）が正解（原文に含まれないもの）となる理由は、それが「複雑化を招く原因（技術的要因）」ではなく、複雑化した環境を管理・改善するための「活動そのもの（取り組み）」を指す言葉だからです。\n\nOrchestrators: コンテナの配備・管理・スケーリングを自動化する司令塔（例：Kubernetes）。\nIoT devices: ネットワークに接続され、物理的な情報を収集・送信するエッジデバイス（CIとして管理対象）。\nBlockchain nodes: 分散型台帳（ブロックチェーン）のネットワークを構成し、データの検証・同期を行う個々のノード。\nContainer technologies: アプリの実行環境を軽量にパッケージ化し、OS上で論理的に隔離して動作させる技術（例：Docker）。",
-    "Course1_Thu Jan 01 2026 09:00:00 GMT+0900 (日本標準時)_8": "Dが正解の理由は、「データの管理（ガバナンス）」ではなく「物理リソースの運用」の話であり、CMDBの整合性や正確性とは直接関係がないためです。\n\nA. incorrectly classified CIs: CIが適切なクラス（例：Windows ServerなのにLinuxテーブルにある等）に分類されていない状態です。\n\nB. unwanted or irrelevant data: 重複データや構成管理に不要なノイズが混じり、情報の信頼性が低下している状態です。\n\nC. inconsistent data quality: データの入力形式がバラバラだったり、必須項目が空欄だったりと品質が一定でない状態です。\n\nD. insufficient server capacity: 物理的なサーバーの処理能力やストレージ容量が足りていないという、インフラ性能の問題です。",
-    "Course1_Fri Jan 02 2026 09:00:00 GMT+0900 (日本標準時)_1": "A. incident management process: サービスの中断から可能な限り迅速に復旧させるためのプロセスです。\n\nB. change management process: IT環境への変更を適切に制御し、ビジネスへの悪影響を最小限に抑えるプロセスです。\n\nC. configuration management process: サービス提供に必要なすべての構成アイテム（CIs）を特定し、その属性や関係性を正確に記録・維持するためのプロセスです。\n\nD. problem management process: インシデントの根本原因を特定し、再発を防止することに焦点を当てたプロセスです。\n\nCが正解（維持される仕組み）である理由\nCMDB（構成管理データベース）の情報を最新かつ正確に保つことそのものが configuration management process（構成管理プロセス）の直接的な目的であり、定義だからです。",
-    "Course1_Fri Jan 02 2026 09:00:00 GMT+0900 (日本標準時)_7": "A. Service Management (ITSM): インシデントや変更管理など、ITサービスの提供とユーザー満足度の向上を管理するプロセスです。\n\nB. Asset Management (ITAM): IT資産の購入から廃棄までの「財務・契約・在庫」といった所有ライフサイクルを管理するプロセスです。\n\nC. Operations Management (ITOM): サーバーやネットワークの健全性、稼働状況、自動検知などの「インフラ運用」を管理するプロセスです。\n\nD. Financial Management (ITFM): ITにかかる予算策定、会計、課金などの「財務計算」を専門に行うプロセスです。\n\nDが正解（原文に含まれない）の理由\nServiceNowの標準的な定義において、CMDBが直接的に支える「3つの主要領域」はService、Asset、Operationsであり、Financial Managementはそれらとは別の専門的な財務レイヤーとして扱われるためです。",
-    "Course1_Sat Jan 03 2026 09:00:00 GMT+0900 (日本標準時)_1": "Discoverable attributes（ディスカバリ可能な属性）とは、ServiceNow Discoveryなどの自動スキャンツールが、ネットワーク経由で対象のデバイスやソフトウェアにアクセスし、自動的に抽出・特定できる技術的な情報を指します。\n\nA, B, D (Non-discoverable): 「組織・管理上の情報」です。サポート担当や部署、管理責任などはシステム内部にデータとして保持されているものではなく、人間が運用ルールに基づいて定義し、手動入力や外部連携（ERPなど）で補う必要がある項目です。\n\nC (Discoverable): 「技術的な構成情報」です。ネットワーク越しにコマンドを投げたりOSにクエリを送ったりすることで、システム自体から自動的に回答が得られる項目です。\n\n「システムをスキャンして自動取得できる技術的実態（C）と、人間が運用ルールに基づいて定義する管理情報（A, B, D）の違いです。」",
-    "Course1_Sat Jan 03 2026 09:00:00 GMT+0900 (日本標準時)_3": "A. CMDB Health Dashboard\nCMDB内のデータがどれだけ正確で、網羅され、規約に適合しているかを「健全性スコア」として可視化するダッシュボードです。\n\nB. CI Class Manager / ServiceNow schema map\nCIクラスの階層構造や定義を一元管理し、テーブル間の複雑な関係性（スキーマ）を視覚的に確認するためのツールです。\n\nC. Data Manager\nあらかじめ設定したポリシーに基づき、古いCIの引退や削除といったライフサイクル管理タスクを自動化するための仕組みです。\n\nD. Service Mapping\n特定のビジネスサービス（例：会員サイト）から、それを構成するサーバーやアプリへの依存関係を、トップダウンで自動的に描き出す機能です。",
-    "Course1_Sat Jan 03 2026 09:00:00 GMT+0900 (日本標準時)_4": "CMDB CI Class Modelsとは、「最新のITリソース（IoT、クラウド、コンテナ等）をCMDBで正しく分類・管理するための、クラス定義（スキーマ）と関係性の拡張パッケージ」です。",
-    "Course1_Sat Jan 03 2026 09:00:00 GMT+0900 (日本標準時)_5": "1. 「継承（Inheritance）」＝ 基本セットの引き継ぎ\n親クラスが持っている「共通の項目」を、子クラスがそのまま自動的に使えるようになる仕組みです。\n\n2. 「特化（Specialization）」＝ 専用項目の追加\n親クラスをベースにしながら、その種類にしかない「特別な項目」を付け足して詳細にすることです。",
-    "Course1_Sat Jan 03 2026 09:00:00 GMT+0900 (日本標準時)_7": "automated discovery solution（自動ディスカバリ・ソリューション）の一言要約\n「ネットワークを自動的にスキャンしてITインフラの技術的な構成実態を特定し、CMDBへ正確な構成アイテム（CIs）として反映・維持し続ける仕組み」のことです。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_3": "Excelなどの外部データをCMDBにインポートする際、重複データを作らないための『正しい設定方法』はどれか？」を問う問題。\nServiceNowにはもともと「ServiceNow Discovery」という、ネットワーク越しに外からスキャンして情報を集める機能（エージェントレス）があります。\nしかし、外からのスキャンだと「常に最新の細かい動き」を監視するのは苦手でした。\n\nAgent Client Collector (ACC) の強み\nACCは、監視したいサーバーなどの機器の「中」に直接住み込ませる（エージェントベース）仕組みです。\nそのため、以下のようなことが得意になります。\n\nリアルタイムな監視：CPUが異常に跳ね上がったり、サーバーがダウンしそうになったりした瞬間に、中からServiceNowへSOS（イベント）を送って自動でインシデントを起票できます。\n\n詳細な構成チェック：そのパソコンに何のソフトウェアがインストールされているかなど、外からでは分かりにくい細かい情報を正確に拾い上げて、CMDB（構成管理データベース）を常に最新に保ちます。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_6": "一言でまとめると、「入口（エントリポイント）から通信をたどって（トラバース）、特定のシステム（アプリケーションサービス）を動かしている部品（CI）のつながりを地図にするのが、Service Mapping」\n1. Service Mapping（サービスマッピング）\n\n意味: 特定の業務システム（例：勤怠管理システムやWebサイト）が、裏側で「どのサーバーやデータベースに依存して動いているか」を自動で追跡し、地図のように可視化する機能です。\n\n特徴: ユーザーがアクセスする入口から「上から下へ（トップダウン）」調査していくのが最大の特徴です。\n\n2. エントリポイント (Entry Point)\n\n意味: Service Mappingが調査を開始するための「出発点」です。\n\n具体例: ユーザーがシステムにアクセスするために入力する「URL」や「IPアドレス」などがこれにあたります。（例：https://company-portal.com）\n\n3. アプリケーションサービス (Application Service)\n\n意味: ユーザーやビジネスに対して提供される、システムの「意味のあるまとまり」のことです。\n\n具体例: 単なる「Webサーバー」や「データベース」という物理的な機械の集まりではなく、それらが連携して動く「オンラインショッピングシステム」というひとつのサービス全体を指します。\n\n4. ServiceNow Discovery（ディスカバリー / 水平検出）\n\n意味: 社内ネットワークにどんな機器（サーバー、ルーターなど）が存在しているかを「横断的に（水平に）」自動で探し出してリストアップする機能です。\n\nService Mappingとの違い: Discoveryが「街にどんな建物があるか（部品のリスト化）」を調べるのに対し、Service Mappingは「特定の荷物がどの建物を経由して届くか（業務のつながり）」を調べます。両者はよくセットで使われます。\n\n5. トラバース (Traverse)\n\n意味: IT用語で「横断する」「巡回する」「たどる」という意味です。\n\n解説: エントリポイント（入口のURL）から始まり、通信の通り道を順番に「たどって」裏側のデータベースまでたどり着く動きを表しています。\n\n6. CI (Configuration Item / 構成アイテム)\n\n意味: CMDB（構成管理データベース）に登録される、システムを構成する「一つひとつの部品」のことです。\n\n具体例: サーバー機器そのもの、インストールされているTomcatなどのソフトウェア、ネットワーク機器などがすべて「CI」として管理されます。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_8": "答えは、BD。\n1台のLinuxサーバーの中で「Tomcat」というシステムを3つ動かしているのに、ServiceNow（CMDB）には「Tomcatが1つしかない」と登録されてしまっている状態です。\nこれは、ServiceNowが「名前が同じTomcatだから、全部同一人物（同じデータ）だな」と勘違いして上書き（マージ）してしまっているのが原因です。\n\n選択肢の用語と正解の理由\nB. Tomcat Web Serverの識別ルールを変更して、構成ファイルパスまたはインストールディレクトリパスを基準属性として含める【正解】\n\n理由: 名前（Tomcat）だけで区別できないなら、「どこにインストールされているか（例：CドライブかDドライブか）」という「場所（パス）」も判断基準（識別ルール）に追加すれば、別々のTomcatとして正しく認識されるからです。\n\nD. CIがホストサーバーに依存していることを確認し、異なるホスト間での名前の競合を防止する【正解】\n\n理由: Tomcatのようなアプリは宙に浮いて存在できず、必ず「どのサーバーの上で動いているか」という情報が必要です。「AサーバーのTomcat」と「BサーバーのTomcat」が混ざらないように、「土台となるサーバー」も識別の条件に含めるのがベストプラクティスです。\n",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_14": "「重複CI修復ウィザード」の問題において、正解が A（最多の関係）、C（最も古く作成された）、E（最も最近更新された） の3つになる理由を解説します。\n\n一言で言うと、「システムが『これが本物（メイン）のデータだろう』と自動で判断するための、最も理にかなった3つの基準」だからです。\n\nそれぞれの理由は以下の通りです。\n\nA. 最多の関係 (Most Relationships) が選ばれる理由\n他のシステムや過去のインシデントと一番多く紐づいているデータは、すでに実際の業務で活発に使われている「本番データ」である可能性が高いからです。これを消してしまうと多くの紐づきが切れてしまうため、メインとして残します。\n\nC. 最も古く作成された (Oldest Created) が選ばれる理由\n一番最初に登録されたデータは、後から何らかのエラーで間違えて作られた重複コピーではなく、「大元のオリジナル」である可能性が高いからです。\n\nE. 最も最近更新された (Most Recent Updated) が選ばれる理由\n直近で情報が書き換えられたデータは、一番新しくて正確な（現在進行形で生きている）データである可能性が高いからです。\n\n重複CI修復ウィザード\n同じ機器のデータ（CI）が複数登録されてしまった際、どれを正として残し、どれを消す（統合する）かを画面上で選択・処理する専用ツール。\n\nメインCI\n重複しているデータ群の中で、「正しい親データ」として最終的に残す（統合先となる）CIのこと。\n\nMost Relationships（最多の関係）\n他の機器やアプリケーションとの紐づき（関連レコード）の数が一番多いデータ。\n\nOldest Created（最も古く作成された）\nシステムに一番最初に登録された（作成日時が最も古い）データ。\n\nMost Recent Updated（最も最近更新された）\n一番直近で情報が書き換えられた（更新日時が最も新しい）データ。\n\nOldest Updated（最も古く更新された）\n最後に情報が更新された日時が一番古いデータ。\n\nLeast Relationships（最少の関係）\n他の機器との紐づき（関係性）の数が一番少ないデータ。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_15": "CI Class Manager（CIクラスマネージャー）\nCMDBの中にあるすべての「クラス（機器の種類）」の設定を、ひとつの画面でまとめて確認・編集できる管理者用の専用画面。\n\nクラス (Class)\n「Windowsサーバー」「Linuxサーバー」「ルーター」など、データを種類ごとに分けるためのグループ（分類）のこと。\n\n調整ルールタブ (Reconciliation Rules tab)\n複数のシステムから同じデータが送られてきた際、「どのシステムのデータを信用して優先するか」のルールを設定・確認する画面。\n\n識別ルールタブ (Identification Rules tab)\nデータが入ってきた際、既存のデータと同一人物か（重複していないか）を判定するための条件を設定・確認する画面。\n\n基本情報タブ (Basic Info tab)\nそのクラスの名前や説明文など、最も基礎的な情報が表示・設定される画面。\n\n固定クラス (Pinned Classes)\nよく使うクラスを「お気に入り登録（ピン留め）」して、次回から一覧を探さずにワンクリックですぐ開けるようにするショートカット機能。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_16": "一言で言うと、「ServiceNowの『動的調整ルール（Dynamic Reconciliation Rule）』の機能に、最初から用意されている公式の選択肢（計算ルール）がその2つだから」です。\n\n【詳しい理由】\nマルチソースCMDB（複数のITツールから同じ機器のデータが集まってくる状態）において、例えば「Aのツールはメモリ8GBと言っているが、Bのツールは16GBと言っている。どちらを正解にするか？」という属性の競合（矛盾）が起きた際、それを自動で解決する機能が「動的調整ルール」です。\n\nこの機能で使える「判定の基準（ルールタイプ）」は、ServiceNowのシステム上で以下の5つだけと厳格に決まっています。\n\nFirst Reported（最初に報告された値）\n\nLast Reported（最後に報告された値）\n\nMost Reported（最も多く報告されている値） ＝ 選択肢E\n\n例：3つのツールが8GB、1つのツールが16GBと報告していたら、多数決で8GBを採用する。\n\nLargest Value（最大値）\n\nSmallest Value（最小値） ＝ 選択肢F\n\nつまり、A（最終更新日）、B（最優先事項）、C（最終作成日）、D（オーナー承認）は、この設定画面には存在しない「引っかけのダミー用語」であるため、システムに実在する機能であるEとFが正解になります。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_20": "CI Class Manager（CIクラスマネージャー）\nCMDB内のすべてのクラス（機器やシステムの種類）の設定を一元管理・編集するための専用画面。\n\n特定のクラスのアイコン\nネットワークの構成図（依存関係マップ）などで、その機器が何であるか（例：Linuxサーバー、データベースなど）を視覚的に分かりやすく表示するためのマークや画像。\n\n基本情報タブ (Basic Info tab)\nクラスの表示名、説明文、そしてアイコンなど、そのクラスに関する最も基礎的な設定を行う画面。\n\n調整ルールタブ (Reconciliation Rules tab)\n複数のシステムから同じ機器のデータが入ってきた際、「どのシステムのデータを信用して書き込むか」の優先順位（ルール）を設定する画面。\n\n固定クラス (Pinned Classes)\n頻繁に設定を変更するクラスを、一覧から探さずにすぐ開けるよう「お気に入り（ピン留め）」しておくショートカット機能。\n\n識別ルールタブ (Identification Rules tab)\n新しいデータが入ってきた際、それが「すでに登録済みのデータと同じものか（重複していないか）」を判定するための条件を設定する画面。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_21": "CMDB正確性スコアカード（CMDB Health Scorecard）\nCMDB内のデータがルール通りに正しく登録されているか（健全性）を自動でチェックし、パーセンテージやグラフで可視化するダッシュボード機能。\n\n重複指標\nCMDBの健全性を測るテスト項目のひとつ。同じ機器のデータがダブって登録されていないかをチェックする基準。\n\n正常なCI数（健全なCI）\n重複などのエラーがなく、システム上で「正しく健康である（非重複）」と判定されたデータの実件数（画像では700件）。\n\n評価数 (Evaluated / 評価範囲)\nスコアカードの計算対象（テスト対象）として読み込まれた、大元となるデータの総件数（画像では800件）。\n\nサーバーレコード\nCMDB上に登録されている、サーバー機器に関する個別のデータ（行）のこと。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_23": "統合マップ (Unified Map)\nサーバーやネットワーク機器などのつながり（依存関係）を可視化する、ServiceNowの新しい標準マップ機能。\n\nコンテキストサイドパネル (Context Side Panel)\nマップ画面の横に表示される領域。選択した機器の詳細情報や、現在発生しているインシデント・変更・問題のレコードなどをリアルタイムで確認できる。\n\nマップキャンバス (Map Canvas)\n機器のアイコン（ノード）とそれらをつなぐ線が実際に描画されている、マップの中央のメインエリア。\n\nミニマップナビゲーター (Minimap Navigator)\n巨大で複雑なマップを表示している際に、全体図のどこを今見ているのかを把握し、表示領域を移動するための小さなナビゲーション画面。\n\nタイムライン (Timeline)\n過去の特定の日時にさかのぼって、マップの構成（機器のつながりや状態）がどう変化したかを時間軸で確認できる機能。\n\nノードバッジ (Node Badge)\nマップ上の各機器のアイコンに付与される小さなマーク。その機器にインシデントやアラートが発生していることを視覚的に知らせる役割を持つ。\n\n依存関係ビューマップ (Dependency Views map)\n統合マップ（Unified Map）が登場する前に使われていた、従来の古いバージョンのマップ機能。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_24": "変換マップ\n外部データ（Excelなど）をServiceNowに取り込む際、どの列のデータをどの項目に入れるか紐づけるルールのこと。\n\ncmdb_ci_serverテーブル\nCMDBの中で、サーバー機器に関するデータを保存しておくための専用のデータベース表。\n\nIRE（識別・調整エンジン / 識別・照合エンジン）\nCMDBにデータが登録される際、既存データとの重複がないかをチェックし、正しいルールでデータを統合する専用機能。\n\nData Refresh Rule（データ更新ルール）\n複数のシステムから同じ項目にデータが入ってきた際、どのシステムのデータを信用して優先するかを決めるルール。\n\nCMDBTransformUtil API\nデータ取り込み時に、IRE（識別・調整エンジン）を呼び出して重複チェックなどの処理を任せるためのプログラム部品。\n\nonBefore変換スクリプト\nデータが実際にテーブルへ書き込まれる「直前」のタイミングで、自動実行させるプログラム（スクリプト）。\n\nCoalesce（合致）フィールド\nデータ取り込み時に、「この項目が一致したら同じデータとみなして上書きする」という判定の基準（キー）を決める設定。\n\nglide.identification_engine.multisource_enabled\n複数の異なるツールからデータを集めてCMDBを作る「マルチソースCMDB機能」をオンにするためのシステム設定。\n\nバイパス\n本来通るべき経路やチェック（ここではIRE）を迂回して、素通りしてしまうこと。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_25": "HIPAAコンプライアンス監査\n患者の医療情報などの機密データを保護するための米国の法律（HIPAA）の基準を、システムが正しく満たしているかを確認する監査のこと。\n\nCSDMフレームワーク (Common Service Data Model)\nServiceNowにおいて、ITシステムやビジネスの構成要素を「どのようなルールでCMDBに登録し、どう紐づけるべきか」を定めた標準のデータモデル（設計ルール）。\n\nビジネスアプリケーション (Business Application)\n企業が業務を行うために使用するシステムやソフトウェア全体のこと。（例：勤怠管理システム、電子カルテシステムなど）\n\nCIクラス\nCMDBの中で、機器やシステムを種類ごとに分けるためのグループ・分類のこと。\n\nData Domain（データドメイン）\nデータを「人事部門用」「顧客管理用」などの大きな領域やグループで切り分けるための枠組み。\n\nBusiness Capability（ビジネス能力）\n企業が業務を行う上で「何ができるか（例：給与計算、人材採用など）」というビジネス上の機能や能力のこと。\n\nDB Catalog（DBカタログ）\nデータベースの構造、構成、テーブルなどの情報を管理するための目録・辞書のこと。\n\nInformation Object（情報オブジェクト）\nシステムやアプリケーションが「どのような機密性・種類のデータ（個人情報、患者記録など）を扱っているか」を定義するための論理的なラベル（クラス）。\n\n論理データレコード\n物理的なファイルやデータベースの箱そのものではなく、「患者の診断記録」といったデータの意味や内容そのものを指す単位。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_0": "レガシーアプリケーションサービス\n最新のクラウドなどではなく、古い技術や基盤（メインフレームなど）で稼働している、従来型の業務システムのこと。\n\nメインフレーム\n企業の基幹業務（今回の例では「課金」システムなど）で使われる、高い処理能力を持つ大型のコンピュータシステム。\n\n物理サーバー\n仮想サーバー（クラウドなど）ではなく、物理的な実体（ハードウェア）として存在するサーバー機器のこと。\n\nマッピング（手動でマッピング）\nシステムや機器同士の「つながり（関係性）」をCMDB上に設定すること。自動検出（Discovery）を使わず、人間が手作業で紐づけることを指す。\n\nCSDM標準 (Common Service Data Model)\nServiceNowにおいて、ITシステムやビジネスサービスをCMDB上で「どのようなルールで登録し、どう紐づけるべきか」を定めた公式の設計ガイドライン。\n\nアプリケーションサービス\nユーザーが実際に業務などで利用する、稼働中のシステムやアプリケーション環境（「本番環境の課金システム」など）のこと。\n\nインフラストラクチャ\nアプリケーションサービスを動かすための土台となる、サーバー、ネットワーク、データベースなどのIT基盤のこと。\n\n依存関係\n「このシステムが動くためには、この物理サーバーが必要である」といった、構成要素（CI）同士のつながりのこと。\n\n関係タイプのペア\n依存関係を結ぶ際に設定する「AはBに依存している（Depends on）」と「BはAに使われている（Used by）」という、双方向の繋がりの定義の組み合わせのこと。",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_9": "ServiceNow Discovery（水平検出）\n指定されたIPアドレスの範囲をネットワーク越しに横断的にスキャンし、企業内にどんなサーバーやネットワーク機器が存在しているかを網羅的に探し出す基本的な検出機能。\n\nIPベースの検出 (IP-based discovery)\nIPアドレスを頼りに機器を探し出す方式のこと。水平検出（Horizontal Discovery）の実体であり、ほぼ同義語として扱われる。\n\nエージェントレス検出 (Agentless discovery)\n調査対象のサーバー等に専用のソフトウェア（エージェント）をインストールせず、外部からパスワード等を使ってログインし、情報を取得する方式。ServiceNow Discoveryの基本的な動作仕様。\n\nタグベースの検出 (Tag-based discovery)\nクラウド環境（AWSやAzureなど）において、仮想サーバーなどに付与されている「タグ（名前や用途などのラベル）」の情報を読み取ってデータを収集する方式。\n\nトップダウンの発見 (Top-down discovery)\nユーザーがアクセスするWebサイトのURLなどを起点として、そこから裏側で繋がっているWebサーバー、データベースへと順番に（上から下へ）依存関係をたどってシステム構成図を描き出す方式。Service Mapping機能で使われるアプローチで、水平検出の対義語にあた",
-    "Course10_Thu Oct 01 2026 09:00:00 GMT+0900 (日本標準時)_29": "Tomcat Web Serverインスタンス\n1台のサーバーの中で独立して稼働している、Webアプリケーション実行用ソフトウェア（Tomcat）の個別のプロセスのこと。\n\nCIレコード\nCMDBに登録されている、個々の機器やソフトウェアの情報を管理するための1行のデータ。\n\nPrincipal Class（プリンシパルクラス）\n同一サーバー上で稼働する同じ種類（クラス）の複数システムを、1つにまとめず、それぞれ別々の独立したデータとして識別・登録できるようにするためのフラグ設定。\n\n識別ルール (Identification Rule)\nシステムがデータを取り込む際、それが既存のデータと同じものか、新しい別のものかを判定するための条件設定。\n\nIdentifier Entry\n上記の識別ルールにおいて、具体的に「どの項目をキーにして判定を行うか」を定義した個別の判定基準。\n\n構成ファイルパス / インストールディレクトリパス\nソフトウェアがサーバー内のどのフォルダ階層に保存・設定されているかを示すパス（住所）。これを見分ける基準（Identifier Entry）にすることで、同一サーバー内で複数動いているTomcatを別々のものとして区別できる。\n\nglide.identification_engine.skip_duplicates.threshold\nデータ処理時に、重複の疑いがあるレコードを何件検知したら処理をスキップ（またはエラー）にするかを制御するシステムの裏側の設定値。\n\nReconciliation Rule（調整ルール）\n複数のツールから同じ機器のデータが送られてきた際、どのツールのデータを最も信頼して優先的に書き込むかを決める設定。",
-    "Course11_Sun Nov 01 2026 09:00:00 GMT+0900 (日本標準時)_0": "CSDM (Common Service Data Model)\nServiceNowにおいて、ITインフラやビジネスサービスをCMDB上でどのように構成・連携させるかを定めた公式の標準データモデル（ガイドライン）。\n\nApplication (cmdb_ci_appl) テーブル\nサーバーなどの機器（ホスト）上で実際に稼働している個別のソフトウェアや実行プロセスの情報を格納するデータベースの表。\n\nアプリケーションポートフォリオ\n企業が保有するすべてのアプリケーションを一覧化し、コストやビジネス価値、ライフサイクルなどを総合的に管理・評価するための枠組み。\n\nDiscovery\nネットワークを自動でスキャンし、社内に存在するサーバー機器や、そこで稼働しているソフトウェアを検出してCMDBに登録する機能。\n\nホスト\nソフトウェアやアプリケーションが実際にインストールされ、稼働している土台となるコンピューター（物理サーバーや仮想マシン）のこと。\n\nインストール済みコード (bits and bytes)\n単なる設計や概念ではなく、サーバー上に物理的（実体として）インストールされ、実行可能になっているプログラムファイルそのものを指す表現。\n\noperational CI（運用CI）\n論理的な概念ではなく、日々のIT運用（インシデント管理、変更管理など）の対象として実際に監視・操作される、実在する稼働中の構成アイテム。\n\nBusiness Application（ビジネスアプリケーション）\n「勤怠管理システム」「経費精算システム」など、企業が特定の業務を行うために使用するシステムの「論理的な全体像・概念」を指すクラス。\n\nデプロイ済みインスタンス\n開発されたシステムが、本番環境やテスト環境など、特定の環境に実際に配置（デプロイ）され、稼働している個別のシステム環境のこと。\n\nSLA・OLA\nSLA（Service Level Agreement）は、提供するITサービスの品質（復旧時間など）を顧客と約束するもの。OLA（Operational Level Agreement）は、そのSLAを守るために社内のITチーム同士で結ぶ内部ルール。",
-    "Course11_Mon Nov 02 2026 09:00:00 GMT+0900 (日本標準時)_0": "Foundationドメイン\nCSDM（共通サービスデータモデル）の概念図において、一番下敷きになる基礎領域。ユーザー情報、部署、ロケーション（拠点）、会社など、IT機器ではないがシステム全体で共通して必要となる「基盤データ」を管理する場所。\n\nBusiness Process（ビジネスプロセス）\n「新入社員の入社手続き」や「請求書の承認フロー」といった、企業が行う具体的な業務活動や手順のまとまりのこと。\n\nCMDB外のオブジェクト\nサーバーやソフトウェアのような「ITの構成要素（CI）」ではないデータのこと。ServiceNowのシステム上、CMDB用のテーブルではなく、別枠のテーブルで管理されているデータ（ユーザー情報や場所情報など）を指す。\n\nCIクラス\nCMDBの中で、データを種類ごとに分類するためのグループのこと。Business Processは、例外的にCMDB内のCIクラスとして定義されている。\n\nロケーション・ドキュメント・ユーザー\n拠点の場所、マニュアルなどの文書、社員などの情報。これらはIT機器ではないため「CMDB外のオブジェクト（Foundationデータ）」に該当する。\n\n全ドメイン\nCSDMフレームワークを構成する複数の領域（Foundation、Design、Buildなど）の全体のこと。\n\nService Consumptionドメイン\nCSDMにおける領域のひとつ。社員や顧客などのエンドユーザーが、実際にITサービスを注文したり利用したりする接点（サービスカタログやポータル画面など）に関連するデータを管理する場所。",
-    "Course11_Sun Nov 01 2026 09:00:00 GMT+0900 (日本標準時)_3": "Application Service（アプリケーションサービス）\nシステムが実際にデプロイ（配置）され、稼働している個別の環境のこと。（例：「経費精算システムの本番環境」「勤怠管理システムのテスト環境」など）\n\nBusiness Service（ビジネスサービス）\nIT部門がビジネス部門（事業部門や一般社員、顧客）に向けて直接提供する、業務の目的を達成するためのサービスのこと。（例：「従業員オンボーディング」「給与支払いサービス」など）\n\nTechnology Management Service（テクノロジー管理サービス / テクニカルサービス）\nIT部門がシステムの裏側を支えるために、主に社内のIT運用者向けに提供する技術的なサービスのこと。（例：「サーバーホスティング」「データベース管理」「ネットワーク監視」など）\n\n企業のITサービス全体\n │\n ├── 1. Business Service（ビジネスサービス）\n │      [対象] 顧客や一般社員\n │      [役割] 業務目的を達成するためのサービスを提供する\n │       │\n │       └── (依存 / 利用)\n │             ▼\n ├── 2. Application Service（アプリケーションサービス）\n │      [実体] 本番環境などの実際に稼働しているシステム\n │      [役割] ビジネスサービスを動かすための実システムとして機能する\n │             ▲\n │       ┌── (管理 / サポート)\n │       │\n └── 3. Technology Management Service（テクノロジー管理サービス）\n        [対象] 社内のIT運用者・エンジニア\n        [役割] システムが安定して動くよう、裏側から技術的な支援・保守を行う",
-    "Course11_Tue Nov 03 2026 09:00:00 GMT+0900 (日本標準時)_3": "Ideation & Strategy ドメイン\n企業が「次にどのようなIT投資やビジネス戦略を行うべきか」というアイデア出し（Ideation）から、実際の計画・戦略立案（Strategy）までを管理するServiceNow上の領域のこと。\n\nStrategic Portfolio Management (SPM)\n企業のビジネス戦略に合わせて、プロジェクトの優先順位付けやリソース（予算・人員）を最適に配分し、目標達成を支援する製品。\n\nEnterprise Architecture（旧APM：Application Portfolio Management）\n企業が保有するすべてのアプリケーションを一覧化し、コストやビジネス上の価値などを評価して、「どのシステムを継続・統合・廃止すべきか」を判断するための製品。\n\nDigital Portfolio Management (DPM)\nサービスの計画、構築、実行から最適化まで、ライフサイクル全体をひとつのダッシュボードで一元管理し、健全性やパフォーマンスを追跡する製品。\n\nCMDB Health Dashboard\nCMDBに登録されているデータに重複や不足がないか（健全性）をグラフ等で可視化する機能。\n\nData Manager\n古くなったデータを自動的にアーカイブ・削除するなど、あらかじめ設定したルール（ポリシー）に従ってデータのライフサイクルを管理する機能。\n\nQuery Builder（CMDB Query Builder）\n複雑なプログラムを書かずに、画面上のドラッグ＆ドロップ操作だけで、CMDB内の機器同士のつながり（関係性）を検索・抽出できる機能。\n\nDiscovery\nネットワークを自動でスキャンし、社内に存在するサーバーやネットワーク機器を探し出してCMDBに登録する機能。\n\nService Mapping\n特定のシステムが、裏側でどのサーバーやデータベースに依存して動いているかを自動でたどり、関係図（マップ）を作成する機能。\n\nIntegrationHub ETL\n外部システム（Excelや他社ツールなど）のデータをServiceNowに取り込む際、データの形を正しく整えて（変換・マッピングして）CMDBに流し込むためのツール。\n\nITSM (IT Service Management)\n社内のITサポート業務（システム障害への対応、パスワードリセットなど）を効率化し、サービス品質を管理する製品群。\n\nGRC (Governance, Risk, and Compliance)\n社内ルールの遵守、事業リスクの管理、外部監査への対応などを一元的に可視化し、統制する製品群。\n\nCustomer Service Management (CSM)\n社内ではなく、社外の「顧客（カスタマー）」からの問い合わせ対応やクレーム解決のプロセスを効率化する製品。",
-    "Course11_Wed Nov 04 2026 09:00:00 GMT+0900 (日本標準時)_0": "Business Capability（ビジネスケイパビリティ / ビジネス能力）\n企業がビジネス上の目標を達成するために「何ができるか（何を行っているか）」という能力や機能のこと。「どのように（どのシステムで）」実行するかではなく、純粋にビジネスの目的（What）に焦点を当てた戦略的な概念です。（例：「人材採用」「給与管理」「顧客サポート」など）\n\nPeople・Process・Technology（人・プロセス・テクノロジー）\n上記のビジネス能力が成り立つために必要となる3つの構成要素。能力はシステム（Technology）だけで成立するものではなく、実行する人員や組織（People）と、業務の手順やルール（Process）が組み合わさって初めて機能するという考え方です。\n\nサブケイパビリティ\n大きなビジネス能力を、より具体的な細かい能力に階層化（分解）したもの。例えば、「人事管理」という大項目の下に、「採用」「評価」「給与支払い」といったサブの能力が紐づくツリー構造になります。\n\nDiscovery（ディスカバリー）\nネットワーク上を自動でスキャンし、企業内に存在するサーバー機器やソフトウェアの情報を探し出して、CMDB（構成管理データベース）に登録するServiceNowの機能。\n\nCI（構成アイテム / Configuration Item）\nCMDBで管理される、ITインフラやサービスを構成する一つ一つの要素（データ）のこと。サーバー、ルーター、ソフトウェア、あるいはビジネスプロセスなどもCIとして扱われます。\n\nBusiness Application（ビジネスアプリケーション）\n「経費精算システム」や「勤怠管理システム」など、特定の業務を行うために企業が購入または自社開発したシステムの「論理的な全体像・概念」を指すクラス。\n\nデプロイ済みインスタンス\n設計上の概念ではなく、本番環境やテスト環境など、サーバー上に実際に配置（デプロイ）されて稼働している個別のシステム環境のこと。（※CSDMでは、これを「Application Service（アプリケーションサービス）」として管理します）\n\nテクノロジーの責任グループ\n特定のサーバー、データベース、ネットワークなどのITインフラに対して、日々の保守・運用や障害対応の責任を持つIT部門内のチーム（サポートグループ）のこと。",
-    "Course11_Wed Nov 04 2026 09:00:00 GMT+0900 (日本標準時)_2": "ERwin（モデリングツール）： エンジニアがシステムやデータベースを開発・構築するために使います。\n\nServiceNow（Information Object）： 会社が「どのシステムが機密データを扱っているか」を監視・管理するために使います（セキュリティや監査の目的）。",
-    "Course11_Thu Nov 05 2026 09:00:00 GMT+0900 (日本標準時)_0": "一言で言うと、「開発チームの世界（Dev）」と「運用チームの世界（Ops）」をCMDB上で繋ぎ合わせるために使用します。\n1. アプリケーションの「部品（モジュール）」の単位での管理\n巨大な「ビジネスアプリケーション（例：勤怠システム）」全体ではなく、実際に開発が行われる単位である「部品（例：ログイン機能、決済機能、データベース処理など）」に細かく分割して管理するための器です。近年主流のマイクロサービス・アーキテクチャを管理する上で欠かせない要素です。\n\n2. 外部の開発ツール（Jira, GitHub, GitLabなど）との連携\nCMDB上のSDLCコンポーネントと、外部ツールのリポジトリ（ソースコードの保管場所）や開発プロジェクトを直接紐づけます。これにより、「このシステムのこの部品は、GitHubのどこで管理されているか」をServiceNow上で統合的に把握できるようになります。\n\n3. 障害発生時の原因追及とDevOpsの実現\n稼働中のシステムに障害（インシデント）が起きた際、SDLCコンポーネントのつながりをたどることで、「最近どの開発チームが、どんなコードの変更（コミット）を行ったか」を素早く特定できます。運用と開発の壁をなくし、迅速なトラブル解決（DevOps）を実現します。",
-    "Course11_Thu Nov 05 2026 09:00:00 GMT+0900 (日本標準時)_1": "一言で言うと「開発チーム（Dev）が実際にシステムを作り、外部と繋ぐプロセスを管理する領域」です。",
-    "Course11_Fri Nov 06 2026 09:00:00 GMT+0900 (日本標準時)_0": "ServiceNowのCSDM（共通サービスデータモデル）における中心的な概念のひとつで、一言で言うと「サーバーやデータベースなどのITインフラの上で、実際に稼働している『個別のシステム環境』」のことです。",
-    "Course11_Fri Nov 06 2026 09:00:00 GMT+0900 (日本標準時)_2": "ここでの「データモデル」とは、ServiceNowの裏側のデータベースにおける「テーブルやフィールドの枠組み（データの入れ物）」のことを指しています。\n\n【噛み砕いた説明】\n画像内の正解選択肢「データモデルのみ。UIや機能はAustralia+リリースで提供予定」という状態は、システム的に以下のような状況を意味しています。\n\n実装済みの「データモデル」とは\nCSDM 5で新しく追加された5つの「Service Instance（サービスインスタンス）」という概念データを保存するために、裏側のデータベースのテーブルや、CIクラスの定義そのものはすでにシステム上に作られている状態です。\n（例えるなら、「データを整理して入れるための新しい棚や箱」だけは先に用意された状態です）\n\n未提供の「UIや機能」とは\nしかし、その新しい棚にデータを簡単に入力するための「専用の入力フォーム」や、繋がりを視覚的に確認できる「マップ画面」、自動でデータを処理する「ワークフロー」など、ユーザーが画面上で便利に操作するための機能はまだ作られていない状態です。",
-    "Course11_Fri Nov 06 2026 09:00:00 GMT+0900 (日本標準時)_3": "一言で表すと、「社内のITエンジニアや運用チームを支えるための裏方サービス（Service）」と、「そのサービスの具体的な提供条件・メニュー（Offering）」という関係にあります。\n\n1. Technology Management Service（テクノロジー管理サービス）\nIT部門がビジネス部門（一般社員や顧客）ではなく、「社内のIT運用者や開発者向け」に提供する、技術的な土台となるサービスのことです。（※古いCSDMバージョンでは「Technical Service（テクニカルサービス）」と呼ばれていた概念に相当します）\n\n2. Technology Management Offering（テクノロジー管理オファリング）\n上記のサービスを、「具体的にどのような条件（SLA、サポート時間、コストなど）で提供するか」を定義したカタログメニューのことです。",
-    "Course11_Sat Nov 07 2026 09:00:00 GMT+0900 (日本標準時)_0": "ServiceNowのCSDM（Common Service Data Model）4.0における「Service Consumption（サービスの消費 / Consume）ドメイン」とは、一言で言うと「完成したITサービスを、社員や顧客などのエンドユーザーが『どのように見つけて、注文し、利用するか』という接点（フロントエンド）を管理する領域」です。",
-    "Course11_Sat Nov 07 2026 09:00:00 GMT+0900 (日本標準時)_1": "ServiceNowのシステム（CMDB）上では、様々なサービスが同じ系統のテーブル（cmdb_ci_service や service_offering など）で管理されます。\nそのため、「このレコードはどの種類のサービスなのか？」をシステム側が正しく識別・分類するためのラベル（属性）が必要になります。  \nこのラベルの役割を果たすのが Service Classification フィールドであり、デフォルトでは主に以下の3つの値が選択肢として用意されています。  \nBusiness Service（ビジネスサービス）： 顧客や一般社員など、ビジネスユーザー向けに提供されるサービスであることを示します。 \nTechnical Service（テクニカルサービス）： IT部門向けに提供される、サーバーやデータベースなどの裏方の技術管理サービスであることを示します。  \nApplication Service（アプリケーションサービス）： 実際にサーバー上にデプロイされ、稼働している個別のシステム環境（本番環境など）であることを示します。",
-    "Course11_Sat Nov 07 2026 09:00:00 GMT+0900 (日本標準時)_3": "Service Consumptionドメイン\n先ほど解説した通り、社員や顧客などのエンドユーザーが、ITサービスを「どのように見つけて、注文し、利用するか（消費するか）」を管理する領域です。\n\nService Builder（サービスビルダー）\n複雑なデータベース構造（CMDB）を意識することなく、ウィザード形式（対話型のステップ）に従って画面に入力していくだけで、標準化された「ビジネスサービス」や「サービスオファリング」を簡単に作成・公開できる機能です。\n\nService Portfolio Management（サービスポートフォリオ管理）\n企業が提供する様々なサービスを束ねてポートフォリオ（カタログのまとまり）として可視化し、サービスの利用状況、パフォーマンス、コストなどをビジネスの視点から総合的に管理・評価するための製品です。\n\nDiscovery / Service Mapping\nネットワークをスキャンしてインフラ機器を自動検出する機能（Discovery）と、それらの機器がシステムとしてどう繋がっているかを図示する機能（Service Mapping）。（※これらは主に「Manage Technical Services」ドメインで活躍します）\n\nCMDB Health Dashboard / Data Manager\nCMDB内のデータに重複や不足がないか（健全性）を監視するダッシュボードと、古くなったデータのアーカイブなどを自動化するポリシー管理機能。\n\nCI Class Manager\nCMDBにおけるクラス（サーバーやソフトウェアといったデータの種類）の階層構造や、属性ルールなどを一元管理するための設定画面。\n\nIRE (Identification and Reconciliation Engine / 識別および調整エンジン)\n複数のシステムからCMDBにデータを取り込む際、それが「既存のデータと同じ機器か、別の新しい機器か」を自動で判定（識別）し、「どのシステムのデータを最も信用して上書きするか」を制御（調整）する、ServiceNowの裏側の強力なコアエンジン。",
-    "Course11_Sun Nov 01 2026 09:00:00 GMT+0900 (日本標準時)_6": "インシデント（障害）は「実際に動いている実体」に対して発生するものであり、「概念・設計図」には発生しないため、選択肢Bが正解となります。\n\nそれぞれの選択肢の理由を噛み砕いて説明します。\n\nなぜBが正しいのか？（正解の理由）\nインシデント管理で対象（CI）として選ぶべきなのは、実際に停止したり、エラーを吐いたりする「運用中の実体（Operational CI）」です。\n\nApplication（Discoveryが検出したインストール済みコード）\nサーバー上に実際にインストールされて動いているソフトウェア（ApacheやTomcatなど）の実体です。プロセスが落ちるなどの障害が直接発生します。\n\nApplication Service（デプロイ済みインスタンス）\n「経費精算システム - 本番環境」のように、実際にデプロイ（配置）されて稼働しているシステム環境全体のことです。システムダウンなどの影響範囲を示す対象として最適です。",
-    "Course11_Sun Nov 08 2026 09:00:00 GMT+0900 (日本標準時)_3": "選択肢Dが正しい理由は、「論理的なサービスの依存」と「物理的なソフトウェアの稼働」の繋がりを、CSDMの標準ルール通りに正確に表現しているからです。\n具体的には、以下の2つの正しい関係性の組み合わせになっています。\n1. Application Service [Depends on（依存する）] Tomcat「アプリケーションサービス（稼働中のシステム環境）」は、それを動かすためのソフトウェア（Tomcat）に依存（Depends on）しています。サービス自体は論理的な概念であるため、ソフトウェアの上に直接「インストールされて動く（Runs on）」わけではありません。\n2. Tomcat [Runs on（上で稼働する）] Linux ServerソフトウェアであるTomcatは、土台となるOSやハードウェア（Linuxサーバー）にインストールされ、その上で稼働（Runs on）しています。これは物理的な実体同士の正しい関係です。\nこのように、「サービス（論理） $\\rightarrow$ ソフトウェア（実体） $\\rightarrow$ サーバー（物理基盤）」という上から下への階層を、適切な関係性の言葉（リレーションシップタイプ）で正しく繋いでいるのがDのみとなります。",
-    "Course12_Tue Dec 01 2026 09:00:00 GMT+0900 (日本標準時)_3": "信頼できるデータ\nCMDB（構成管理データベース）に登録されている、重複や古い情報がない「正確で最新のITインフラデータ」のことです。\n\n失敗変更（Failed Changes）\nIT運用において、システムの設定変更やバージョンアップを行った結果、予期せぬエラーが出たりシステムがダウンしてしまい、元の状態に戻さざるを得なくなるような「失敗した作業」のことです。\n\n【問題の意図】\n「正確なデータ（CMDB）を見ながらシステムの変更作業を行うと、失敗する確率が平均して何パーセント減るか？」を聞いています。",
-    "Course12_Tue Dec 01 2026 09:00:00 GMT+0900 (日本標準時)_1": "CSDM（共通サービスデータモデル）：\nServiceNow上で扱う様々なデータ（インフラ機器、業務システム、ITサービス、ビジネスの目的など）を、「どのテーブルに」「どういう関係性で」保存すべきかを定めた「ServiceNow共通の標準データ設計ルール」のことです。\n【正解の理由】\nCSDMの目的は、まさに「ServiceNowの全製品や開発パートナーが共通の言語として従うべき、データ設計（モデリング）の枠組みを提供すること」だからです。",
-    "Course12_Tue Dec 01 2026 09:00:00 GMT+0900 (日本標準時)_2": "CSDM 5（Yokohama+）：\nServiceNowのデータ設計ルール（CSDM）の最新のメジャーバージョンです。このバージョンから、システムを単に「設計・開発・運用」で分けるだけでなく、ビジネスの「アイデア出しから製品化まで（デジタル製品のライフサイクル全体）」を管理できるように大きく進化しました。\n\nFoundation（基盤）ドメイン」は、CSDMが誕生した初期（バージョン1.0や2.0の頃）からずっと存在し続けている、最も古く基本的な領域だからです。",
-    "Course12_Tue Dec 01 2026 09:00:00 GMT+0900 (日本標準時)_4": "Digital Value Network（デジタルバリューネットワーク）：\n会社の「アイデアや戦略」が、どのように「開発」され、最終的にどんな「サービス」としてユーザーに届き、会社に『価値（Value）』をもたらしているのか。そのデータの繋がり全体を網の目（ネットワーク）のように可視化した状態のことです。\n\n【正解の理由】\nServiceNowが公式に発表しているCSDM 5のプレゼンテーション資料やドキュメントにおいて、「Our “North Star” for CSDM 5+ is The Digital Value Network（我々のCSDM5以降の北極星は、デジタルバリューネットワークである）」と明確に宣言されているからです。",
-    "Course12_Tue Dec 01 2026 09:00:00 GMT+0900 (日本標準時)_7": "3 Pillar approach（3つの柱のアプローチ）：\nCMDBを成功に導くための基本戦略で、一般的に「Govern（統制）」「Populate（データ投入）」「Utilize / Use（活用）」の3つのフェーズ（柱）から成り立ちます。\n\nGovern（ガバン / ガバナンス）：\nシステムにデータを入れる前に、「誰がそのデータの責任者なのか？」「どうやってデータの正確さを維持するのか？」といったルールと管理体制（仕組み）を決めることを指します。\n\n【正解の理由】\nCMDBが「使えないゴミデータの山」になるのを防ぐための「人（チーム・ロール）」と「プロセス（監視やライフサイクルルールの徹底）」の確立について、最も正確に記述している。",
-    "Course12_Tue Dec 01 2026 09:00:00 GMT+0900 (日本標準時)_8": "テクニカルデット（技術的負債）：\n以前の問題でも解説しましたが、公式の標準ルール（CSDM）を無視して「とりあえず自分たちが使いやすいように」と独自のカスタマイズや間違った設計をしてしまった結果、後になって機能追加やバージョンアップができなくなり、修正に膨大なコストや手間（＝借金）がかかる状態のことです。\n\n【正解の理由】\n「指定された正しいテーブルを使わないこと」こそが、CSDMの根幹である「データの持ち方の標準化（モデリング）」に真っ向から違反する行為であり、将来的に最も深刻な技術的負債を生み出す典型例だからです。",
-    "Course12_Wed Dec 02 2026 09:00:00 GMT+0900 (日本標準時)_0": "Application（アプリケーション / cmdb_ci_appl）：\n日常会話の「スマホのアプリ」や「業務アプリ」といった広い意味ではなく、ServiceNowのCMDBにおいては「特定のサーバーにインストールされて、実際に裏側で動いているソフトウェア（プログラムの実体）」という、非常に物理的・技術的な意味を持ちます。\n\n【正解の理由】\nServiceNowのCMDBにおいて「Application（cmdb_ci_appl）」テーブルに入るのは、まさにTomcat、WebSphere、Oracle DBインスタンスのような「特定のサーバー上で実行されているソフトウェアコンポーネント（インストール済みコード）」だからです。したがって、正解は C となります。\n\n1. そもそも2つの言葉は何を指しているか？\n① Application Service（環境）＝「お店全体」\n\n例：「経費精算システムの本番環境」\n\n意味：ユーザーにサービスを提供している、システム全体の稼働環境です。\n\n② Application / cmdb_ci_appl（インストール済みコード）＝「お店の中で働く専用の機械」\n\n例：「Tomcat（Web処理エンジン）」「Oracle（データベースエンジン）」\n\n意味：サーバーという箱の中にインストールされて、実際にメモリ上で動いている「ソフトウェアの部品（ミドルウェア）」のことです。\n\n2. どう結びつくのか？（全体構成）\n「経費精算システムの本番環境（①）」は、魔法のように1つの塊で動いているわけではありません。裏側では、Web画面を表示する機械（Tomcat）や、データを保存する機械（Oracle）など、複数の「インストールされたコード（②）」が連携して動くことで、初めて1つの「環境」として成立しています。\n\nつまり、結びつきとしては「環境（全体）」は「インストールされたコード（部品）」に依存しているという関係になります。",
-    "Course12_Wed Dec 02 2026 09:00:00 GMT+0900 (日本標準時)_2": "Business Service（ビジネスサービス / cmdb_ci_service）：\nITの裏側の仕組み（サーバーやデータベースなど）ではなく、「経費精算サービス」や「PC貸与サービス」といった、一般の社員や顧客（コンシューマー）が実際に利用するサービスの枠組みのことです。\n\n【正解の理由】\nBusiness Serviceには「このサービスに手を加える時は、誰の許可が必要か」を設定する機能が備わっており、変更管理（Change）における承認ルートを決定するために使用されるからです。",
-    "Course12_Wed Dec 02 2026 09:00:00 GMT+0900 (日本標準時)_3": "Technology Management Service（cmdb_ci_service_technical）：\n以前のCSDMバージョンでは「Technical Service（テクニカルサービス）」と呼ばれていたものです。「サーバーホスティング」や「データベース管理」など、一般のユーザーではなく、IT部門がシステムの裏側を支えるために提供する技術的なサービスのことです。\n\nディベロッパーフォーカス：\nソースコードを書く「開発者」の視点です。主に「Build（構築）」ドメインのSDLCコンポーネントなどで重視されます。\n\n【正解の理由】\nTechnology Management Serviceは、IT部門がビジネスを裏から支えるための技術（サーバーやネットワーク等）を「プロバイダー（提供者）としての責任を持って提供・管理するための枠組み」だからです。",
-    "Course12_Wed Dec 02 2026 09:00:00 GMT+0900 (日本標準時)_4": "Application Service（cmdb_ci_service_auto）：\nこれまでの問題でも登場した、「経費精算システムの本番環境」といった稼働中のシステム実体のことです。\n\nService Instance（サービスインスタンス）：\nCSDM 5から新しく提唱された概念です。Application Serviceだけでなく、他の様々な実体も包括して管理しようとする「新しい上位の枠組み」のことです。\n\nAustralia（オーストラリア）リリース：\nServiceNowのバージョン名です（Utah、Vancouver、Washington、Xanadu、Yokohama、Zurichとアルファベット順に進み、Zの次はAに戻って「Australia」となる予定の、将来のメジャーリリースのことです）。\n\n【正解の理由】\nCSDM 5は「概念（設計図）」としてはYokohamaリリース等のタイミングで発表されましたが、実際のシステム画面（UI）の作り込みはまだ現在進行形であり、将来のリリースに向けたロードマップとして予定されている段階だからです。",
-    "Course12_Thu Dec 03 2026 09:00:00 GMT+0900 (日本標準時)_0": "Foundation Domain（基盤ドメイン）：\n「ユーザー」「グループ」「部署」「会社」「場所（ロケーション）」など、ServiceNowを使う上で必ず最初に登録しておくべき、全体共通のマスターデータ（基本データ）を管理する領域です。\n\nCMDBリレーションシップ：\n「サーバーAが動いているから、システムBが使える」といった、IT機器同士の複雑な依存関係を表現するための、CMDB特有の「線を結ぶ機能（cmdb_rel_ciテーブル）」のことです。\n\n【正解の理由】\nFoundationデータ（人、組織、場所など）は、あくまで他のシステムや機器のデータから「参照」されるための基本データであり、CIではないためCMDBリレーションシップを使用しないからです。",
-    "Course12_Thu Dec 03 2026 09:00:00 GMT+0900 (日本標準時)_4": "【正解の理由】\nBの製品群（ITSM, GRC, CSM）は、Foundationドメインのマスターデータ（ユーザー、グループ、会社、部署など）が整備されていないと、業務プロセスとして全く機能しない（最も強く依存している）代表的な製品だからです。",
-    "Course12_Fri Dec 04 2026 09:00:00 GMT+0900 (日本標準時)_0": "Ideation & Strategy Domain（アイデア出し・戦略ドメイン）：\nシステムを作るよりずっと前の段階。「会社としてどんなビジネスをやりたいか」「どこにIT予算を投資するか」という経営層のアイデアや戦略を管理する、CSDMで最も上位の領域です。\n\nStrategic Plan（戦略計画）：\n企業や事業部が「自分たちは何のために存在し、どこを目指すのか」を言語化した、すべてのビジネス活動やIT投資の「原点」となる計画のことです。\n\n【正解の理由】\nStrategic Plan（戦略計画）の目的は、システムの要件やスケジュールを決めることではなく、会社や組織が目指すべき究極の姿（企業理念と方向性）を定義することだからです。",
-    "Course12_Fri Dec 04 2026 09:00:00 GMT+0900 (日本標準時)_1": "Information Object（情報オブジェクト / cmdb_ci_information_object）：\nシステムが扱う「データそのもの」のことではなく、「どんな種類のデータ（個人情報、クレジットカード情報、社外秘データなど）を扱っているか」を分類するためのラベル（論理的な概念）のことです。\n\n【正解の理由】\nInformation Objectの最大の存在意義は、「どのビジネスアプリケーションが、法律で保護すべき機密データ（個人情報など）を扱っているか」を明らかにし、会社のガバナンス（統制）を効かせることだからです。",
-    "Course12_Fri Dec 04 2026 09:00:00 GMT+0900 (日本標準時)_2": "Build & Integrate（構築・統合）ドメイン：\n設計図（Design）をもとに、実際にプログラマーが書いた「ソースコード」や、組み合わせる「ソフトウェアの部品（SBOMなど）」を管理する、開発領域のことです。\n\nAI Digital Assets（AIデジタルアセット）：\nシステムに組み込まれるAIモデルや、生成AIを動かすためのプロンプトのコードなど、AIに関連する「IT資産（データ・プログラム）」のことです。\n\n【正解の理由】\nBuild & Integrateドメインの役割は「ソフトウェアの部品（ソースコードやバイナリ）」を管理することであり、AIモデルや生成AIのアルゴリズムも、従来のソフトウェアと同じように「開発部品（コンポーネント）」としてこのドメインで管理されるべきだからです。",
-    "Course12_Fri Dec 04 2026 09:00:00 GMT+0900 (日本標準時)_3": "Ideation & Strategy（アイデア出し・戦略）ドメイン：\n「会社としてどんなビジネスをやりたいか」「どこにIT予算を投資するか」という経営層のアイデアや戦略を管理する、一番最初の領域です。\n\nDesign & Planning（設計・計画）ドメイン：\n戦略に基づいて「自社のどの業務能力（ケイパビリティ）を強化するか」「どのシステム（ビジネスアプリケーション）を導入・統廃合するか」という全体設計図を作る領域です。\n\nStrategic Portfolio Management (SPM) ・ Enterprise Architecture (EA / 旧APM)：\nSPMは会社の「予算、プロジェクト、戦略の進捗」を管理する製品です。EA（エンタープライズアーキテクチャ：旧称APM）は、「会社が保有する全システム（アプリ）の価値やコストを評価・整理する」ための製品です。\n\n【正解の理由】\n会社の「戦略（予算やプロジェクト）」と「設計図（どのシステムに投資するか）」は表裏一体であり、それを管理するSPMとEA（APM）こそが、この2つの上流ドメインをまたいで利用される中核製品だからです。",
-    "Course12_Sat Dec 05 2026 09:00:00 GMT+0900 (日本標準時)_1": "AI Functionとは「面倒な機械のお世話はすべてGoogleやAmazonなどの専門業者に丸投げして、美味しいところ（AIの機能）だけをインターネット越しに使う」ための分類です。\n\n先ほどの難しい言葉を、3つのポイントに分けて「例え話」で翻訳してみます。\n\n1. 「インフラの保守管理をパブリッククラウド側に任せ」とは？\n＝ サーバーという「機械のお世話」を丸投げすること\n\n自社でAIを動かそうとすると、超高性能なパソコン（サーバー）を買ってきて、熱を持たないように部屋を冷やし、壊れたら部品を交換し…といった「機械のお世話」がとても大変です。\nAI Functionは、この面倒な作業をすべてAWS（Amazon）やGoogleなどの業者に任せてしまう状態を指します。「自分たちでキッチンを作らずに、UberEatsで料理だけ配達してもらう」ようなイメージです。\n\n2. 「スケーラブル（規模を柔軟に変更可能）」とは？\n＝ 必要な時に、必要な分だけパワーを引き出せること\n\nたとえば「普段は1日10回しかAIを使わないけど、キャンペーンの時だけ1日1万回使いたい」という場合、自社の機械だとパンクしてしまいます。\nしかしAI Function（外部サービス）なら、向こうの業者が勝手にパワーを調整してくれるので、「使った分だけお金を払えば、絶対にパンクしない（いつでも巨大なパワーを借りられる）」という特徴があります。\n\n3. だから、ServiceNow（CSDM）はわざわざ分類を作った！\n会社の中で色々なAIを使い始めると、IT部門は以下のように混乱してしまいます。\n\nIT部門Aさん：「今度うちの会社で使うこのAIシステム、裏側のサーバーが壊れないか毎日監視しないとダメかな？」\n\nIT部門Bさん：「いや、これは AI Function（外部のクラウドサービスを借りてるだけ） に分類されているから、機械の故障はGoogle側が対応してくれるよ。僕らはサーバーの監視をしなくていいんだ！」\n\nこのように、「これは自分たちで機械の面倒を見なきゃいけないAI（AI Application）」なのか、「外部の業者に丸投げしている便利なAI（AI Function）」なのかをパッと見で区別するために、わざわざ「AI Function」という専用の名前（クラス）が作られたのです。",
-    "Course12_Sat Dec 05 2026 09:00:00 GMT+0900 (日本標準時)_0": "問題文の意図と、登場する用語の噛み砕いた意味\nこの問題は、ServiceNowのCSDMにおける最新のAIガバナンスにおいて、「AI Function（AI機能）」という言葉が、どのような形態のAIシステムを指しているかを正しく区別できるかを問うものです。\n\nAI Function（AI機能）：\n自社のサーバーにわざわざシステムをインストールしなくても、インターネット経由で手軽に呼び出して使える「クラウド上の便利なAIサービス（SaaS/PaaS）」のことです。例えば、OpenAIのAPIや、AWS・Google Cloudが提供している画像認識APIなどがこれに該当します。\n\n【正解の理由】\nCSDMにおいて「AI Function」というクラスは、まさにインフラの保守管理をパブリッククラウド側に任せ、スケーラブル（規模を柔軟に変更可能）に利用できるAIサービス（SaaS/PaaS）を表現するために作られた専用の定義だからです。",
-    "Course12_Sat Dec 05 2026 09:00:00 GMT+0900 (日本標準時)_2": "API Insights（APIインサイト）：\nServiceNowが提供している、社内に散らばるAPIを一覧化し、エラーや重複がないかをダッシュボードで一元管理するための専用機能です。\n\n【正解の理由】\n現代のIT環境において、APIはシステム障害の大きな原因になり得ます。そのためServiceNowは、APIを単なるプログラムの一部ではなく、CMDB内の独立した重要な構成要素（CI）として扱い、専用ツールで集中管理する仕組みを提供しているからです。",
-    "Course12_Sat Dec 05 2026 09:00:00 GMT+0900 (日本標準時)_3": "Service Consumption（サービス消費）ドメイン：\n裏側のIT機器の話ではなく、「経費精算サービス」や「リモートワーク支援サービス」など、一般社員や顧客が実際に利用（消費）するサービスの枠組みを管理する領域です。\n\nBCM（Business Continuity Management / 事業継続管理）：\n地震、火災、サイバー攻撃などの大災害が起きたときに、「会社のどの業務を最優先で復旧させるべきか」という計画（BCP）を立て、実行するためのServiceNow製品です。\n\n【正解の理由】\n災害時に「サーバーAとサーバーB、どちらを先に直すか」を決めるためには、「サーバーAが止まると、顧客向けの『重要サービス（Service Consumption）』が止まってしまうから最優先で直そう」という判断が必要不可欠だからです。",
-    "Course12_Sun Dec 06 2026 09:00:00 GMT+0900 (日本標準時)_0": "この問題は、会社の予算やプロジェクトを管理するSPMという製品において、「Lenses（レンズ）機能」として用意されている『データを分析・管理するための切り口（視点）』はどれか？を正しく理解しているかを問うものです。\n\nSPM（Strategic Portfolio Management）：\n会社が「どのプロジェクトにいくらお金と人を投資するか」という経営戦略を練り、実行状況を管理するための製品です。（前回の問題で登場したIdeation & Strategyドメインの中核製品です）\n\nLenses（レンズ）機能：\nカメラやメガネのレンズと同じように、「どの角度（視点）からプロジェクトや予算を見るか」を切り替える機能のことです。たとえば「部署ごと（Organization）」に見るレンズ、「製品ごと（Product）」に見るレンズなど、見たい角度に合わせてデータをグループ化してくれます。\n\nValue Stream・Product・Organization・Goals・Project Portfolio・Project Program・Strategic Investments：\n「価値の流れ」「製品」「組織」「目標」「投資枠」といった、経営層がビジネスや予算を評価する際の「切り口（視点・枠組み）」のグループです。",
-    "Course12_Sun Dec 06 2026 09:00:00 GMT+0900 (日本標準時)_1": "この問題は、CSDM（共通サービスデータモデル）を自社に導入する際の進め方の一つである「Outcome Centric（成果中心）アプローチ」の『弱点（デメリット）』を正しく理解しているかを問うものです。\n\nOutcome Centric（成果中心）アプローチ：\n「まずは全社のシステム構成図を完璧に作ろう！」とするのではなく、「『障害復旧の時間を半分にする』といった特定の目標（成果＝アウトカム）を達成するために必要なデータ『だけ』を、つまみ食いして登録しよう！」という進め方のことです。\n\n正解の理由】\n特定の目標（例：セキュリティ監査を通すこと）に必要なデータだけをピンポイントで集めるため、いざ別の目標（例：ITコストの削減）をやろうとした時に、「せっかく集めたデータが別の部署では全く使い物にならない（データの孤島化）」という副作用が起きやすいからです。",
-    "Course12_Sun Dec 06 2026 09:00:00 GMT+0900 (日本標準時)_2": "この問題は、CSDMを自社に導入する際の最も王道な進め方である「Step Wise（段階的）アプローチ」の『強み（メリット）』を正しく理解しているかを問うものです。\n\nStep Wise（ステップワイズ）アプローチ：\nServiceNowが公式に推奨している、基礎から順番にシステムを構築していく王道のアプローチです。赤ちゃんの成長に例えて、「Crawl（這う） → Walk（歩く） → Run（走る） → Fly（飛ぶ）」という順番で、少しずつ高度なデータ管理へとステップアップしていく手法です。\n\nEA（Enterprise Architecture）チーム：\n会社全体のシステムの設計図（どの業務にどのシステムを使うか）を描く、上流工程（Design & Planning）の専門チームのことです。\n\n【正解の理由】\nStep Wise（Crawl, Walk...）アプローチの最大の目的は、「手抜きをせずに最初にユーザーや場所などのマスターデータ（Foundation）を完璧にし、設計（EA）と運用（現場）のデータを最初から正しく結びつけること」だからです。",
-    "Course12_Sun Dec 06 2026 09:00:00 GMT+0900 (日本標準時)_3": "この問題は、これまでのCSDM 4.0から最新の「CSDM 5」へバージョンアップする際、システム内部でどのような「具体的な仕様変更」が行われるのかを正しく把握しているかを問うものです。\n\nベースクラス（Base Class）の変更：\nServiceNowのデータベース（CMDB）は、親から子へ特徴を受け継ぐ「階層構造（ツリー構造）」になっています。ベースクラスの変更とは、あるデータの「親（所属するグループの根本）」を別のものに付け替える（お引越しする）という、システム裏側の構造変更のことです。\n\n【正解の理由】\nCSDM 5への移行は、これまでの資産（データ）を維持したまま新しい概念を取り入れるための「進化」であり、既存のシステムに影響を与えずに実行できるこの2つのアップデートこそが、アーキテクチャ上の主要な変更点として定義されているからです。",
-    "Course12_Sun Dec 06 2026 09:00:00 GMT+0900 (日本標準時)_4": "CSDM Bingo（CSDMビンゴ）：\nServiceNow界隈で使われる「失敗の比喩表現」です。CSDMの全体図をビンゴカードに見立て、「この箱（テーブル）にデータを入れたぞ！次はこの箱だ！」と、ただデータを埋めてマスを開けること自体が目的になってしまい、ビジネス的な価値（成果）が置き去りになっている状態を指します。\n\n【正解の理由】\nStep Wiseアプローチは基礎から順に箱を埋めていくため、「基礎の箱埋め作業（CrawlやWalk）に必死になりすぎて、成果が出る（Fly）前に疲弊し、単なるビンゴゲーム化してしまうリスク」が最も高いからです。",
-    "Course12_Sun Dec 06 2026 09:00:00 GMT+0900 (日本標準時)_5": "4つのデジタル製品ポートフォリオ：\nIT部門が扱うシステムやサービスを、「①企画・設計」「②製造・デリバリー」「③内部向け提供」「④外部向け提供」の4つの切り口に分けた枠組みのことです。\n\nManufacture & Delivery（製造・デリバリー）：\nプログラマーや開発チームが、ソースコードを書いてテストし、サーバーに自動配置（デプロイ）するための「工場（ツールチェーンや自動化パイプライン）」にあたる領域です。\n\n【正解の理由】\n「製造・デリバリー（Manufacture & Delivery）」ポートフォリオの最大の目的は、開発チームのツールを連携させてソフトウェアを自動でデプロイすることであり、その製造ラインから生み出される最終的な成果物（実体）こそが「Service Instance」だからです。",
-    "Course12_Mon Dec 07 2026 09:00:00 GMT+0900 (日本標準時)_0": "3 Pillar approach（3つの柱のアプローチ）：\n正確なデータベースを作り、活用するための3つのステップです。\n\nIngest（取り込み）： データを集めてCMDBに入れる段階。\n\nInsight（洞察）： チームを確立し、集まったデータが綺麗か（ヘルス）を監視・整理する段階。\n\nGovern（統制・活用）： 綺麗になったデータを使って、実際の業務（障害対応など）を正しく回すための段階。\n\n【正解の理由】\nDの「ガバナンス（ルール決めや監視体制の構築）」は、データをただ取り込むための作業ではなく、取り込んだ後のデータの健全性を評価し、管理・維持するための「Insight（洞察）」フェーズに属する役割だからです。",
-    "Course12_Mon Dec 07 2026 09:00:00 GMT+0900 (日本標準時)_1": "Service Graph Connector（SGC）：\nServiceNowと各メーカー（Microsoftなど）が共同で開発・テストした、「公式のデータお引越しツール（連携プラグイン）」のことです。\n\nIRE（識別・照合エンジン / Identification and Reconciliation Engine）：\nCMDB内に「同じサーバーが2つ登録されてしまう」といったデータの重複を防ぐための、強力な裏側エンジンのことです。\n\nMultisource CMDB（マルチソースCMDB）：\n「サーバーのOS情報はAWSから取得し、CPUの情報はSCCMから取得する」といったように、複数の外部ツールから別々にデータを集めてきても、どれが一番信用できるデータかを裏側で記録・整理してくれる機能のことです。\n\n【正解の理由】\nService Graph Connectorの最大の存在意義は、「誰が設定しても、必ず重複防止エンジン（IRE）を通り、必ず正しいテーブル（CSDMアライン）にデータが入るように、最初からServiceNowのお墨付きで設計されていること」だからです。",
-    "Course12_Mon Dec 07 2026 09:00:00 GMT+0900 (日本標準時)_2": "Service Graph（サービスグラフ）：\n従来のCMDB（主にサーバーなどの物理機器を管理する箱）を進化させ、ITのすべてを繋げて管理するための次世代のデータ基盤のことです。公式では、このService Graphの特徴を以下の3つの「C・C・I」で定義しています。\n\nComprehensive（包括的・広範囲）\n\nConnected（接続されている）\n\nIntegrated（統合されている）\n\n【正解の理由】\n「Comprehensive」という英単語自体が「総合的・包括的・幅広い」という意味を持っており、「昔のCMDB（インフラ中心）の枠を超えて、IT資産全体を幅広くカバーしている」という進化の規模感を表現しているからです。",
-    "Course12_Mon Dec 07 2026 09:00:00 GMT+0900 (日本標準時)_3": "この問題は、ServiceNowのCMDB/CSDMを構築・運用するための「3つの柱（3 Pillar）のアプローチ」において、最後のフェーズである『Govern（ガバン/統制）』がどのような役割を担っているかを正しく理解しているかを問うものです。\n\nこの資料における「3つの柱」は以下の順序で定義されています。\n\nIngest（取り込み）： データを集めてCMDBに入れる段階。\n\nInsight（洞察）： チームを確立し、集まったデータが綺麗か（ヘルス）を監視・整理する段階。\n\nGovern（統制・活用）： 綺麗になったデータを使って、実際の業務（障害対応など）を正しく回すための段階。\n\n【正解の理由】\nこのアプローチにおける「Govern（ガバン）」とは、データを集めることでも綺麗にすることでもなく、「信頼できるデータを使って、インシデント管理や変更管理といったITプロセスに『ガバナンス（統制）』を効かせ、正しい経営判断（レポート・計画）を行うこと」だからです。",
     "令和2年_令和2年_0": "CSMA/CDってそもそも何?\n\n一言でいうと:「みんなで1本の道(ケーブル)を使う時のマナー」のことです。\n\n身近な例で考える\n\nトランシーバーでの会話をイメージしてください。\n\n話す前に「今、誰か喋ってないかな?」と耳を澄ませる → これがキャリア検知\n誰も喋ってなければ「よし、今なら話せる」と喋り始める → これがマルチプルアクセス(みんな自由に使える)\nでも、たまたま同じタイミングで2人が同時に喋り出しちゃった → これが衝突(コリジョン)\n「あ、声がかぶった!」と気づいたら、いったん喋るのをやめて、ちょっと時間を置いてからもう一度喋り直す → これが衝突検出+再送\n\nこの4つの動きをまとめて CSMA/CD と呼びます。\n\nなぜこの説明が「正解」なのか\n\n問題の選択肢の中で、上の4ステップ(聞く→話す→ぶつかったら気づく→やり直す)をそのまま文章にしたものが正解の記述だからです。イーサネット(会社のLANケーブルとか)は、まさにこの「トランシーバー方式」で通信しています。",
-    "Course1_Thu Jan 01 2026 09:00:00 GMT+0900 (日本標準時)_2": "Ongoing IT efforts（継続的なITへの取り組み）とは、単なる「日々の運用」を超えて、プラットフォームを通じてITサービスの価値を最大化し、改善し続ける活動全般を指します。",
     "令和2年_令和2年_3": "大前提:MACアドレスとIPアドレスの役割の違い\nIPアドレス:最終的な目的地(ホストB)を表す、いわば「最終目的地の住所」。通信の間ずっと変わらない\nMACアドレス:今から1区間だけデータを渡す相手を表す、いわば「次の中継地点の名前」。区間ごとに書き換わる\n宅配便でたとえると\n\nホストAからホストBへ荷物を送る時、AとBが**別のLAN(別の地域)にいる場合、荷物は必ずルータ(配送センター)**を経由します。\n\n荷物の送り状(伝票)には、最初から最後まで「届け先:ホストB」と書かれたまま変わりません → これがIPデータグラムの宛先=IP3(ホストB)\nでも、LAN1区間では、荷物はまず最寄りの配送センター(ルータ)に届ける必要があります → これがイーサネットフレームの宛先=MAC2(ルータのインタフェース)\n\nつまり、「送り状の届け先」と「今すぐ渡す相手」は別物という点がポイントです。\n\nなぜAやC・Dが違うのか\n選択肢\t誤りのポイント\nA(MAC2, IP2)\tIPデータグラムの宛先がルータのIP(IP2)になっている → 送り状の届け先が「配送センター」になってしまい、最終目的地(ホストB)に届かなくなる\nC(MAC3, IP2)\tMAC3(ホストB本人のMACアドレス)を直接指定 → 同じLAN内にいない相手のMACアドレスは、通常直接わからない/使えない\nD(MAC3, IP3)\tCと同様、LAN1にいないホストBのMACアドレスをそのまま使ってしまっている\n覚え方のキーワード\nIPアドレスは\"旅の目的地\"、MACアドレスは\"次の一歩\"\n別LAN宛の通信では、イーサネットフレームの宛先は常にルータ(デフォルトゲートウェイ)のMACアドレスになる\nIPデータグラムの宛先は、ルータを経由しても最後まで変化しない(ホストBのIPのまま)",
     "令和2年_令和2年_4": "一言でいうと\n\nSNMP = ネットワーク機器の「健康診断＆遠隔監視」をするための仕組みです。\n\nイメージで理解する\n\n会社に何十台ものルータやスイッチ、サーバーがあるとします。管理者が1台1台に足を運んで「動いてる?」「調子どう?」と確認するのは大変です。\n\n**SNMP(Simple Network Management Protocol)**を使うと、管理者のPC(マネージャ)から、離れた場所にある機器(エージェント)に対して、\n\n「CPU使用率は?」\n「ポートは正常に動いてる?」\n「障害は起きてない?」\n\nといった情報を自動的に収集したり、逆に機器側から「異常が起きました!」と**通知(トラップ)**を受け取ったりできます。まさに「構成機器や障害時の情報収集」そのものの役割です。",
     "令和5年B_第3問（令和5年 問4）_0": "論理型の解説\nこの関数は、「指定された値を配列の適切な場所に保存し、成功したか失敗したかを返す」という役割を持っています。特に重要なのは、「最初に計算した場所がすでに使われていた場合（衝突）のバックアッププラン」が組み込まれている点です。\n\nプログラムの各行がどのような意味を持っているのか、順を追って翻訳・解説します。\n\n関数の定義\nPlaintext\n○論理型: add(整数型: value)\n意味: add という名前の関数を定義しています。引数（受け取るデータ）として整数の value を受け取ります。\n\n論理型: この関数は、最終的に「処理が成功したか（true）」、「失敗したか（false）」のどちらかを返す（出力する）ことを意味しています。\n\n1回目の保存チャレンジ\nPlaintext\n  整数型: i ← calcHash1(value)\n  if (hashArray[i] = −1)\n    hashArray[i] ← value\n    return true\n意味:\n\nまず、1つ目の計算式である calcHash1 に value を渡し、保存すべき場所（要素番号 i）を計算させます。\n\nif (hashArray[i] = -1)：配列のその場所が -1（空き部屋）かどうかを確認します。\n\n空いていれば、その場所に value を格納（保存）します。\n\n無事に保存できたので、true（成功）を返して、この関数の処理を終了します。\n\n2回目の保存チャレンジ（1回目が失敗した場合）\nPlaintext\n  else\n    i ← calcHash2(value)\n    if (hashArray[i] = −1)\n      hashArray[i] ← value\n      return true\n    endif\n  endif\n意味:\n\nelse：もし1回目の場所が -1 ではなかった（すでに別のデータが入ってしまっていた＝衝突）場合の処理です。\n\n今度はバックアッププランである2つ目の計算式 calcHash2 に value を渡し、別の場所（新しい要素番号 i）を計算させます。\n\nif (hashArray[i] = -1)：新しく計算した場所が -1（空き部屋）かどうかを再度確認します。\n\n空いていれば、その場所に value を格納し、true（成功）を返して終了します。\n\n両方失敗した場合の処理\nPlaintext\n  return false\n意味:\n1回目（calcHash1）の場所も、2回目（calcHash2）の場所も、両方ともすでに埋まっていた場合にここへ到達します。\nこれ以上探す手段がないため、保存を諦めて false（失敗）を返し、処理を終了します。\n\nプロとしての補足ポイント\n実際のシステム開発における「ハッシュ関数」の衝突回避（オープンアドレス法など）では、空きが見つかるまで3回、4回とループ処理を使って探し続けることが多いです。\nしかし、この基本情報技術者試験のプログラムはアルゴリズムをシンプルに問うため、「再チャレンジは1回（calcHash2）のみ。それでもダメなら潔く諦める（return false）」という割り切った仕様で実装されています。",
