@@ -1084,20 +1084,6 @@ function saveHistory(lid, qkey) {
   });
   save();
 
-  // スプレッドシートに送信
-  const records = [];
-  qs.scores.forEach((score, qi) => {
-    records.push({
-      date: dateStr,
-      category: lesson.category || 'ServiceNow CIS-DF',
-      course: lesson.course,
-      lesson: lesson.lesson,
-      qno: `Q${qi+1}`,
-      result: score === 1 ? '正解' : '不正解'
-    });
-  });
-  sendToSheet('saveHistory', { records });
-
   renderContent();
   showToast('📊 履歴を保存しました');
 }
@@ -1338,24 +1324,6 @@ function saveCommentFixed(course, lesson, qi, text) {
   const key = course + '_' + lesson + '_' + qi;
   state.comments[key] = text;
   save();
-
-  // スプレッドシートに送信（デバウンス）
-  clearTimeout(window._memoTimer);
-  window._memoTimer = setTimeout(() => {
-    const now = new Date();
-    const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    // カテゴリを取得
-    const lesson_obj = state.lessons.find(l => l.course === course && l.lesson === lesson);
-    const category = lesson_obj ? (lesson_obj.category || 'ServiceNow CIS-DF') : 'ServiceNow CIS-DF';
-    sendToSheet('saveMemo', {
-      category,
-      course,
-      lesson,
-      qno: `Q${parseInt(qi)+1}`,
-      text,
-      date: dateStr
-    });
-  }, 1500);
 }
 
 function getComment(lid, qi) {
