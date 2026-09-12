@@ -305,8 +305,10 @@ function load() {
   renderHomeScreen();
 
   // GitHub管理のJSON(data/lessons.json)から問題データ・メモを読み込み
-  // ※スプレッドシート(GAS)連携は廃止済み
+  // ※スプレッドシート(GAS)連携は廃止済み。2026-09-12、書き込みのみGAS中継経由で復活
+  //   (読み込みは従来通りGitHub Pages上の静的JSONを直接fetch。gas/README.md参照)
   loadLessonsFromGithub();
+  loadHistoryFromGithub();
 }
 
 // ── Mode ───────────────────────────────────────────────
@@ -1069,8 +1071,8 @@ function saveHistory(lid, qkey) {
   const now = new Date();
   const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-  // localStorageの履歴に追加
-  state.history.unshift({
+  const record = {
+    id: `${now.getTime()}_${Math.random().toString(36).slice(2,7)}`, // 端末間の履歴同期(data/history.json)での重複排除キー
     lessonId: lid,
     category: lesson.category || 'ServiceNow CIS-DF',
     course: lesson.course,
@@ -1081,11 +1083,18 @@ function saveHistory(lid, qkey) {
     date: dateStr,
     wrongs: errArr,
     scores: qs.scores.slice() // 各問題の正解(1)/不正解(0)/未回答(null)を○×表示用に保持
-  });
+  };
+
+  // localStorageの履歴に追加
+  state.history.unshift(record);
   save();
 
   renderContent();
   showToast('📊 履歴を保存しました');
+
+  // GitHub(data/history.json)へも保存し、端末間で共有する(2026-09-12、GAS中継経由で復活。
+  // 通信は非同期・失敗してもローカル表示はブロックしない。詳細はgas/README.md参照)
+  syncToRepo('saveHistory', { record });
 }
 
 
@@ -1324,6 +1333,13 @@ function saveCommentFixed(course, lesson, qi, text) {
   const key = course + '_' + lesson + '_' + qi;
   state.comments[key] = text;
   save();
+
+  // GitHub(data/lessons.jsonのcomments)へも保存し、端末間で共有する(デバウンス。
+  // 2026-09-12、GAS中継経由で復活。詳細はgas/README.md参照)
+  clearTimeout(window._memoSyncTimer);
+  window._memoSyncTimer = setTimeout(() => {
+    syncToRepo('saveMemo', { key, text });
+  }, 1500);
 }
 
 function getComment(lid, qi) {
@@ -1439,6 +1455,56 @@ async function loadLessonsFromGithub() {
         renderContent();
       }
     }
+  }
+}
+
+// data/history.json(GitHub管理)から履歴を読み込み、ローカルに無い分だけ追加する。
+// id(saveHistory側で発行)で重複排除し、他端末で追加された履歴だけを取り込む。
+// 読み込みはlessons.json同様、GitHub Pagesの静的JSONを直接fetchするだけ(認証不要)。
+// 書き込み(GAS中継)とあわせて2026-09-12追加。詳細はgas/README.md参照。
+async function loadHistoryFromGithub() {
+  try {
+    const res = await fetch('data/history.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const remoteHistory = json.history || [];
+    if (remoteHistory.length === 0) return;
+
+    const existingIds = new Set(state.history.map(r => r.id).filter(Boolean));
+    let added = 0;
+    remoteHistory.forEach(r => {
+      if (r.id && !existingIds.has(r.id)) {
+        state.history.push(r);
+        added++;
+      }
+    });
+    if (added > 0) {
+      state.history.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      save();
+      if (state.mode === 'history') renderContent();
+    }
+  } catch (err) {
+    console.error('履歴データ読込エラー(GitHub JSON):', err);
+    // 取得に失敗した場合はlocalStorageの履歴をそのまま使用(特に何もしない)
+  }
+}
+
+// GitHub同期リレー(GAS Web App)経由で履歴・メモをリポジトリ側へ書き込む。
+// 書き込み権限(GitHub PAT)はGAS側(サーバー)にのみ置き、ブラウザには一切持たせない
+// (2026-09-12、ユーザー指示によりGAS構成を復活。旧GAS連携(スプレッドシート向け、
+// commit e9ab15cで撤去)とは別物で、今回はGitHubのdata/配下JSONへの書き込み専用)。
+// GAS_URLが未設定の間はローカル保存のみで動作する(何もせず正常終了)。
+// 失敗してもローカルの保存・表示はブロックしない(非同期・失敗時はconsole.warnのみ)。
+const GAS_URL = ''; // デプロイ後、発行されたWebアプリURLをここに設定する(gas/README.md参照)
+
+async function syncToRepo(action, payload) {
+  if (!GAS_URL) return;
+  try {
+    const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action, ...payload }) });
+    const json = await res.json();
+    if (json.status !== 'ok') console.warn('GitHub同期エラー:', json.message);
+  } catch (err) {
+    console.warn('GitHub同期エラー(通信失敗):', err);
   }
 }
 
