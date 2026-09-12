@@ -165,10 +165,48 @@ textarea.tinput{min-height:180px;}
 .err-section{background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--yellow);}
 
 /* Responsive */
+/* 携帯幅では、ヘッダーのタブ行・サイドバーを常時表示ではなく「押したときだけ表示」に
+   切り替える(ハンバーガーメニュー化)。2026-09-12、ユーザー指示「携帯の画面で開くと
+   レイアウト構成が壊れる。各メニュー部分はプルダウンや、押したときだけ表示にすべて修正しろ」 */
+.menu-toggle{display:none;background:#21262d;border:1px solid #30363d;color:#e6edf3;border-radius:var(--r);padding:6px 10px;cursor:pointer;font-size:14px;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;flex-shrink:0;}
+.menu-toggle:hover{background:var(--border);}
+.sidebar-backdrop{display:none;}
 @media(max-width:640px){
   .layout{grid-template-columns:1fr;}
-  .side{position:relative;top:0;max-height:none;border-right:none;border-bottom:1px solid var(--border);}
   .content{max-height:none;}
+
+  /* ハンバーガーボタン自体は携帯幅でのみ表示する(PC幅ではdisplay:noneのまま) */
+  .menu-toggle{display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;}
+
+  /* ヘッダー本体が375px幅等で収まるよう、ロゴ文字を隠し・カテゴリselectを可変幅にする
+     (ハンバーガーボタン追加でヘッダーが右側にはみ出し、hdr-left側が画面外に押し出されて
+     見えなくなる不具合があったための対応) */
+  .logo{display:none;}
+  .hdr-center{flex:1;min-width:0;}
+  .category-select{min-width:0;width:100%;max-width:none;}
+  .home-btn{padding:6px 8px;font-size:12px;}
+
+  /* ヘッダータブ(要約/問題/復習/苦手問題/履歴): 既定は非表示、ハンバーガーボタンで
+     プルダウン表示に切り替える。JS側のinline style(display:none/flex、画面切替用)より
+     優先させるため!importantを使う */
+  .hdr-tabs{display:none !important;}
+  .hdr-tabs.mobile-open{
+    display:flex !important;flex-direction:column;gap:2px;
+    position:absolute;top:56px;left:0;right:0;
+    background:var(--hdr);border-bottom:1px solid var(--border);
+    padding:8px;z-index:150;overflow-x:visible;
+  }
+  .hdr-tabs .hdr-tab{width:100%;text-align:left;}
+
+  /* サイドバー(レッスン一覧): 既定は非表示、ハンバーガーボタンで左からのドロワーとして表示 */
+  .side{
+    position:fixed;top:56px;left:0;bottom:0;width:82%;max-width:300px;
+    max-height:none;border-right:1px solid var(--border);border-bottom:none;
+    transform:translateX(-100%);transition:transform .2s ease;
+    z-index:150;box-shadow:2px 0 16px rgba(0,0,0,.4);
+  }
+  .side.mobile-open{transform:translateX(0);}
+  .sidebar-backdrop.show{display:block;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:140;}
 }
 
 /* Random mode button */
@@ -205,6 +243,7 @@ textarea.tinput{min-height:180px;}
 
 <div class="hdr">
   <div class="hdr-left">
+    <button class="menu-toggle" id="sidebar-toggle-btn" onclick="toggleMobileSidebar()" title="レッスン一覧" style="display:none;">☰</button>
     <button class="home-btn" onclick="goHome()" title="ホームへ">🏠 ホーム</button>
     <div class="logo">📚 Study App</div>
   </div>
@@ -212,6 +251,7 @@ textarea.tinput{min-height:180px;}
     <select class="category-select" id="category-select" onchange="onCategoryChange(this.value)">
     </select>
   </div>
+  <button class="menu-toggle" id="tabs-toggle-btn" onclick="toggleMobileTabs()" title="メニュー" style="display:none;margin-left:auto;">☰</button>
   <div class="hdr-tabs" id="hdr-tabs" style="display:none;">
     <button class="hdr-tab on" onclick="setMode('summary')">📄 要約</button>
     <button class="hdr-tab" onclick="setMode('quiz')">❓ 問題</button>
@@ -220,6 +260,7 @@ textarea.tinput{min-height:180px;}
     <button class="hdr-tab" onclick="setMode('history')">📊 履歴</button>
   </div>
 </div>
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
 
 <!-- ホーム画面 -->
 <div id="home-screen" class="home-screen" style="display:none;">
@@ -300,8 +341,7 @@ function load() {
   // 常にホーム画面から開始
   document.getElementById('home-screen').style.display = 'flex';
   document.getElementById('study-layout').style.display = 'none';
-  document.getElementById('hdr-category-area').style.display = 'none';
-  document.getElementById('hdr-tabs').style.display = 'none';
+  setHeaderMenuVisible(false);
   renderHomeScreen();
 
   // GitHub管理のJSON(data/lessons.json)から問題データ・メモを読み込み
@@ -317,12 +357,14 @@ function setMode(m) {
   document.querySelectorAll('.hdr-tab').forEach((b,i) => {
     b.classList.toggle('on', ['summary','quiz','review','weak','history'][i] === m);
   });
+  closeMobileTabs(); // 携帯幅でタブを選んだらプルダウンを閉じる
   renderSidebar();
   renderContent();
 }
 
 function setActiveLesson(id) {
   state.activeLesson = id;
+  closeMobileSidebar(); // 携帯幅でレッスンを選んだらドロワーを閉じる
   renderSidebar();
   renderContent();
 }
@@ -695,14 +737,46 @@ function autoResizeMemo(el) {
   el.style.height = el.scrollHeight + 'px';
 }
 
+// ── ヘッダーメニュー(携帯幅ではハンバーガーメニュー化) ──────────────
+// hdr-category-area・hdr-tabsの表示/非表示と、携帯幅用のハンバーガーボタン2つ
+// (sidebar-toggle-btn・tabs-toggle-btn)の表示/非表示を常に連動させるための
+// 共通関数(2026-09-12追加。画面切替のたびに4要素を個別にdisplay切替していたのを統一)。
+function setHeaderMenuVisible(visible) {
+  document.getElementById('hdr-category-area').style.display = visible ? 'flex' : 'none';
+  document.getElementById('hdr-tabs').style.display = visible ? 'flex' : 'none';
+  document.getElementById('sidebar-toggle-btn').style.display = visible ? '' : 'none';
+  document.getElementById('tabs-toggle-btn').style.display = visible ? '' : 'none';
+  if (!visible) {
+    closeMobileSidebar();
+    closeMobileTabs();
+  }
+}
+
+// 携帯幅(@media max-width:640px)でのみ実際に効く。PC幅ではCSS側で
+// .menu-toggleがdisplay:noneのまま・.hdr-tabs/.sideは通常表示のため、
+// ここでのクラス付け外し自体は見た目に影響しない。
+function toggleMobileSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.getElementById('sidebar-backdrop').classList.toggle('show');
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-backdrop').classList.remove('show');
+}
+function toggleMobileTabs() {
+  document.getElementById('hdr-tabs').classList.toggle('mobile-open');
+}
+function closeMobileTabs() {
+  document.getElementById('hdr-tabs').classList.remove('mobile-open');
+}
+
 // ── ホーム画面 ─────────────────────────────────────────
 function goHome() {
   state.currentCategory = null;
   save();
   document.getElementById('home-screen').style.display = 'flex';
   document.getElementById('study-layout').style.display = 'none';
-  document.getElementById('hdr-category-area').style.display = 'none';
-  document.getElementById('hdr-tabs').style.display = 'none';
+  setHeaderMenuVisible(false);
   renderHomeScreen();
 }
 
@@ -738,8 +812,7 @@ function selectCategory(catName) {
   // ホーム非表示・学習画面表示
   document.getElementById('home-screen').style.display = 'none';
   document.getElementById('study-layout').style.display = 'flex';
-  document.getElementById('hdr-category-area').style.display = 'flex';
-  document.getElementById('hdr-tabs').style.display = 'flex';
+  setHeaderMenuVisible(true);
   // カテゴリセレクト更新
   updateCategorySelect(catName);
   // サイドバー・コンテンツ更新
