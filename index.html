@@ -1570,11 +1570,21 @@ async function loadHistoryFromGithub() {
 }
 
 // data/progress.json(GitHub管理)からクイズの途中経過を読み込み、ローカルに
-// まだ無いqkeyの分だけ補完する(ローカル優先。既にそのqkeyの進捗がローカルに
-// あればGitHub側では上書きしない、既存のcomments/history読込と同じ方針)。
+// 実際の回答が無いqkeyの分だけ補完する(ローカル優先。既に1問でも回答済みの
+// 進捗がローカルにあればGitHub側では上書きしない)。
 // 2026-09-13追加、ユーザー指示「途中までやった内容(1問目・2問目の結果)を、
 // 問題画面を開いたら反映してほしい」。書き込みは「履歴・メモ保存」ボタンを
 // 押した時のみ(saveHistory参照)、読み込みはlessons.json等と同様に毎回行う。
+//
+// 注意: 「ローカルに存在するか」だけでは判定しない。renderQuiz()は問題画面を
+// 開いた時点で(1問も答えていなくても)state.quizState[qkey]に全問null埋めの
+// 空エントリを作ってしまうため、単純な存在チェックだと「一度でも開いたことが
+// ある端末」ではGitHub側の実際の進捗が永久に無視されるバグがあった(2026-09-13
+// 発覚・修正)。「1問でも回答済みか(scoresにnull以外が含まれるか)」で判定する。
+function hasAnyAnswer(qs) {
+  return !!(qs && Array.isArray(qs.scores) && qs.scores.some(s => s !== null));
+}
+
 async function loadProgressFromGithub() {
   try {
     const res = await fetch('data/progress.json', { cache: 'no-store' });
@@ -1583,7 +1593,7 @@ async function loadProgressFromGithub() {
     const remoteProgress = json.progress || {};
     let added = 0;
     Object.keys(remoteProgress).forEach(qkey => {
-      if (!state.quizState[qkey]) {
+      if (!hasAnyAnswer(state.quizState[qkey])) {
         state.quizState[qkey] = remoteProgress[qkey];
         added++;
       }
