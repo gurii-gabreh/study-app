@@ -1568,7 +1568,7 @@ async function loadHistoryFromGithub() {
 // commit e9ab15cで撤去)とは別物で、今回はGitHubのdata/配下JSONへの書き込み専用)。
 // GAS_URLが未設定の間はローカル保存のみで動作する(何もせず正常終了)。
 // 失敗してもローカルの保存・表示はブロックしない(非同期・失敗時はconsole.warnのみ)。
-const GAS_URL = ''; // デプロイ後、発行されたWebアプリURLをここに設定する(gas/README.md参照)
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyGDJV8yypaJFzoGEXzL7LoDJqv5tCMc7tiEqoZVA-bPmCeXF0w8Z4Z9DBcQOdeO4w/exec'; // 2026-09-13設定
 
 async function syncToRepo(action, payload) {
   if (!GAS_URL) return;
