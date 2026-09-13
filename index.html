@@ -349,6 +349,7 @@ function load() {
   //   (読み込みは従来通りGitHub Pages上の静的JSONを直接fetch。gas/README.md参照)
   loadLessonsFromGithub();
   loadHistoryFromGithub();
+  loadProgressFromGithub();
 }
 
 // ── Mode ───────────────────────────────────────────────
@@ -557,7 +558,7 @@ function renderQuiz(el, lesson, isReview) {
       ${!isReview && errCount > 0 ? `<span class="err-chip">🔴 ${errCount}問ミス</span>` : ''}
       <button class="btn" onclick="resetQuiz('${qkey}',${isReview})">🔄 リセット</button>
       <button class="btn${randOn?' btn-rand-on':''}" onclick="toggleRandom()" title="選択肢の順番をランダムに表示">🔀 ランダム${randOn?' ON':' OFF'}</button>
-      ${answered > 0 ? `<button class="btn btn-y" onclick="saveHistory('${lid}','${qkey}')">💾 履歴保存</button>` : ''}
+      ${answered > 0 ? `<button class="btn btn-y" onclick="saveHistory('${lid}','${qkey}')" title="履歴・メモ・ここまでの問題回答状況(何問目まで解いたか)をまとめてGitHubへ保存し、他の端末・ブラウザでも見られるようにします">💾 履歴・メモ保存</button>` : ''}
     </div>
   `;
 
@@ -1163,11 +1164,17 @@ function saveHistory(lid, qkey) {
   save();
 
   renderContent();
-  showToast('📊 履歴を保存しました');
+  showToast('📊 履歴・メモ・回答状況を保存しました');
 
   // GitHub(data/history.json)へも保存し、端末間で共有する(2026-09-12、GAS中継経由で復活。
   // 通信は非同期・失敗してもローカル表示はブロックしない。詳細はgas/README.md参照)
   syncToRepo('saveHistory', { record });
+
+  // クイズの途中経過(quizState)もあわせて同期する(2026-09-13追加、ユーザー指示
+  // 「途中までやった内容(例: 1問目・2問目の結果)を、問題画面を開いたら反映してほしい」)。
+  // 1問答えるごとの自動同期ではなく、この「履歴保存」ボタンを押した時にだけ送る
+  // (ユーザー判断: commitが増えすぎるのを避けるため)。
+  syncToRepo('saveProgress', { qkey, quizState: qs });
 }
 
 
@@ -1181,7 +1188,7 @@ function renderHistory(el) {
     : state.history;
 
   if (history.length === 0) {
-    el.innerHTML = `<div class="welcome"><div style="font-size:48px;">📊</div><h2>履歴がありません</h2><p>問題モードで回答後「履歴保存」ボタンを押すと記録されます。</p></div>`;
+    el.innerHTML = `<div class="welcome"><div style="font-size:48px;">📊</div><h2>履歴がありません</h2><p>問題モードで回答後「履歴・メモ保存」ボタンを押すと、履歴・メモ・ここまでの回答状況がまとめて記録されます。</p></div>`;
     return;
   }
 
@@ -1559,6 +1566,35 @@ async function loadHistoryFromGithub() {
   } catch (err) {
     console.error('履歴データ読込エラー(GitHub JSON):', err);
     // 取得に失敗した場合はlocalStorageの履歴をそのまま使用(特に何もしない)
+  }
+}
+
+// data/progress.json(GitHub管理)からクイズの途中経過を読み込み、ローカルに
+// まだ無いqkeyの分だけ補完する(ローカル優先。既にそのqkeyの進捗がローカルに
+// あればGitHub側では上書きしない、既存のcomments/history読込と同じ方針)。
+// 2026-09-13追加、ユーザー指示「途中までやった内容(1問目・2問目の結果)を、
+// 問題画面を開いたら反映してほしい」。書き込みは「履歴・メモ保存」ボタンを
+// 押した時のみ(saveHistory参照)、読み込みはlessons.json等と同様に毎回行う。
+async function loadProgressFromGithub() {
+  try {
+    const res = await fetch('data/progress.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const remoteProgress = json.progress || {};
+    let added = 0;
+    Object.keys(remoteProgress).forEach(qkey => {
+      if (!state.quizState[qkey]) {
+        state.quizState[qkey] = remoteProgress[qkey];
+        added++;
+      }
+    });
+    if (added > 0) {
+      save();
+      renderContent(); // 既に問題画面を開いていた場合、反映済みの回答状況を表示し直す
+    }
+  } catch (err) {
+    console.error('進捗データ読込エラー(GitHub JSON):', err);
+    // 取得に失敗した場合はlocalStorageの進捗をそのまま使用(特に何もしない)
   }
 }
 

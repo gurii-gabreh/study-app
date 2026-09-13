@@ -114,6 +114,19 @@ function saveMemo_(key, text) {
   });
 }
 
+// クイズの途中経過(quizState)をqkeyごとに丸ごと上書き保存する。2026-09-13追加、
+// ユーザー指示「途中までやった内容(例: 1問目・2問目の結果)を、問題画面を開いたら
+// 反映してほしい」。「💾 履歴保存」ボタンを押した時にだけ呼ばれる(自動同期はしない。
+// 1問答えるごとに毎回commitすると数が増えすぎるため、ユーザー判断でボタン押下時のみに)。
+function saveProgress_(qkey, quizState) {
+  return withRetry_(() => {
+    const { sha, data } = ghGet_('data/progress.json');
+    data.progress = data.progress || {};
+    data.progress[qkey] = quizState;
+    ghPut_('data/progress.json', data, sha, `progress: ${qkey}`);
+  });
+}
+
 function doPost(e) {
   let result = { status: 'error', message: 'unknown action' };
   try {
@@ -123,6 +136,9 @@ function doPost(e) {
       result = { status: 'ok' };
     } else if (body.action === 'saveMemo') {
       saveMemo_(body.key, body.text);
+      result = { status: 'ok' };
+    } else if (body.action === 'saveProgress') {
+      saveProgress_(body.qkey, body.quizState);
       result = { status: 'ok' };
     }
   } catch (err) {

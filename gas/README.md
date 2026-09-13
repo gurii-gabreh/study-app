@@ -2,9 +2,11 @@
 
 ## これは何か
 
-study-appはGitHub Pages上の静的サイトで、サーバーを持っていません。履歴(`data/history.json`)・メモ(`data/lessons.json`のcomments)をGitHubリポジトリに書き込んで端末間で共有するには、書き込み権限を持つ認証情報(GitHub PAT)が必要ですが、これをブラウザ側(誰でも開発者ツールで見られる環境)に直接持たせるのは避け、このGoogle Apps Script(GAS)をサーバー側の中継(リレー)役として使います。PATはこのGASの「スクリプト プロパティ」にのみ保存され、ブラウザには一切渡りません。
+study-appはGitHub Pages上の静的サイトで、サーバーを持っていません。履歴(`data/history.json`)・メモ(`data/lessons.json`のcomments)・クイズの途中経過(`data/progress.json`、2026-09-13追加)をGitHubリポジトリに書き込んで端末間で共有するには、書き込み権限を持つ認証情報(GitHub PAT)が必要ですが、これをブラウザ側(誰でも開発者ツールで見られる環境)に直接持たせるのは避け、このGoogle Apps Script(GAS)をサーバー側の中継(リレー)役として使います。PATはこのGASの「スクリプト プロパティ」にのみ保存され、ブラウザには一切渡りません。
 
-読み込み側(履歴・メモを表示する)は、GAS経由ではなく`data/history.json`・`data/lessons.json`をGitHub Pagesから直接fetchするだけです(認証不要、静的配信なので)。このGASは**書き込み専用**です。
+読み込み側(履歴・メモ・途中経過を表示する)は、GAS経由ではなく`data/history.json`・`data/lessons.json`・`data/progress.json`をGitHub Pagesから直接fetchするだけです(認証不要、静的配信なので)。このGASは**書き込み専用**です。
+
+クイズの途中経過(`data/progress.json`)は、1問答えるごとの自動同期ではなく、**「💾 履歴・メモ保存」ボタンを押した時にだけ**その時点のクイズ状態(qs)を丸ごと上書き保存します(ユーザー判断: 自動同期だとcommitが増えすぎるため)。
 
 旧GAS連携(Googleスプレッドシートへの書き込み。commit `e9ab15c`で意図的に撤去)とは別物です。今回はスプレッドシートを使わず、GitHubリポジトリのJSONファイルへ直接書き込みます。
 
@@ -26,4 +28,4 @@ study-appはGitHub Pages上の静的サイトで、サーバーを持ってい�
 
 ## 動作確認
 
-デプロイ後、study-appで1問解いて「履歴を保存」し、数秒待ってから`data/history.json`(GitHub上)に新しいレコードが増えているか確認してください。メモも同様に、入力して1.5秒待てば`data/lessons.json`の`comments`に反映されます。反映されない場合は、GASのプロジェクトの「実行数」(左メニュー)でエラーログを確認してください。
+デプロイ後、study-appで1問解いて「履歴・メモ保存」を押し、数秒待ってから`data/history.json`(GitHub上)に新しいレコードが、`data/progress.json`にそのレッスンの途中経過が、それぞれ増えているか確認してください。メモも同様に、入力して1.5秒待てば`data/lessons.json`の`comments`に反映されます。反映されない場合は、GASのプロジェクトの「実行数」(左メニュー)でエラーログを確認してください。
