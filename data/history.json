@@ -1,3 +1,67 @@
 {
-  "history": []
+  "history": [
+    {
+      "id": "1789275325505_535p8",
+      "lessonId": "令和2年_令和2年",
+      "category": "基本情報技術者試験",
+      "course": "令和2年",
+      "lesson": "令和2年",
+      "title": "令和2年",
+      "correct": 8,
+      "total": 47,
+      "date": "2026/09/13 13:55",
+      "wrongs": [
+        4
+      ],
+      "scores": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ]
 }
