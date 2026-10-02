@@ -59,6 +59,24 @@ never followed up. This update folds that ad-hoc procedure into this skill
 (Part A below) specifically so the "report remaining items" step always ends
 in a tracked task, not a chat message that can be forgotten.
 
+## `tex-image-extraction` (Text-Extraction repo) is superseded for this purpose (2026-10-02)
+
+That sibling skill (`gurii-gabreh/Text-Extraction`'s `tex-image-extraction`)
+reads the same kind of Drive screenshot folders, but writes to a new Google
+Spreadsheet for manual review instead of to a repo. Checked against actual
+history (TEX-001, TEX-002, TEX-003): every one of its outputs was eventually
+hand-transcribed into study-app's `data/lessons.json` anyway — no other
+destination was ever found for it. Part A below does that same job directly,
+without the spreadsheet hop. So as of 2026-10-02 (user decision), it has no
+remaining real-world use for study-app question sets, and it's removed from
+the dashboard's 🤖AI基本設定 tab (`progress-tracker-dashboard`'s
+`data/ai-config.json`, `web.customSkills.table`) so it doesn't come up as a
+candidate. Per explicit instruction, its skill file itself
+(`Text-Extraction` repo's `.claude/skills/tex-image-extraction/SKILL.md`) and
+its entry in `ai-config.json`'s `ai.customSkills.registry` are both left in
+place (marked `"status": "superseded"` there) rather than deleted, in case a
+genuinely different, non-study-app use for it ever comes up.
+
 ## Part A: transcribing a Drive folder of screenshot images
 
 Use this when the input is a Google Drive folder of raw exam-screenshot
