@@ -147,14 +147,18 @@ when the destination is study-app.
    needed: actually produce the crop yourself (per CLAUDE.md rule 15 — don't
    defer the whole thing to the user when the work is doable). Crop + save +
    palette-quantize using the same method as `tex-image-extraction`'s step
-   4, then **upload all of this run's crops together into one new subfolder
-   inside the *source* Drive folder** (reuse an existing crops subfolder if
-   one's already there, same as `tex-image-extraction`). This folder is a
-   staging area, not the final destination — note its URL, you'll report it
-   in Part B step 2. **Continue directly into Part B below within this same
-   run** (don't stop and wait for the user to separately invoke the Part B
-   trigger phrase — that phrase is for re-running Part B alone later, not a
-   gate on finishing this run) for how each crop actually lands in the repo.
+   4. Where you put the result depends on which Part B path applies (decided
+   in Part B's own first step) — if study-app is already cloned locally in
+   this session (**Path A**, the default), save the crop straight into that
+   clone's `images/<course-slug>/` and skip Drive entirely; only if it isn't
+   (**Path B**, the fallback) do you upload it to a new subfolder inside the
+   *source* Drive folder as a staging area (reuse an existing crops subfolder
+   if one's already there, same as `tex-image-extraction`) and note its URL
+   for Part B step 2's report. **Continue directly into Part B below within
+   this same run** (don't stop and wait for the user to separately invoke
+   the Part B trigger phrase — that phrase is for re-running Part B alone
+   later, not a gate on finishing this run) for how each crop actually lands
+   in the repo.
 
 6. **Write the clean bucket into `data/lessons.json`** via a Python script
    (rule 22 — this file is large). Match the existing schema:
@@ -217,38 +221,54 @@ figure-needing questions are already known.
 generated output** (that's the specific thing that caused the 2026-09-08
 corruption — see above). Producing the crop file itself (reading an
 already-downloaded/already-local image, cropping/palette-quantizing with
-Bash+PIL, saving back to disk, uploading to Drive) is fine — that's
-file-to-file, nothing binary ever passes through Claude's generated text.
-What's not fine is Claude typing out byte/base64 content as part of a tool
-call, or committing straight from a Drive hotlink. So:
+Bash+PIL, saving back to disk) is fine — that's file-to-file, nothing binary
+ever passes through Claude's generated text. What's not fine is Claude
+typing out byte/base64 content as part of a tool call (e.g. a
+`base64Content` parameter to an upload tool), or committing straight from a
+Drive hotlink.
 
-1. Decide the target path following the existing convention:
-   `images/<course-slug>/q<N>_<short-english-slug>.png` (e.g.
-   `images/kihon-jouhou-h30-aki/q22_nand-circuit.png`). Set the quiz item's
-   `img` field in `data/lessons.json` to
-   `https://raw.githubusercontent.com/gurii-gabreh/study-app/main/<that path>`
-   **before the file exists at that path** — this is safe, since a missing
-   image just fails to load (handled by the existing `onerror` fallback in
-   `index.html`), and it means no further JSON edit is needed once the file
-   lands.
-2. **Report back to the user, as the actual output of this task** (per
-   explicit user instruction, 2026-10-02) **all of the following**:
-   - the Drive folder URL from Part A step 5 where this run's crops are all
-     staged together (so the user has one place to grab every file from),
-   - a short table — question number / description / exact target repo path
-     — and for each row, the **GitHub upload URL** for that exact folder:
+**First, decide which path applies** (2026-10-02, user decision: Path A is
+the default, Path B is the explicit fallback — don't use B just because it's
+the older/more-documented one):
+
+- **Path A — study-app is already cloned locally in this session** (check
+  e.g. `git -C /home/user/study-app rev-parse HEAD` succeeds): copy the crop
+  file straight into that clone's `images/<course-slug>/` (plain `cp`/file
+  write, not through Drive at all), `git add`/commit/push it together with
+  (or right alongside) the `data/lessons.json` change from Part A step 7.
+  This is strictly file-to-file the whole way — no base64 typed by Claude,
+  no Drive staging, no user action needed at all. This is how the
+  2026-10-02 平成31年春期 run (STU-003) actually did it, after discovering
+  Path B's Drive-staging dance was unnecessary overhead when a local clone
+  already exists.
+- **Path B — study-app is NOT locally cloned in this session** (a fresh
+  session, or this skill is somehow invoked without `add_repo`-ing
+  study-app first): fall back to the original design — upload the crop to a
+  Drive staging folder (Part A step 5), then hand the user a manual step:
+  1. Decide the target path following the existing convention:
+     `images/<course-slug>/q<N>_<short-english-slug>.png` (e.g.
+     `images/kihon-jouhou-h30-aki/q22_nand-circuit.png`). Set the quiz
+     item's `img` field in `data/lessons.json` to
+     `https://raw.githubusercontent.com/gurii-gabreh/study-app/main/<that path>`
+     **before the file exists at that path** — safe, since a missing image
+     just fails to load (`onerror` fallback in `index.html`), so no further
+     JSON edit is needed once the file lands.
+  2. **Report back to the user, as the actual output of this task, all of
+     the following**: the Drive folder URL where this run's crops are
+     staged together, and a short table — question number / description /
+     exact target repo path — with, per row, the **GitHub upload URL** for
+     that folder:
      `https://github.com/gurii-gabreh/study-app/upload/main/images/<course-slug>`
      (GitHub's own "upload files to this folder" page — the user opens it
      and drags the matching file in, named exactly as the target path's
-     filename).
-   Do not attempt to commit the image content yourself.
-3. The user places the real image files at those exact paths themselves
-   (via the GitHub upload URL from step 2, or git).
-   This is the only path from "image exists somewhere" to "image exists in
-   the repo" that this skill uses.
-4. Once the user confirms the files are in place, verify with a read-only
-   check (e.g. `git log`/`ls` after they push, or ask them to confirm in the
-   live app) rather than assuming — do not mark the task done on faith.
+     filename). Do not attempt to commit the image content yourself.
+  3. The user places the real image files at those exact paths themselves
+     (via that GitHub upload URL, or git) — the only path from "image
+     exists somewhere" to "image exists in the repo" that Path B uses.
+
+Either path, **verify once done**: `ls`/`git log` the committed files (Path
+A) or wait for the user's confirmation and then check (Path B) — don't mark
+the task done on faith.
 
 ## Non-goals / things not to do
 
