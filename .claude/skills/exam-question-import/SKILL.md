@@ -144,14 +144,17 @@ when the destination is study-app.
      fixed from Drive data; it needs a fresh screenshot from the user.
 
 5. **Crops for the needs_image_verify bucket**, when a crop is genuinely
-   needed: upload to a new subfolder inside the *source* Drive folder is NOT
-   the target here (unlike `tex-image-extraction`, which stays within
-   Drive) — this skill's destination is GitHub. **Continue directly into
-   Part B below within this same run** (don't stop and wait for the user to
-   separately invoke the Part B trigger phrase — that phrase is for
-   re-running Part B alone later, not a gate on finishing this run) for how
-   the crop actually lands in the repo (GitHub raw URL, user places the
-   file).
+   needed: actually produce the crop yourself (per CLAUDE.md rule 15 — don't
+   defer the whole thing to the user when the work is doable). Crop + save +
+   palette-quantize using the same method as `tex-image-extraction`'s step
+   4, then **upload all of this run's crops together into one new subfolder
+   inside the *source* Drive folder** (reuse an existing crops subfolder if
+   one's already there, same as `tex-image-extraction`). This folder is a
+   staging area, not the final destination — note its URL, you'll report it
+   in Part B step 2. **Continue directly into Part B below within this same
+   run** (don't stop and wait for the user to separately invoke the Part B
+   trigger phrase — that phrase is for re-running Part B alone later, not a
+   gate on finishing this run) for how each crop actually lands in the repo.
 
 6. **Write the clean bucket into `data/lessons.json`** via a Python script
    (rule 22 — this file is large). Match the existing schema:
@@ -196,6 +199,10 @@ when the destination is study-app.
 9. **Report to the user**: total images, clean count (now in `lessons.json`,
    with the commit hash), needs_image_verify question numbers, needs_recapture
    question numbers, and the `STU-NNN` task ID where the remainder is tracked.
+   If any needs_image_verify items exist, this report also includes Part B's
+   own report (step 2 below) in the same message — the Drive staging folder
+   URL and, per question, the target repo path plus its GitHub upload URL.
+   Don't split these into two separate replies.
 
 ## Part B: image-reference handling (for questions whose figure must stay visual)
 
@@ -206,8 +213,14 @@ a direct continuation of Part A (same run, same report at the end) or
 standalone via its own trigger phrase (see "Trigger phrases" above) when the
 figure-needing questions are already known.
 
-**Claude does not fetch, transcribe, or embed image bytes itself, ever, for
-this workflow.** Instead:
+**Claude never writes image bytes into the GitHub repo through its own
+generated output** (that's the specific thing that caused the 2026-09-08
+corruption — see above). Producing the crop file itself (reading an
+already-downloaded/already-local image, cropping/palette-quantizing with
+Bash+PIL, saving back to disk, uploading to Drive) is fine — that's
+file-to-file, nothing binary ever passes through Claude's generated text.
+What's not fine is Claude typing out byte/base64 content as part of a tool
+call, or committing straight from a Drive hotlink. So:
 
 1. Decide the target path following the existing convention:
    `images/<course-slug>/q<N>_<short-english-slug>.png` (e.g.
@@ -218,12 +231,19 @@ this workflow.** Instead:
    image just fails to load (handled by the existing `onerror` fallback in
    `index.html`), and it means no further JSON edit is needed once the file
    lands.
-2. **Report back to the user, as the actual output of this task, exactly
-   which questions need an image and the exact repo path each one expects**
-   (a short table: question number / description / target path is enough).
-   Do not attempt to produce the image content yourself.
+2. **Report back to the user, as the actual output of this task** (per
+   explicit user instruction, 2026-10-02) **all of the following**:
+   - the Drive folder URL from Part A step 5 where this run's crops are all
+     staged together (so the user has one place to grab every file from),
+   - a short table — question number / description / exact target repo path
+     — and for each row, the **GitHub upload URL** for that exact folder:
+     `https://github.com/gurii-gabreh/study-app/upload/main/images/<course-slug>`
+     (GitHub's own "upload files to this folder" page — the user opens it
+     and drags the matching file in, named exactly as the target path's
+     filename).
+   Do not attempt to commit the image content yourself.
 3. The user places the real image files at those exact paths themselves
-   (direct upload to the repo — e.g. GitHub's web UI drag-and-drop, or git).
+   (via the GitHub upload URL from step 2, or git).
    This is the only path from "image exists somewhere" to "image exists in
    the repo" that this skill uses.
 4. Once the user confirms the files are in place, verify with a read-only
