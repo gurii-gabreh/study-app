@@ -100,6 +100,7 @@ textarea.tinput{min-height:180px;}
 .copy-row{display:flex;justify-content:flex-end;margin-bottom:8px;}
 
 /* Quiz */
+.quiz-sticky-hdr{position:sticky;top:0;z-index:5;background:var(--bg);margin:0 -24px;padding:0 24px 4px;}
 .quiz-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .score-chip{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:var(--green);background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--r);padding:4px 14px;}
 .err-chip{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--red);background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r);padding:4px 12px;}
@@ -173,7 +174,14 @@ textarea.tinput{min-height:180px;}
 .sidebar-backdrop{display:none;}
 @media(max-width:640px){
   .layout{grid-template-columns:1fr;}
-  .content{max-height:none;}
+  .content{max-height:none;overflow-y:visible;}
+  /* .contentがoverflow-y:autoのままだと(中身が収まっていてもCSS上は)独自の
+     スクロールコンテナとみなされ続け、quiz-sticky-hdrのposition:stickyがbody側の
+     スクロールに反応しなくなる(.contentには一切スクロールが発生しないため)。
+     overflow-y:visibleに変えて.content自身のスクロールコンテナ化を解除し、bodyの
+     スクロールに対してstickyが機能するようにする。あわせてtop基準も.hdr(56px)の下へ
+     合わせる(top:0のままだと.hdrの裏に隠れてしまう)。2026-10-20追加 */
+  .quiz-sticky-hdr{top:56px;}
 
   /* ハンバーガーボタン自体は携帯幅でのみ表示する(PC幅ではdisplay:noneのまま) */
   .menu-toggle{display:inline-flex;align-items:center;justify-content:center;padding:6px 8px;}
@@ -549,16 +557,18 @@ function renderQuiz(el, lesson, isReview) {
 
   const randOn = state.randomMode;
   let html = `
-    <div class="sec-hdr">
-      <span class="course-chip">${lesson.course} · ${lesson.lesson}</span>
-      <span class="sec-title">${lesson.title}${isReview?' — 復習モード':''}</span>
-    </div>
-    <div class="quiz-bar">
-      <span class="score-chip">${correct} / ${answered}</span>
-      ${!isReview && errCount > 0 ? `<span class="err-chip">🔴 ${errCount}問ミス</span>` : ''}
-      <button class="btn" onclick="resetQuiz('${qkey}',${isReview})">🔄 リセット</button>
-      <button class="btn${randOn?' btn-rand-on':''}" onclick="toggleRandom()" title="選択肢の順番をランダムに表示">🔀 ランダム${randOn?' ON':' OFF'}</button>
-      ${answered > 0 ? `<button class="btn btn-y" onclick="saveHistory('${lid}','${qkey}')" title="履歴・メモ・ここまでの問題回答状況(何問目まで解いたか)をまとめてGitHubへ保存し、他の端末・ブラウザでも見られるようにします">💾 履歴・メモ保存</button>` : ''}
+    <div class="quiz-sticky-hdr">
+      <div class="sec-hdr">
+        <span class="course-chip">${lesson.course} · ${lesson.lesson}</span>
+        <span class="sec-title">${lesson.title}${isReview?' — 復習モード':''}</span>
+      </div>
+      <div class="quiz-bar">
+        <span class="score-chip">${correct} / ${answered}</span>
+        ${!isReview && errCount > 0 ? `<span class="err-chip">🔴 ${errCount}問ミス</span>` : ''}
+        <button class="btn" onclick="resetQuiz('${qkey}',${isReview})">🔄 リセット</button>
+        <button class="btn${randOn?' btn-rand-on':''}" onclick="toggleRandom()" title="選択肢の順番をランダムに表示">🔀 ランダム${randOn?' ON':' OFF'}</button>
+        ${answered > 0 ? `<button class="btn btn-y" onclick="saveHistory('${lid}','${qkey}')" title="履歴・メモ・ここまでの問題回答状況(何問目まで解いたか)をまとめてGitHubへ保存し、他の端末・ブラウザでも見られるようにします">💾 履歴・メモ保存</button>` : ''}
+      </div>
     </div>
   `;
 
